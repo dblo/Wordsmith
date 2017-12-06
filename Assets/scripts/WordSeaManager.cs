@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class WordSeaManager : MonoBehaviour {
 
+    public ButtonBar buttonBar;
+
 	// Use this for initialization
 	void Start () {
 		
@@ -13,4 +15,9 @@ public class WordSeaManager : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    internal bool WordClicked(string v)
+    {
+        return buttonBar.TryAdd(v);
+    }
 }
