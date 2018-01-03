@@ -1,0 +1,18 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class Line
+{
+    List<string> words = new List<string>();
+
+    public Line(List<string> aWords)
+    {
+        words = aWords;
+    }
+
+    public override string ToString()
+    {
+        return string.Join(" ", words.ToArray());
+    }
+}

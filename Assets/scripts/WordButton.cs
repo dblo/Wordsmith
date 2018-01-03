@@ -6,20 +6,24 @@ using UnityEngine.UI;
 
 public class WordButton : MonoBehaviour
 {
-    private WordSeaManager parent;
+    private WordSeaManager wordSea;
+    private Text text;
+    private Button button;
 
     void Start()
     {
-        parent = GetComponentInParent<WordSeaManager>();
-        Button button = GetComponent<Button>();
+        wordSea = GetComponentInParent<WordSeaManager>();
+        button = GetComponent<Button>();
+        text = button.GetComponentInChildren<Text>();
         button.onClick.AddListener(() => OnClick());
     }
 
     private void OnClick()
     {
-        if(parent.WordClicked("foo"))
+        if(wordSea.WordClicked(text.text))
         {
-            GetComponentInChildren<Text>().text = "";
+            text.text = "";
+            button.interactable = false;
         }
     }
 }

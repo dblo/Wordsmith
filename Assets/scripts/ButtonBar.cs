@@ -6,22 +6,53 @@ using UnityEngine.UI;
 
 public class ButtonBar : MonoBehaviour
 {
-    public Button button1;
-    public Button button2;
-    public Button button3;
-    public Button button4;
-
+    public Button[] buttons;
+    public LineLog linelog;
     private int currentButton = 0;
+    public WordSeaManager wordSea;
 
     internal bool TryAdd(string v)
     {
-        switch (currentButton)
+        if (AllWordsChosen())
+            return false;
+
+        var text = buttons[currentButton].GetComponentInChildren<Text>();
+        text.text = v;
+        currentButton++;
+        return true;
+    }
+
+    internal void Reset()
+    {
+        foreach (var btn in buttons)
         {
-            case 0:
-                var text = button1.GetComponentInChildren<Text>();
-                text.text = v;
-                return true;
+            btn.GetComponentInChildren<Text>().text = "";
         }
-        return false;
+        currentButton = 0;
+    }
+
+    public void TryAcceptLine()
+    {
+        if (AllWordsChosen())
+        {
+            linelog.AddNewLine(MakeLine());
+            Reset();
+            wordSea.Reset();
+        }
+    }
+
+    Line MakeLine()
+    {
+        List<string> words = new List<string>(buttons.Length);
+        foreach (var button in buttons)
+        {
+            words.Add(button.GetComponentInChildren<Text>().text);
+        }
+        return new Line(words);
+    }
+
+    private bool AllWordsChosen()
+    {
+        return currentButton == buttons.Length;
     }
 }
