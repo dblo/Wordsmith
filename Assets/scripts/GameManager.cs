@@ -5,10 +5,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-
     private static GameManager _instance;
-
-    public ButtonBar buttonBar;
 
     public static GameManager Instance
     {
@@ -21,4 +18,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+    }
 }
