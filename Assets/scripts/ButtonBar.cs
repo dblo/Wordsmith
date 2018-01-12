@@ -7,9 +7,9 @@ using UnityEngine.UI;
 public class ButtonBar : MonoBehaviour
 {
     public Button[] buttons;
-    public LineLog linelog;
     private int currentButton = 0;
     public WordSeaManager wordSea;
+    public GameManager gm;
 
     internal bool TryAdd(string v)
     {
@@ -35,7 +35,7 @@ public class ButtonBar : MonoBehaviour
     {
         if (AllWordsChosen())
         {
-            linelog.AddNewLine(MakeLine());
+            gm.AddNewLine(MakeLine(), Player.Player1);
             Reset();
             wordSea.Reset();
         }

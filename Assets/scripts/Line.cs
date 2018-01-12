@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 public class Line
 {
-    List<string> words = new List<string>();
+    private List<string> words = new List<string>();
+
+    public int Length { get { return words.Count; } }
 
     public Line(List<string> aWords)
     {
