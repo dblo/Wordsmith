@@ -21,14 +21,26 @@ public class WordSeaManager : MonoBehaviour
                                          "cow", "wrench", "tremble", "surround",
                                          "same", "double", "road" };
 
+    internal void ReturnWord(Button btn)
+    {
+        var text = btn.GetComponentInChildren<Text>();
+        text.color = new Color(50f / 255, 50f / 255, 50f / 255, 255);
+        btn.interactable = true;
+    }
+
     private void Start()
     {
         Reset();
     }
 
-    internal bool WordClicked(string v)
+    public void WordClicked(Button btn)
     {
-        return buttonBar.TryAdd(v);
+        var text = btn.GetComponentInChildren<Text>();
+        if (buttonBar.TryAdd(btn))
+        {
+            text.color = new Color(0,0,0,0);
+            btn.interactable = false;
+        }
     }
 
     internal void Reset()
