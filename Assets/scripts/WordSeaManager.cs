@@ -24,8 +24,13 @@ public class WordSeaManager : MonoBehaviour
     internal void ReturnWord(Button btn)
     {
         var text = btn.GetComponentInChildren<Text>();
-        text.color = new Color(50f / 255, 50f / 255, 50f / 255, 255);
+        UseDefaultColor(text);
         btn.interactable = true;
+    }
+
+    private static void UseDefaultColor(Text text)
+    {
+        text.color = new Color(50f / 255, 50f / 255, 50f / 255, 255);
     }
 
     private void Start()
@@ -38,9 +43,14 @@ public class WordSeaManager : MonoBehaviour
         var text = btn.GetComponentInChildren<Text>();
         if (buttonBar.TryAdd(btn))
         {
-            text.color = new Color(0,0,0,0);
+            UseTransparantColor(text);
             btn.interactable = false;
         }
+    }
+
+    private static void UseTransparantColor(Text text)
+    {
+        text.color = new Color(0, 0, 0, 0);
     }
 
     internal void Reset()
@@ -50,7 +60,9 @@ public class WordSeaManager : MonoBehaviour
 
         for (int i = 0; i < words.Length; i++)
         {
-            buttons[i].GetComponentInChildren<Text>().text = words[i];
+            var text = buttons[i].GetComponentInChildren<Text>();
+            text.text = words[i];
+            UseDefaultColor(text); 
             currentSea.Add(words[i]);
             buttons[i].interactable = true;
         }

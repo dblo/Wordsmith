@@ -69,6 +69,7 @@ public class ButtonBar : MonoBehaviour
             btn.GetComponentInChildren<Text>().text = "";
         }
         currentButton = 0;
+        buttonMap.Clear();
     }
 
     public void TryAcceptLine()
