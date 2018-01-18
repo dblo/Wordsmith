@@ -20,6 +20,7 @@ public class WordSeaManager : MonoBehaviour
                                          "insurance", "groan", "remarkable", "print",
                                          "cow", "wrench", "tremble", "surround",
                                          "same", "double", "road" };
+    string[] library2 = new string[] { "is", "are", "you", "what", "when", "like", "a", "your" };
 
     internal void ReturnWord(Button btn)
     {
@@ -53,7 +54,11 @@ public class WordSeaManager : MonoBehaviour
     internal void Reset()
     {
         currentSea.Clear();
-        var words = GenerateUniqueWords(buttons.Count, library);
+        var words1 = GenerateUniqueWords(buttons.Count - 3, library);
+        var words2 = GenerateUniqueWords(3, library2);
+        string[] words = new string[words1.Length + words2.Length];
+        words1.CopyTo(words, 0);
+        words2.CopyTo(words, words1.Length);
 
         for (int i = 0; i < words.Length; i++)
         {
