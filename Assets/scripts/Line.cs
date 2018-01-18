@@ -4,23 +4,23 @@ using System.Collections.Generic;
 
 public class Line
 {
-    private List<string> words = new List<string>();
-    private List<Color> colors = new List<Color>();
+    private string[] words;
+    private string[] colors;
 
-    public int Length { get { return words.Count; } }
+    public int Length { get { return words.Length; } }
 
-    public Line(List<string> aWords)
+    public Line(string[] words, string[] colors)
     {
-        words = aWords;
-
-        for (int i = 0; i < Length; i++)
-        {
-            colors.Add(Color.black);
-        }
+        this.words = words;
+        this.colors = colors;
     }
 
     public override string ToString()
     {
-        return string.Join(" ", words.ToArray());
+        string str = "";
+        for (int i = 0; i < words.Length - 1; i++)
+            str += "<color=" + colors[i] + ">" + words[i] + "</color>" + " ";
+        str += "<color=" + colors[words.Length - 1] + ">" + words[words.Length - 1] + "</color>";
+        return str;
     }
 }

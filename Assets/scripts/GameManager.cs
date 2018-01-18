@@ -1,46 +1,58 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-
+﻿using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public Text p1text;
-    public Text p2text;
+    public LineLog p1Log;
+    public LineLog p2Log;
     public WordSeaManager wordSea;
-
-    private List<Line> p1Lines = new List<Line>();
-    private List<Line> p2Lines = new List<Line>();
+    public int linesInAGame = 5;
 
     private void Awake()
     {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        p1Log.SetLinesInAGame(linesInAGame);
+        p2Log.SetLinesInAGame(linesInAGame);
     }
 
-    internal void AddNewLine(Line line, Player player)
+    internal void LineChosen(string[] words, Player player)
     {
-        AddLine(line, player);
-        AddLine(new Line(new List<string>(wordSea.PickRandomWordsFromSea(line.Length))), Player.Player2);
-    }
+        var p2words = wordSea.PickRandomWordsFromSea(words.Length);
+        string[] p1WordsCopy = (string[]) words.Clone();
+        string[] p2WordsCopy = (string[]) p2words.Clone();
+        string[] p1Colors = new string[words.Length];
+        string[] p2Colors = new string[words.Length];
 
-    private void AddLine(Line line, Player player)
-    {
-        Text playerText = player == Player.Player1 ? p1text : p2text;
-        List<Line> playerLines = player == Player.Player1 ? p1Lines: p2Lines;
-
-        if (playerLines.Count == 6)
+        for (int i = 0; i < p1Colors.Length; i++)
         {
-            playerLines.Clear();
-            playerText.text = "";
+            p1Colors[i] = "red";
+            p2Colors[i] = "red";
         }
-
-        playerLines.Add(line);
-
-        if (playerLines.Count > 1)
-            playerText.text = playerText.text += "\n" + line.ToString();
-        else
-            playerText.text = line.ToString();
+        for (int i = 0; i < p1WordsCopy.Length; i++)
+        {
+            if (p1WordsCopy[i].Equals(p2WordsCopy[i]))
+            {
+                p1Colors[i] = "green";
+                p2Colors[i] = "green";
+                p1WordsCopy[i] = null;
+                p2WordsCopy[i] = null;
+            }
+        }
+        for (int i = 0; i < p1WordsCopy.Length; i++)
+        {
+            if(p1WordsCopy[i] != null)
+            {
+                for (int j = 0; j < p2WordsCopy.Length; j++)
+                {
+                    if (p1WordsCopy[i].Equals(p2WordsCopy[j]))
+                    {
+                        p1Colors[i] = "yellow";
+                        p2Colors[j] = "yellow";
+                        p2WordsCopy[j] = null;
+                    }
+                }
+            }
+        }
+        p1Log.AddLine(new Line(words, p1Colors));
+        p2Log.AddLine(new Line(p2words, p2Colors));
     }
 }

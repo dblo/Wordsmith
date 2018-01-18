@@ -81,21 +81,21 @@ public class ButtonBar : MonoBehaviour
     {
         if (AllWordsChosen())
         {
-            gm.AddNewLine(MakeLine(), Player.Player1);
+            gm.LineChosen(GetWords(), Player.Player1);
             Reset();
             wordSea.Reset();
             goButton.interactable = false;
         }
     }
 
-    Line MakeLine()
+    string[] GetWords()
     {
-        List<string> words = new List<string>(buttons.Length);
-        foreach (var button in buttons)
+        string[] words = new string[buttons.Length];
+        for (int i = 0; i < buttons.Length; i++)
         {
-            words.Add(button.GetComponentInChildren<Text>().text);
+            words[i] = buttons[i].GetComponentInChildren<Text>().text;
         }
-        return new Line(words);
+        return words;
     }
 
     private bool AllWordsChosen()
