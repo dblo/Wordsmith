@@ -592,6 +592,21 @@ Prefab:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
       value: 
       objectReference: {fileID: 687963065}
+    - target: {fileID: 114861314480903900, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0,
+        type: 2}
+      propertyPath: m_Colors.m_HighlightedColor.r
+      value: 0.6627451
+      objectReference: {fileID: 0}
+    - target: {fileID: 114861314480903900, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0,
+        type: 2}
+      propertyPath: m_Colors.m_HighlightedColor.g
+      value: 0.6627451
+      objectReference: {fileID: 0}
+    - target: {fileID: 114861314480903900, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0,
+        type: 2}
+      propertyPath: m_Colors.m_HighlightedColor.b
+      value: 0.6627451
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0, type: 2}
   m_IsPrefabParent: 0
@@ -1013,6 +1028,21 @@ Prefab:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
       value: 
       objectReference: {fileID: 571724822}
+    - target: {fileID: 114861314480903900, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0,
+        type: 2}
+      propertyPath: m_Colors.m_HighlightedColor.r
+      value: 0.6627451
+      objectReference: {fileID: 0}
+    - target: {fileID: 114861314480903900, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0,
+        type: 2}
+      propertyPath: m_Colors.m_HighlightedColor.g
+      value: 0.6627451
+      objectReference: {fileID: 0}
+    - target: {fileID: 114861314480903900, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0,
+        type: 2}
+      propertyPath: m_Colors.m_HighlightedColor.b
+      value: 0.6627451
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0, type: 2}
   m_IsPrefabParent: 0
@@ -1604,6 +1634,21 @@ Prefab:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
       value: 
       objectReference: {fileID: 196458004}
+    - target: {fileID: 114861314480903900, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0,
+        type: 2}
+      propertyPath: m_Colors.m_HighlightedColor.r
+      value: 0.6627451
+      objectReference: {fileID: 0}
+    - target: {fileID: 114861314480903900, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0,
+        type: 2}
+      propertyPath: m_Colors.m_HighlightedColor.g
+      value: 0.6627451
+      objectReference: {fileID: 0}
+    - target: {fileID: 114861314480903900, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0,
+        type: 2}
+      propertyPath: m_Colors.m_HighlightedColor.b
+      value: 0.6627451
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0, type: 2}
   m_IsPrefabParent: 0
@@ -1828,6 +1873,7 @@ MonoBehaviour:
   - {fileID: 571724822}
   - {fileID: 196458004}
   - {fileID: 1440096777}
+  goButton: {fileID: 1126274667}
   wordSea: {fileID: 1016799784}
   gm: {fileID: 2209512}
 --- !u!224 &687963064 stripped
@@ -3410,6 +3456,21 @@ Prefab:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
       value: 
       objectReference: {fileID: 1440096777}
+    - target: {fileID: 114861314480903900, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0,
+        type: 2}
+      propertyPath: m_Colors.m_HighlightedColor.r
+      value: 0.6627451
+      objectReference: {fileID: 0}
+    - target: {fileID: 114861314480903900, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0,
+        type: 2}
+      propertyPath: m_Colors.m_HighlightedColor.g
+      value: 0.6627451
+      objectReference: {fileID: 0}
+    - target: {fileID: 114861314480903900, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0,
+        type: 2}
+      propertyPath: m_Colors.m_HighlightedColor.b
+      value: 0.6627451
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1ecad2bc4f2af144f8b0e70b3f4e5ec0, type: 2}
   m_IsPrefabParent: 0

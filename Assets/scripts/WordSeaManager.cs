@@ -25,7 +25,7 @@ public class WordSeaManager : MonoBehaviour
     {
         var text = btn.GetComponentInChildren<Text>();
         SetTextAlpha(text, 1f);
-        btn.enabled = true;
+        btn.interactable = true;
     }
 
     private void Start()
@@ -39,7 +39,7 @@ public class WordSeaManager : MonoBehaviour
         if (buttonBar.TryAdd(btn))
         {
             SetTextAlpha(text, 0f);
-            btn.enabled = false;
+            btn.interactable = false;
         }
     }
 
@@ -61,7 +61,7 @@ public class WordSeaManager : MonoBehaviour
             text.text = words[i];
             SetTextAlpha(text, 1f); 
             currentSea.Add(words[i]);
-            buttons[i].enabled = true;
+            buttons[i].interactable = true;
         }
     }
 

@@ -8,6 +8,7 @@ public class ButtonBar : MonoBehaviour
 {
     public Button[] buttons;
     private Dictionary<Button, Button> buttonMap = new Dictionary<Button, Button>();
+    public Button goButton;
 
     private int currentButton = 0;
     public WordSeaManager wordSea;
@@ -17,13 +18,16 @@ public class ButtonBar : MonoBehaviour
     {
         if (AllWordsChosen())
             return false;
-
         var newText = btn.GetComponentInChildren<Text>();
         var oldText = buttons[currentButton].GetComponentInChildren<Text>();
 
         oldText.text = newText.text;
         buttonMap.Add(buttons[currentButton], btn);
         currentButton++;
+
+        if (AllWordsChosen())
+            goButton.interactable = true;
+
         return true;
     }
 
@@ -39,6 +43,7 @@ public class ButtonBar : MonoBehaviour
         wordSea.ReturnWord(wordSeaButton);
         ShiftWordsLeft();
         currentButton--;
+        goButton.interactable = false;
     }
 
     private void ShiftWordsLeft()
@@ -79,6 +84,7 @@ public class ButtonBar : MonoBehaviour
             gm.AddNewLine(MakeLine(), Player.Player1);
             Reset();
             wordSea.Reset();
+            goButton.interactable = false;
         }
     }
 
