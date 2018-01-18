@@ -10,6 +10,16 @@ public class LineLog : MonoBehaviour
     private Text text;
     private List<Line> lines = new List<Line>();
 
+    public int LinesCount()
+    {
+        return lines.Count;
+    }
+
+    public string GetLinesAsString()
+    {
+        return text.text;
+    }
+
     private void Awake()
     {
         text = GetComponent<Text>();

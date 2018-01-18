@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="Assets\scripts\ButtonBar.cs" />
     <Compile Include="Assets\scripts\GameManager.cs" />
+    <Compile Include="Assets\scripts\GameOverScreen.cs" />
     <Compile Include="Assets\scripts\Line.cs" />
     <Compile Include="Assets\scripts\LineLog.cs" />
     <Compile Include="Assets\scripts\Shared.cs" />
