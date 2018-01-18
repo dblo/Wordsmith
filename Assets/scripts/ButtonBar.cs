@@ -50,18 +50,18 @@ public class ButtonBar : MonoBehaviour
     {
         for (int i = 0; i < currentButton - 1; i++)
         {
-            if(!buttonMap.ContainsKey(buttons[i]))
+            if (!buttonMap.ContainsKey(buttons[i]))
             {
                 var leftButtonText = buttons[i].GetComponentInChildren<Text>();
-                var rightButtonText = buttons[i+1].GetComponentInChildren<Text>();
+                var rightButtonText = buttons[i + 1].GetComponentInChildren<Text>();
 
                 leftButtonText.text = rightButtonText.text;
                 rightButtonText.text = "";
 
                 Button wordSeaButton;
-                if (!buttonMap.TryGetValue(buttons[i+1], out wordSeaButton))
+                if (!buttonMap.TryGetValue(buttons[i + 1], out wordSeaButton))
                     throw new InvalidOperationException();
-                buttonMap.Remove(buttons[i+1]);
+                buttonMap.Remove(buttons[i + 1]);
                 buttonMap.Add(buttons[i], wordSeaButton);
             }
         }
@@ -82,8 +82,11 @@ public class ButtonBar : MonoBehaviour
         if (AllWordsChosen())
         {
             gm.LineChosen(GetWords(), Player.Player1);
-            Reset();
-            wordSea.Reset();
+            if (!gm.GameOver())
+            {
+                Reset();
+                wordSea.Reset();
+            }
             goButton.interactable = false;
         }
     }

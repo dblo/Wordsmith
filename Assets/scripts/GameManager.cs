@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -8,6 +10,8 @@ public class GameManager : MonoBehaviour
     public WordSeaManager wordSea;
     public int linesInAGame = 5;
     public GameOverScreen gameOverScreen;
+    public ButtonBar buttonBar;
+
     private List<int> scores;
     
     private void Awake()
@@ -68,14 +72,25 @@ public class GameManager : MonoBehaviour
 
         if (GameOver())
         {
+            MakeUINonInteractable();
+
             var canvas = GameObject.Find("Canvas");
             var go = Instantiate(gameOverScreen, canvas.transform);
-            //todo Make everything else non-ineractable
             go.AddData(p1Log.GetLinesAsString(), p2Log.GetLinesAsString(), scores.ToArray());
         }
     }
 
-    private bool GameOver()
+    private void MakeUINonInteractable()
+    {
+        var canvas = GameObject.Find("Canvas");
+        var buttons = canvas.GetComponentsInChildren<Button>();
+        foreach (var btn in buttons)
+        {
+            btn.interactable = false;
+        }
+    }
+
+    public bool GameOver()
     {
         return p1Log.LinesCount() == linesInAGame && p2Log.LinesCount() == linesInAGame;
     }
