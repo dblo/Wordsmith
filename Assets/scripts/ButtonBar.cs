@@ -9,6 +9,7 @@ public class ButtonBar : MonoBehaviour
     public Button[] buttons;
     private Dictionary<Button, Button> buttonMap = new Dictionary<Button, Button>();
     public Button goButton;
+    public PlayerConnection localPlayer;
 
     private int currentButton = 0;
     public WordSeaManager wordSea;
@@ -29,6 +30,11 @@ public class ButtonBar : MonoBehaviour
             goButton.interactable = true;
 
         return true;
+    }
+
+    internal void AssignLocalPlayer(PlayerConnection localPlayer)
+    {
+        this.localPlayer = localPlayer;
     }
 
     public void WordClicked(Button button)
@@ -81,13 +87,8 @@ public class ButtonBar : MonoBehaviour
     {
         if (AllWordsChosen())
         {
-            gm.LineChosen(GetWords(), Player.Player1);
-            if (!gm.GameOver())
-            {
-                Reset();
-                wordSea.Reset();
-            }
             goButton.interactable = false;
+            localPlayer.WordsChosen(GetWords());
         }
     }
 

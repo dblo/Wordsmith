@@ -6,9 +6,15 @@ using UnityEngine.UI;
 
 public class LineLog : MonoBehaviour
 {
-    private int maxVisibleRows;
-    private Text text;
+    private Text plyerLines;
+    private Text playerLabel;
     private List<Line> lines = new List<Line>();
+
+    public string PlayerName
+    {
+        get { return playerLabel.text; }
+        set { playerLabel.text = value; }
+    }
 
     public int LinesCount()
     {
@@ -17,28 +23,27 @@ public class LineLog : MonoBehaviour
 
     public string GetLinesAsString()
     {
-        return text.text;
+        return plyerLines.text;
     }
 
     private void Awake()
     {
-        text = GetComponent<Text>();
-    }
-
-    public void SetLinesInAGame(int count)
-    {
-        maxVisibleRows = count;
+        var gos = GetComponentsInChildren<Text>();
+        foreach (var go in gos)
+        {
+            if (go.name == "Log")
+                plyerLines = go;
+            else if (go.name == "Label")
+                playerLabel = go;
+        }
     }
 
     public void AddLine(Line line)
     {
-        if (lines.Count + 1 > maxVisibleRows)
-            throw new InvalidOperationException();
-
         if (lines.Count > 0)
-            text.text = text.text + "\n" + line.ToString();
+            plyerLines.text = plyerLines.text + "\n" + line.ToString();
         else
-            text.text = line.ToString();
+            plyerLines.text = line.ToString();
 
         lines.Add(line);
     }

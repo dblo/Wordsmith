@@ -1,8 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-
-public class Line
+﻿public class Line
 {
     private string[] words;
     private string[] colors;
