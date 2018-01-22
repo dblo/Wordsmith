@@ -27,11 +27,6 @@ public class WordSeaManager : MonoBehaviour
         btn.interactable = true;
     }
 
-    private void Start()
-    {
-        Reset();
-    }
-
     public void WordClicked(Button btn)
     {
         var text = btn.GetComponentInChildren<Text>();
@@ -49,23 +44,28 @@ public class WordSeaManager : MonoBehaviour
         text.color = newColor;
     }
 
-    internal void Reset()
+    internal void SetNewSea(string[] words)
     {
         currentSea.Clear();
-        var words1 = GenerateUniqueWords(buttons.Count - 3, library);
-        var words2 = GenerateUniqueWords(3, library2);
-        string[] words = new string[words1.Length + words2.Length];
-        words1.CopyTo(words, 0);
-        words2.CopyTo(words, words1.Length);
 
         for (int i = 0; i < words.Length; i++)
         {
             var text = buttons[i].GetComponentInChildren<Text>();
             text.text = words[i];
-            SetTextAlpha(text, 1f); 
+            SetTextAlpha(text, 1f);
             currentSea.Add(words[i]);
             buttons[i].interactable = true;
         }
+    }
+
+    internal string[] GenerateNewSea()
+    {
+        var words1 = GenerateUniqueWords(buttons.Count - 3, library);
+        var words2 = GenerateUniqueWords(3, library2);
+        string[] words = new string[words1.Length + words2.Length];
+        words1.CopyTo(words, 0);
+        words2.CopyTo(words, words1.Length);
+        return words;
     }
 
     public string[] PickRandomWordsFromSea(int count)

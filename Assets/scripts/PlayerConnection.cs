@@ -19,7 +19,7 @@ public class PlayerConnection : NetworkBehaviour
         }
         if(isServer)
         {
-            gm.AddPlayerName(netId.ToString());
+            gm.CmdAddPlayerName(netId.ToString());
         }
     }
 

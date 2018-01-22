@@ -29,14 +29,14 @@ public class GameManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void RpcOnAllPlayersJoined(string msg)
+    void RpcOnAllPlayersJoined(string setupDataJson)
     {
-        var names = msg.Split(' ');
+        var setupData = JsonUtility.FromJson<SetupData>(setupDataJson);
         playerNames.Clear();
-        playerNames.AddRange(names);
+        playerNames.AddRange(setupData.playerNames);
 
         var localPlayer = GetLocalPlayerId();
-        if (names[0].Equals(localPlayer))
+        if (setupData.playerNames[0].Equals(localPlayer))
         {
             p1Log.PlayerName = playerNames[0];
             p2Log.PlayerName = playerNames[1];
@@ -46,16 +46,28 @@ public class GameManager : NetworkBehaviour
             p1Log.PlayerName = playerNames[1];
             p2Log.PlayerName = playerNames[0];
         }
+        wordSea.SetNewSea(setupData.wordSeaWords);
     }
 
-    internal void AddPlayerName(string name)
+    [Command]
+    internal void CmdAddPlayerName(string name)
     {
         playerNames.Add(name);
-        if (playerNames.Count == expectedPlayerCount)
+        if (IsGameFull())
         {
-            var names = String.Join(" ", playerNames.ToArray());
-            RpcOnAllPlayersJoined(names);
+            var data = new SetupData()
+            {
+                playerNames = playerNames.ToArray(),
+                wordSeaWords = wordSea.GenerateNewSea()
+            };
+            var dataJson = JsonUtility.ToJson(data);
+            RpcOnAllPlayersJoined(dataJson);
         }
+    }
+
+    private bool IsGameFull()
+    {
+        return playerNames.Count == expectedPlayerCount;
     }
 
     // todo move to AI players "class"?
@@ -71,10 +83,23 @@ public class GameManager : NetworkBehaviour
         var wordPkg = JsonUtility.FromJson<PlayerStrings>(wordPackageJson);
         playersWords.Add(wordPkg);
 
-        if (!AllPlayersReady())
-            return;
+        if (AllPlayersReady())
+        {
+            ConcludeRound();
+        }
+    }
+     
+    //Server only
+    private void ConcludeRound()
+    {
+        var newWordSea = GameOver() ? null : wordSea.GenerateNewSea();
+        var roundData = new RoundData()
+        {
+            strings = playersWords.ToArray(),
+            wordSeaWords = newWordSea
+        };
 
-        var playersWordsJson = JsonArrayHelper.ToJson(playersWords.ToArray());
+        var playersWordsJson = JsonUtility.ToJson(roundData);
         RpcAllPlayersWordsChosen(playersWordsJson);
     }
 
@@ -91,16 +116,21 @@ public class GameManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void RpcAllPlayersWordsChosen(string str)
+    void RpcAllPlayersWordsChosen(string roundDataJson)
     {
-        var playersWordsJson = JsonArrayHelper.FromJson<PlayerStrings>(str);
+        var roundData = JsonUtility.FromJson<RoundData>(roundDataJson);
         playersWords.Clear();
-        playersWords.AddRange(playersWordsJson);
+        playersWords.AddRange(roundData.strings);
 
         //todo move local player to index 0
         List<PlayerStrings> wordColors = DetermineColors();
         scores.Add(DetermineScore(wordColors));
         ShowLines(wordColors);
+
+        if (!GameOver())
+        {
+            wordSea.SetNewSea(roundData.wordSeaWords);
+        }
     }
 
     private int DetermineScore(List<PlayerStrings> wordColors)
@@ -178,7 +208,7 @@ public class GameManager : NetworkBehaviour
         p1Log.AddLine(new Line(playersWords[playerIx].strings, wordColors[playerIx].strings));
         playerIx = (playerIx + 1) % playersWords.Count;
         p2Log.AddLine(new Line(playersWords[playerIx].strings, wordColors[playerIx].strings));
-
+        
         if (GameOver())
         {
             MakeUINonInteractable();
@@ -189,8 +219,8 @@ public class GameManager : NetworkBehaviour
         }
         else
         {
+            playersWords.Clear();
             buttonBar.Reset();
-            wordSea.Reset();
         }
     }
     private bool AllPlayersReady()
