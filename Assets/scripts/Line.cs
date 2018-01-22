@@ -3,8 +3,6 @@
     private string[] words;
     private string[] colors;
 
-    public int Length { get { return words.Length; } }
-
     public Line(string[] words, string[] colors)
     {
         this.words = words;

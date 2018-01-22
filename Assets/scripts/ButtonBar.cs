@@ -7,13 +7,13 @@ using UnityEngine.UI;
 public class ButtonBar : MonoBehaviour
 {
     public Button[] buttons;
-    private Dictionary<Button, Button> buttonMap = new Dictionary<Button, Button>();
     public Button goButton;
     public PlayerConnection localPlayer;
-
-    private int currentButton = 0;
     public WordSeaManager wordSea;
     public GameManager gm;
+
+    private Dictionary<Button, Button> buttonMap = new Dictionary<Button, Button>();
+    private int currentButton;
 
     internal bool TryAdd(Button btn)
     {
@@ -37,7 +37,7 @@ public class ButtonBar : MonoBehaviour
         this.localPlayer = localPlayer;
     }
 
-    public void WordClicked(Button button)
+    internal void WordClicked(Button button)
     {
         Button wordSeaButton;
         if (!buttonMap.TryGetValue(button, out wordSeaButton))
@@ -83,7 +83,7 @@ public class ButtonBar : MonoBehaviour
         buttonMap.Clear();
     }
 
-    public void TryAcceptLine()
+    internal void TryAcceptLine()
     {
         if (AllWordsChosen())
         {
@@ -92,7 +92,7 @@ public class ButtonBar : MonoBehaviour
         }
     }
 
-    string[] GetWords()
+    private string[] GetWords()
     {
         string[] words = new string[buttons.Length];
         for (int i = 0; i < buttons.Length; i++)

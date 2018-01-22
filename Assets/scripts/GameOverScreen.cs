@@ -31,6 +31,7 @@ public class GameOverScreen : MonoBehaviour
             scorePerLineText.text = scorePerLineText.text + scores[i].ToString() + "\n";
         }
         scorePerLineText.text = scorePerLineText.text + scores[scores.Length - 1].ToString();
+
         scoreTotalText.text = scores.Aggregate((sum, next) => sum += next).ToString();
     }
 
