@@ -16,6 +16,7 @@ public class GameManager : NetworkBehaviour
     public int expectedPlayerCount = 2;
     public GameOverScreen gameOverScreen;
     public ButtonBar buttonBar;
+    public GameObject pauseMenuPrefab;
 
     private List<int> scores;
     // Mapping of client NetIds to the selected words of that client's Player
@@ -229,6 +230,7 @@ public class GameManager : NetworkBehaviour
             buttonBar.Reset();
         }
     }
+
     private bool AllPlayersReady()
     {
         return playersWords.Count == expectedPlayerCount;
@@ -252,5 +254,11 @@ public class GameManager : NetworkBehaviour
     private static bool PerfectScore(int wordCount, int score)
     {
         return score == wordCount * 2;
+    }
+
+    public void LaunchPauseMenu()
+    {
+        GameObject canvas = GameObject.Find("Canvas");
+        Instantiate(pauseMenuPrefab, canvas.transform);
     }
 }
