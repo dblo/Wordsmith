@@ -140,7 +140,7 @@ MonoBehaviour:
   p2Log: {fileID: 1871754816}
   wordSea: {fileID: 1016799784}
   wordsPerLine: 4
-  linesPerGame: 11
+  linesPerGame: 3
   expectedPlayerCount: 2
   gameOverScreen: {fileID: 114276765913125036, guid: d79cb6d6a96ffd94696f271a89e12d39,
     type: 2}
@@ -3168,7 +3168,7 @@ Prefab:
     - target: {fileID: 224618117233616314, guid: b5181ea07e7034f44947ae39bc65aff8,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: -156.56764
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b5181ea07e7034f44947ae39bc65aff8, type: 2}
@@ -4203,7 +4203,7 @@ Prefab:
     - target: {fileID: 224618117233616314, guid: b5181ea07e7034f44947ae39bc65aff8,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: -156.56764
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: b5181ea07e7034f44947ae39bc65aff8, type: 2}

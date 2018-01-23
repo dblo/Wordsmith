@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour
 {
@@ -47,6 +48,11 @@ public class GameManager : NetworkBehaviour
             p2Log.PlayerName = playerNames[0];
         }
         wordSea.SetNewSea(setupData.wordSeaWords);
+    }
+
+    internal void LaunchMainMenu()
+    {
+        SceneManager.LoadScene("main_menu");
     }
 
     [Command]

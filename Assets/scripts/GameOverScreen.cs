@@ -9,6 +9,9 @@ public class GameOverScreen : MonoBehaviour
     {
         Button rematchButton = GameObject.Find("RematchButton").GetComponent<Button>();
         rematchButton.onClick.AddListener(Rematch);
+
+        Button mainMenuButton = GameObject.Find("MainMenuButton").GetComponent<Button>();
+        mainMenuButton.onClick.AddListener(LaunchMainMenu);
     }
 
     public void AddData(string p1Name, string p2Name, string p1Lines, string p2Lines, int[] scores)
@@ -38,5 +41,10 @@ public class GameOverScreen : MonoBehaviour
     private void Rematch()
     {
         SceneManager.LoadScene("main");
+    }
+
+    private void LaunchMainMenu()
+    {
+        SceneManager.LoadScene("main_menu");
     }
 }
