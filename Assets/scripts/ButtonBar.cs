@@ -8,7 +8,7 @@ public class ButtonBar : MonoBehaviour
     public Button[] buttons;
     public Button goButton;
     public PlayerConnection localPlayer;
-    public WordSeaManager wordSea;
+    public WordSea wordSea;
     public GameManager gm;
 
     private Dictionary<Button, Button> buttonMap = new Dictionary<Button, Button>();

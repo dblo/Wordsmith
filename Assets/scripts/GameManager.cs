@@ -8,16 +8,15 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour
 {
-    public List<LineLog> lineLogs = new List<LineLog>();
-    public WordSeaManager wordSea;
-    public int wordsPerLine = 4;
     public int linesPerGame = 3;
     public int expectedPlayerCount = 2;
-    public GameOverScreen gameOverScreen;
+    public WordSea wordSea;
     public ButtonBar buttonBar;
-    public GameObject pauseMenuPrefab;
+    public GameOverScreen gameOverPrefab;
     public GameObject lineLogPrefab;
 
+    private const int wordsPerLine = 4;
+    private List<LineLog> lineLogs = new List<LineLog>();
     private List<int> scores = new List<int>();
     // Mapping of client NetIds to the selected words of that client's Player
     // The order of players in this list defines player number, i.e. player at index 0 is player1
@@ -26,7 +25,7 @@ public class GameManager : NetworkBehaviour
 
     private void Awake()
     {
-        if (GameStatics.PlayerCount > 0)
+        if (!Application.isEditor ||  GameStatics.PlayerCount > 0)
             expectedPlayerCount = GameStatics.PlayerCount;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
@@ -42,6 +41,7 @@ public class GameManager : NetworkBehaviour
                 playerNames = playerNames.ToArray(),
                 wordSeaWords = wordSea.GenerateNewSea()
             };
+            playerNames.Clear(); // Will add again in RpcOnAllPlayersJoined(), treating host like any client
             var dataJson = JsonUtility.ToJson(data);
             RpcOnAllPlayersJoined(dataJson);
         }
@@ -51,7 +51,6 @@ public class GameManager : NetworkBehaviour
     void RpcOnAllPlayersJoined(string setupDataJson)
     {
         var setupData = JsonUtility.FromJson<SetupData>(setupDataJson);
-        playerNames.Clear();
         playerNames.AddRange(setupData.playerNames);
 
         var localPlayerName = GetLocalPlayerId();
@@ -62,7 +61,7 @@ public class GameManager : NetworkBehaviour
                 break;
         }
 
-        switch (playerNames.Count)
+        switch (expectedPlayerCount)
         {
             case 1:
                 lineLogs.Add(CreateLineLog(0f, 1f, localPlayerName));
@@ -113,7 +112,7 @@ public class GameManager : NetworkBehaviour
             strings = playersWords.ToArray(),
             wordSeaWords = nextWordSea
         };
-
+        playersWords.Clear(); // Will add again in RpcOnAllPlayersJoined(), treating host like any client
         var playersWordsJson = JsonUtility.ToJson(roundData);
         RpcAllPlayersWordsChosen(playersWordsJson);
     }
@@ -147,19 +146,18 @@ public class GameManager : NetworkBehaviour
     void RpcAllPlayersWordsChosen(string roundDataJson)
     {
         var roundData = JsonUtility.FromJson<RoundData>(roundDataJson);
-        playersWords.Clear();
         playersWords.AddRange(roundData.strings);
 
         List<PlayerStrings> wordColors;
-        if (playerNames.Count == 1)
+        if (expectedPlayerCount == 1)
         {
             wordColors = new List<PlayerStrings>() {
                 new PlayerStrings() { id = playersWords[0].id, strings = GetInitialColors(wordsPerLine) }
             };
         }
-        else if (playerNames.Count == 2)
+        else if (expectedPlayerCount == 2)
         {
-            wordColors = DetermineColors();
+            wordColors = Determine2PlayerColors();
         }
         else
             throw new ArgumentException();
@@ -180,7 +178,7 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    private List<PlayerStrings> DetermineColors()
+    private List<PlayerStrings> Determine2PlayerColors()
     {
         string[] p1Words = (string[])playersWords[0].strings.Clone();
         string[] p1Colors = GetInitialColors(wordsPerLine);
@@ -253,7 +251,7 @@ public class GameManager : NetworkBehaviour
     private void ShowGameOverScreen()
     {
         var canvas = GameObject.Find("Canvas");
-        var go = Instantiate(gameOverScreen, canvas.transform);
+        var go = Instantiate(gameOverPrefab, canvas.transform);
 
         switch (playerNames.Count)
         {

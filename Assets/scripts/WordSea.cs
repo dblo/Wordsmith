@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class WordSeaManager : MonoBehaviour
+public class WordSea : MonoBehaviour
 {
     public ButtonBar buttonBar;
     public List<Button> buttons;
