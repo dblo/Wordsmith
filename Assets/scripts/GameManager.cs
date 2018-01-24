@@ -8,8 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour
 {
-    public LineLog p1Log;
-    public LineLog p2Log;
+    public List<LineLog> lineLogs = new List<LineLog>();
     public WordSeaManager wordSea;
     public int wordsPerLine = 4;
     public int linesPerGame = 3;
@@ -17,43 +16,20 @@ public class GameManager : NetworkBehaviour
     public GameOverScreen gameOverScreen;
     public ButtonBar buttonBar;
     public GameObject pauseMenuPrefab;
+    public GameObject lineLogPrefab;
 
-    private List<int> scores;
+    private List<int> scores = new List<int>();
     // Mapping of client NetIds to the selected words of that client's Player
     // The order of players in this list defines player number, i.e. player at index 0 is player1
     private List<PlayerStrings> playersWords = new List<PlayerStrings>();
     private List<string> playerNames = new List<string>();
+    private GameObject pauseMenuGO;
 
     private void Awake()
     {
+        if (GameStatics.PlayerCount > 0)
+            expectedPlayerCount = GameStatics.PlayerCount;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
-        scores = new List<int>();
-    }
-
-    [ClientRpc]
-    void RpcOnAllPlayersJoined(string setupDataJson)
-    {
-        var setupData = JsonUtility.FromJson<SetupData>(setupDataJson);
-        playerNames.Clear();
-        playerNames.AddRange(setupData.playerNames);
-
-        var localPlayer = GetLocalPlayerId();
-        if (setupData.playerNames[0].Equals(localPlayer))
-        {
-            p1Log.PlayerName = playerNames[0];
-            p2Log.PlayerName = playerNames[1];
-        }
-        else
-        {
-            p1Log.PlayerName = playerNames[1];
-            p2Log.PlayerName = playerNames[0];
-        }
-        wordSea.SetNewSea(setupData.wordSeaWords);
-    }
-
-    internal void LaunchMainMenu()
-    {
-        SceneManager.LoadScene("main_menu");
     }
 
     [Command]
@@ -72,17 +48,51 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    private bool IsGameFull()
+    [ClientRpc]
+    void RpcOnAllPlayersJoined(string setupDataJson)
     {
-        return playerNames.Count == expectedPlayerCount;
+        var setupData = JsonUtility.FromJson<SetupData>(setupDataJson);
+        playerNames.Clear();
+        playerNames.AddRange(setupData.playerNames);
+
+        var localPlayerName = GetLocalPlayerId();
+        int playerIx = 0;
+        for (; playerIx < playerNames.Count; playerIx++)
+        {
+            if (playerNames[playerIx].Equals(localPlayerName))
+                break;
+        }
+
+        switch (playerNames.Count)
+        {
+            case 1:
+                lineLogs.Add(CreateLineLog(0f, 1f, localPlayerName));
+                break;
+            case 2:
+                lineLogs.Add(CreateLineLog(0f, 0.5f, localPlayerName));
+                playerIx = (playerIx + 1) % playerNames.Count;
+                lineLogs.Add(CreateLineLog(0.5f, 1f, playerNames[playerIx]));
+                break;
+            default:
+                throw new ArgumentException();
+        }
+        wordSea.SetNewSea(setupData.wordSeaWords);
     }
 
-    // todo move to AI players "class"?
-    //var p2Words = wordSea.PickRandomWordsFromSea(linesInAGame);
-    //foreach (var w in p2Words)
-    //{
-    //    Player2.words.Add(w);
-    //}
+    LineLog CreateLineLog(float anchorXMin, float anchorXMax, string playerName)
+    {
+        var anchorYMin = 0.65f;
+        var anchorYMax = 1f;
+        Transform canvasTrans = GameObject.Find("Canvas").transform;
+        var go = Instantiate(lineLogPrefab, canvasTrans, false);
+        var rTrans = go.GetComponent<RectTransform>();
+        rTrans.anchorMin = new Vector2(anchorXMin, anchorYMin);
+        rTrans.anchorMax = new Vector2(anchorXMax, anchorYMax);
+
+        var ll = go.GetComponent<LineLog>();
+        ll.PlayerName = playerName;
+        return ll;
+    }
 
     [Command]
     internal void CmdLineChosen(string wordPackageJson)
@@ -92,18 +102,17 @@ public class GameManager : NetworkBehaviour
 
         if (AllPlayersReady())
         {
-            ConcludeRound();
+            ConcludeRoundAndTellClients();
         }
     }
-     
-    //Server only
-    private void ConcludeRound()
+
+    private void ConcludeRoundAndTellClients()
     {
-        var newWordSea = GameOver() ? null : wordSea.GenerateNewSea();
+        var nextWordSea = GameOver() ? null : wordSea.GenerateNewSea();
         var roundData = new RoundData()
         {
             strings = playersWords.ToArray(),
-            wordSeaWords = newWordSea
+            wordSeaWords = nextWordSea
         };
 
         var playersWordsJson = JsonUtility.ToJson(roundData);
@@ -122,6 +131,19 @@ public class GameManager : NetworkBehaviour
         return null;
     }
 
+    // Return index of localplayer in the playerWords list
+    private int GetLocalPlayerIndex()
+    {
+        var localPlayerName = GetLocalPlayerId();
+        int playerIx = 0;
+        for (; playerIx < playersWords.Count; playerIx++)
+        {
+            if (playersWords[playerIx].id.Equals(localPlayerName))
+                break;
+        }
+        return playerIx;
+    }
+
     [ClientRpc]
     void RpcAllPlayersWordsChosen(string roundDataJson)
     {
@@ -129,30 +151,34 @@ public class GameManager : NetworkBehaviour
         playersWords.Clear();
         playersWords.AddRange(roundData.strings);
 
-        //todo move local player to index 0
-        List<PlayerStrings> wordColors = DetermineColors();
+        List<PlayerStrings> wordColors;
+        if (playerNames.Count == 1)
+        {
+            wordColors = new List<PlayerStrings>() {
+                new PlayerStrings() { id = playersWords[0].id, strings = GetInitialColors(wordsPerLine) }
+            };
+        }
+        else if (playerNames.Count == 2)
+        {
+            wordColors = DetermineColors();
+        }
+        else
+            throw new ArgumentException();
+
         scores.Add(DetermineScore(wordColors));
         ShowLines(wordColors);
 
-        if (!GameOver())
+        if (GameOver())
         {
+            MakeUINonInteractable();
+            ShowGameOverScreen();
+        }
+        else
+        {
+            playersWords.Clear();
+            buttonBar.Reset();
             wordSea.SetNewSea(roundData.wordSeaWords);
         }
-    }
-
-    private int DetermineScore(List<PlayerStrings> wordColors)
-    {
-        int score = 0;
-        foreach (var item in wordColors[0].strings)
-        {
-            if (item == "green")
-                score += 2;
-            else if (item == "yellow")
-                score += 1;
-        }
-        if (PerfectScore(wordsPerLine, score))
-            score += 3;
-        return score;
     }
 
     private List<PlayerStrings> DetermineColors()
@@ -200,34 +226,49 @@ public class GameManager : NetworkBehaviour
         return Enumerable.Repeat("red", length).ToArray();
     }
 
+    private int DetermineScore(List<PlayerStrings> wordColors)
+    {
+        int score = 0;
+        foreach (var item in wordColors[0].strings)
+        {
+            if (item == "green")
+                score += 2;
+            else if (item == "yellow")
+                score += 1;
+        }
+        if (PerfectScore(wordsPerLine, score))
+            score += 3;
+        return score;
+    }
+
     private void ShowLines(List<PlayerStrings> wordColors)
     {
-        int playerIx = 0;
-        var localPlayerName = GetLocalPlayerId();
-        for (; playerIx < playersWords.Count; playerIx++)
+        var playerIx = GetLocalPlayerIndex();
+        for (int i = 0; i < playersWords.Count; i++)
         {
-            if (playersWords[playerIx].id.Equals(localPlayerName))
-            {
+            lineLogs[i].AddLine(new Line(playersWords[playerIx].strings, wordColors[playerIx].strings));
+            playerIx = (playerIx + 1) % playersWords.Count;
+        }
+    }
+
+    private void ShowGameOverScreen()
+    {
+        var canvas = GameObject.Find("Canvas");
+        var go = Instantiate(gameOverScreen, canvas.transform);
+
+        switch (playerNames.Count)
+        {
+            case 1:
+                go.AddData(lineLogs[0].PlayerName, " ",
+                    lineLogs[0].GetLinesAsString(), " ", scores.ToArray());
                 break;
-            }
-        }
-
-        p1Log.AddLine(new Line(playersWords[playerIx].strings, wordColors[playerIx].strings));
-        playerIx = (playerIx + 1) % playersWords.Count;
-        p2Log.AddLine(new Line(playersWords[playerIx].strings, wordColors[playerIx].strings));
-        
-        if (GameOver())
-        {
-            MakeUINonInteractable();
-
-            var canvas = GameObject.Find("Canvas");
-            var go = Instantiate(gameOverScreen, canvas.transform);
-            go.AddData(p1Log.PlayerName, p2Log.PlayerName, p1Log.GetLinesAsString(), p2Log.GetLinesAsString(), scores.ToArray());
-        }
-        else
-        {
-            playersWords.Clear();
-            buttonBar.Reset();
+            case 2:
+                go.AddData(lineLogs[0].PlayerName, lineLogs[1].PlayerName,
+                    lineLogs[0].GetLinesAsString(), lineLogs[1].GetLinesAsString(),
+                    scores.ToArray());
+                break;
+            default:
+                throw new ArgumentException();
         }
     }
 
@@ -248,7 +289,12 @@ public class GameManager : NetworkBehaviour
 
     public bool GameOver()
     {
-        return p1Log.LinesCount() == linesPerGame && p2Log.LinesCount() == linesPerGame;
+        foreach (var ll in lineLogs)
+        {
+            if (ll.LinesCount() != linesPerGame)
+                return false;
+        }
+        return true;
     }
 
     private static bool PerfectScore(int wordCount, int score)
@@ -258,7 +304,22 @@ public class GameManager : NetworkBehaviour
 
     public void LaunchPauseMenu()
     {
-        GameObject canvas = GameObject.Find("Canvas");
-        Instantiate(pauseMenuPrefab, canvas.transform);
+        if (pauseMenuGO != null)
+            Destroy(pauseMenuGO);
+        else
+        {
+            GameObject canvas = GameObject.Find("Canvas");
+            pauseMenuGO = Instantiate(pauseMenuPrefab, canvas.transform);
+        }
+    }
+
+    private bool IsGameFull()
+    {
+        return playerNames.Count == expectedPlayerCount;
+    }
+
+    internal void LaunchMainMenu()
+    {
+        SceneManager.LoadScene("main_menu");
     }
 }

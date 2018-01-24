@@ -42,7 +42,6 @@ public class LineLog : MonoBehaviour
             plyerLines.text = plyerLines.text + "\n" + line.ToString();
         else
             plyerLines.text = line.ToString();
-
         lines.Add(line);
     }
 }

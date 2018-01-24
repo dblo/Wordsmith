@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -41,7 +40,7 @@ public class ButtonBar : MonoBehaviour
     {
         Button wordSeaButton;
         if (!buttonMap.TryGetValue(button, out wordSeaButton))
-            return; // Clicking a btn without a word. TODO this could hide error if we a re out of sync?
+            return; // Todo Fix. Clicking a btn without a word. TODO this could hide error if we a re out of sync?
 
         var text = button.GetComponentInChildren<Text>();
         text.text = "";

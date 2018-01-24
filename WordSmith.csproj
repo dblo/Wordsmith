@@ -81,6 +81,7 @@
     <Compile Include="Assets\scripts\ButtonBar.cs" />
     <Compile Include="Assets\scripts\GameManager.cs" />
     <Compile Include="Assets\scripts\GameOverScreen.cs" />
+    <Compile Include="Assets\scripts\GameStatics.cs" />
     <Compile Include="Assets\scripts\JsonArrayHelper.cs" />
     <Compile Include="Assets\scripts\Line.cs" />
     <Compile Include="Assets\scripts\LineLog.cs" />
