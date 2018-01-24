@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
-using System.Linq;
 using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour
@@ -23,7 +23,6 @@ public class GameManager : NetworkBehaviour
     // The order of players in this list defines player number, i.e. player at index 0 is player1
     private List<PlayerStrings> playersWords = new List<PlayerStrings>();
     private List<string> playerNames = new List<string>();
-    private GameObject pauseMenuGO;
 
     private void Awake()
     {
@@ -170,7 +169,7 @@ public class GameManager : NetworkBehaviour
 
         if (GameOver())
         {
-            MakeUINonInteractable();
+            SetUIButtonsInteractable(false);
             ShowGameOverScreen();
         }
         else
@@ -277,13 +276,13 @@ public class GameManager : NetworkBehaviour
         return playersWords.Count == expectedPlayerCount;
     }
 
-    private void MakeUINonInteractable()
+    internal void SetUIButtonsInteractable(bool value)
     {
         var canvas = GameObject.Find("Canvas");
         var buttons = canvas.GetComponentsInChildren<Button>();
         foreach (var btn in buttons)
         {
-            btn.interactable = false;
+            btn.interactable = value;
         }
     }
 
@@ -297,22 +296,12 @@ public class GameManager : NetworkBehaviour
         return true;
     }
 
+    // True if score is such that 2 points per word was awarded
     private static bool PerfectScore(int wordCount, int score)
     {
         return score == wordCount * 2;
     }
-
-    public void LaunchPauseMenu()
-    {
-        if (pauseMenuGO != null)
-            Destroy(pauseMenuGO);
-        else
-        {
-            GameObject canvas = GameObject.Find("Canvas");
-            pauseMenuGO = Instantiate(pauseMenuPrefab, canvas.transform);
-        }
-    }
-
+    
     private bool IsGameFull()
     {
         return playerNames.Count == expectedPlayerCount;

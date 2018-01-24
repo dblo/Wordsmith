@@ -5,7 +5,8 @@ public class PauseMenu : MonoBehaviour
 {
     public void ResumeGame()
     {
-        Destroy(gameObject);
+        PauseManager pm = GameObject.Find("PauseButton").GetComponent<PauseManager>();
+        pm.ToggleShowPauseMenu();
     }
 
     public void LaunchMainMenu()
