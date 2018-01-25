@@ -3093,7 +3093,7 @@ Prefab:
     - target: {fileID: 114012004743998208, guid: 1e843520e1cb4c7408b52bbbe07f847f,
         type: 2}
       propertyPath: devConnectionCount
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1e843520e1cb4c7408b52bbbe07f847f, type: 2}
