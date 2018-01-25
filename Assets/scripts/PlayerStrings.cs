@@ -3,5 +3,5 @@
 [Serializable]
 public class PlayerStrings {
     public string[] strings;
-    public string id;
+    public string playerName;
 }

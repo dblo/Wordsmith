@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-class PauseManager : MonoBehaviour
+public class PauseManager : MonoBehaviour
 {
     public GameObject pauseMenuPrefab;
 

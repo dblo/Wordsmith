@@ -3,6 +3,6 @@
 [Serializable]
 class RoundData
 {
-    public PlayerStrings[] strings;
+    public PlayerStrings[] playerStrings;
     public string[] wordSeaWords;
 }

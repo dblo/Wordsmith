@@ -7,13 +7,13 @@ public class MainMenu : MonoBehaviour
 {
     public void LaunchMultiPlayer()
     {
-        GameStatics.PlayerCount = 2;
+        MyNetworkManager.PlayerCount = 2;
         SceneManager.LoadScene("main");
     }
 
     public void LaunchSinglePlayer()
     {
-        GameStatics.PlayerCount = 1;
+        MyNetworkManager.PlayerCount = 1;
         SceneManager.LoadScene("main");
     }
 

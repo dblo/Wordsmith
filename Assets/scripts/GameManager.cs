@@ -8,40 +8,53 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour
 {
-    public int linesPerGame = 3;
-    public int expectedPlayerCount = 2;
+    public int linesPerGame;
     public WordSea wordSea;
     public ButtonBar buttonBar;
     public GameOverScreen gameOverPrefab;
-    public GameObject lineLogPrefab;
+    public LineLog lineLogPrefab;
 
     private const int wordsPerLine = 4;
+    private const int perfectScoreBonus = 2;
     private List<LineLog> lineLogs = new List<LineLog>();
     private List<int> scores = new List<int>();
     // Mapping of client NetIds to the selected words of that client's Player
     // The order of players in this list defines player number, i.e. player at index 0 is player1
-    private List<PlayerStrings> playersWords = new List<PlayerStrings>();
-    private List<string> playerNames = new List<string>();
+    private PlayerStrings[] playersWords;
 
-    private void Awake()
+    private void Start()
     {
-        if (!Application.isEditor ||  GameStatics.PlayerCount > 0)
-            expectedPlayerCount = GameStatics.PlayerCount;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        playersWords = new PlayerStrings[MyNetworkManager.PlayerCount];
     }
 
     [Command]
     internal void CmdAddPlayerName(string name)
     {
-        playerNames.Add(name);
+        for (int i = 0; i < playersWords.Length; i++)
+        {
+            if (playersWords[i] == null)
+            {
+                playersWords[i] = new PlayerStrings()
+                {
+                    playerName = name,
+                    strings = null
+                };
+                break;
+            }
+        }
         if (IsGameFull())
         {
+            string[] playerNames = new string[playersWords.Length];
+            for (int i = 0; i < playersWords.Length; i++)
+            {
+                playerNames[i] = playersWords[i].playerName;
+            }
             var data = new SetupData()
             {
-                playerNames = playerNames.ToArray(),
+                playerNames = playerNames,
                 wordSeaWords = wordSea.GenerateNewSea()
             };
-            playerNames.Clear(); // Will add again in RpcOnAllPlayersJoined(), treating host like any client
             var dataJson = JsonUtility.ToJson(data);
             RpcOnAllPlayersJoined(dataJson);
         }
@@ -51,30 +64,42 @@ public class GameManager : NetworkBehaviour
     void RpcOnAllPlayersJoined(string setupDataJson)
     {
         var setupData = JsonUtility.FromJson<SetupData>(setupDataJson);
-        playerNames.AddRange(setupData.playerNames);
+        int localPlayerIndex = 0;
+        string localPlayerName = GetLocalPlayerName();
 
-        var localPlayerName = GetLocalPlayerId();
-        int playerIx = 0;
-        for (; playerIx < playerNames.Count; playerIx++)
+        for (int i = 0; i < playersWords.Length; i++)
         {
-            if (playerNames[playerIx].Equals(localPlayerName))
-                break;
+            playersWords[i] = new PlayerStrings()
+            {
+                playerName = setupData.playerNames[i],
+                strings = null
+            };
+            if (setupData.playerNames[i].Equals(localPlayerName))
+                localPlayerIndex = i;
         }
 
-        switch (expectedPlayerCount)
+        MoveLocalPlayerToFront(localPlayerIndex);
+
+        switch (playersWords.Length)
         {
             case 1:
                 lineLogs.Add(CreateLineLog(0f, 1f, localPlayerName));
                 break;
             case 2:
                 lineLogs.Add(CreateLineLog(0f, 0.5f, localPlayerName));
-                playerIx = (playerIx + 1) % playerNames.Count;
-                lineLogs.Add(CreateLineLog(0.5f, 1f, playerNames[playerIx]));
+                lineLogs.Add(CreateLineLog(0.5f, 1f, playersWords[1].playerName));
                 break;
             default:
                 throw new ArgumentException();
         }
         wordSea.SetNewSea(setupData.wordSeaWords);
+    }
+
+    private void MoveLocalPlayerToFront(int localPlayerIndex)
+    {
+        PlayerStrings tmp = playersWords[0];
+        playersWords[0] = playersWords[localPlayerIndex];
+        playersWords[localPlayerIndex] = tmp;
     }
 
     LineLog CreateLineLog(float anchorXMin, float anchorXMax, string playerName)
@@ -96,8 +121,11 @@ public class GameManager : NetworkBehaviour
     internal void CmdLineChosen(string wordPackageJson)
     {
         var wordPkg = JsonUtility.FromJson<PlayerStrings>(wordPackageJson);
-        playersWords.Add(wordPkg);
-
+        for (int i = 0; i < playersWords.Length; i++)
+        {
+            if (playersWords[i].playerName.Equals(wordPkg.playerName))
+                playersWords[i] = wordPkg;
+        }
         if (AllPlayersReady())
         {
             ConcludeRoundAndTellClients();
@@ -109,15 +137,23 @@ public class GameManager : NetworkBehaviour
         var nextWordSea = GameOver() ? null : wordSea.GenerateNewSea();
         var roundData = new RoundData()
         {
-            strings = playersWords.ToArray(),
+            playerStrings = playersWords,
             wordSeaWords = nextWordSea
         };
-        playersWords.Clear(); // Will add again in RpcOnAllPlayersJoined(), treating host like any client
         var playersWordsJson = JsonUtility.ToJson(roundData);
+        ClearPlayersWords(); // Let's us treat host as any client in RpcAllPlayersWordsChosen()
         RpcAllPlayersWordsChosen(playersWordsJson);
     }
 
-    private string GetLocalPlayerId()
+    private void ClearPlayersWords()
+    {
+        for (int i = 0; i < playersWords.Length; i++)
+        {
+            playersWords[i].strings = null;
+        }
+    }
+
+    private string GetLocalPlayerName()
     {
         var gos = GameObject.FindGameObjectsWithTag("Player");
         foreach (var go in gos)
@@ -129,38 +165,36 @@ public class GameManager : NetworkBehaviour
         return null;
     }
 
-    // Return index of localplayer in the playerWords list
-    private int GetLocalPlayerIndex()
-    {
-        var localPlayerName = GetLocalPlayerId();
-        int playerIx = 0;
-        for (; playerIx < playersWords.Count; playerIx++)
-        {
-            if (playersWords[playerIx].id.Equals(localPlayerName))
-                break;
-        }
-        return playerIx;
-    }
-
     [ClientRpc]
     void RpcAllPlayersWordsChosen(string roundDataJson)
     {
         var roundData = JsonUtility.FromJson<RoundData>(roundDataJson);
-        playersWords.AddRange(roundData.strings);
+        for (int i = 0; i < roundData.playerStrings.Length; i++)
+        {
+            for (int j = 0; j < playersWords.Length; j++)
+            {
+                if (roundData.playerStrings[i].playerName.Equals(playersWords[j].playerName))
+                {
+                    playersWords[j] = roundData.playerStrings[i];
+                    break;
+                }
+            }
+        }
 
         List<PlayerStrings> wordColors;
-        if (expectedPlayerCount == 1)
+        switch (playersWords.Length)
         {
-            wordColors = new List<PlayerStrings>() {
-                new PlayerStrings() { id = playersWords[0].id, strings = GetInitialColors(wordsPerLine) }
+            case 1:
+                wordColors = new List<PlayerStrings>() {
+                new PlayerStrings() { playerName = playersWords[0].playerName, strings = GetInitialColors(wordsPerLine) }
             };
+                break;
+            case 2:
+                wordColors = Determine2PlayerColors();
+                break;
+            default:
+                throw new ArgumentException();
         }
-        else if (expectedPlayerCount == 2)
-        {
-            wordColors = Determine2PlayerColors();
-        }
-        else
-            throw new ArgumentException();
 
         scores.Add(DetermineScore(wordColors));
         ShowLines(wordColors);
@@ -172,7 +206,7 @@ public class GameManager : NetworkBehaviour
         }
         else
         {
-            playersWords.Clear();
+            ClearPlayersWords();
             buttonBar.Reset();
             wordSea.SetNewSea(roundData.wordSeaWords);
         }
@@ -212,8 +246,8 @@ public class GameManager : NetworkBehaviour
             }
         }
         var wordColors = new List<PlayerStrings>() {
-            new PlayerStrings() { id = playersWords[0].id, strings = p1Colors },
-            new PlayerStrings() { id = playersWords[1].id, strings = p2Colors }
+            new PlayerStrings() { playerName = playersWords[0].playerName, strings = p1Colors },
+            new PlayerStrings() { playerName = playersWords[1].playerName, strings = p2Colors }
         };
         return wordColors;
     }
@@ -234,17 +268,15 @@ public class GameManager : NetworkBehaviour
                 score += 1;
         }
         if (PerfectScore(wordsPerLine, score))
-            score += 3;
+            score += perfectScoreBonus;
         return score;
     }
 
     private void ShowLines(List<PlayerStrings> wordColors)
     {
-        var playerIx = GetLocalPlayerIndex();
-        for (int i = 0; i < playersWords.Count; i++)
+        for (int i = 0; i < playersWords.Length; i++)
         {
-            lineLogs[i].AddLine(new Line(playersWords[playerIx].strings, wordColors[playerIx].strings));
-            playerIx = (playerIx + 1) % playersWords.Count;
+            lineLogs[i].AddLine(new Line(playersWords[i].strings, wordColors[i].strings));
         }
     }
 
@@ -253,7 +285,7 @@ public class GameManager : NetworkBehaviour
         var canvas = GameObject.Find("Canvas");
         var go = Instantiate(gameOverPrefab, canvas.transform);
 
-        switch (playerNames.Count)
+        switch (playersWords.Length)
         {
             case 1:
                 go.AddData(lineLogs[0].PlayerName, " ",
@@ -271,7 +303,12 @@ public class GameManager : NetworkBehaviour
 
     private bool AllPlayersReady()
     {
-        return playersWords.Count == expectedPlayerCount;
+        foreach (var p in playersWords)
+        {
+            if (p.strings == null)
+                return false;
+        }
+        return true;
     }
 
     internal void SetUIButtonsInteractable(bool value)
@@ -299,10 +336,15 @@ public class GameManager : NetworkBehaviour
     {
         return score == wordCount * 2;
     }
-    
+
     private bool IsGameFull()
     {
-        return playerNames.Count == expectedPlayerCount;
+        foreach (var p in playersWords)
+        {
+            if (p == null)
+                return false;
+        }
+        return true;
     }
 
     internal void LaunchMainMenu()

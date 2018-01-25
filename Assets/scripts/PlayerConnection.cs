@@ -34,7 +34,7 @@ public class PlayerConnection : NetworkBehaviour
         var pkg = new PlayerStrings()
         {
             strings = words,
-            id = netId.Value.ToString()
+            playerName = netId.Value.ToString()
         };
         var jsonPkg = JsonUtility.ToJson(pkg);
         gm.CmdLineChosen(jsonPkg);
