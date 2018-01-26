@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ButtonBar : MonoBehaviour
-{
+public class ButtonBar : MonoBehaviour {
     public Button[] buttons;
     public Button goButton;
     public PlayerConnection localPlayer;
@@ -14,8 +13,7 @@ public class ButtonBar : MonoBehaviour
     private Dictionary<Button, Button> buttonMap = new Dictionary<Button, Button>();
     private int currentButton;
 
-    public bool TryAdd(Button btn)
-    {
+    public bool TryAdd (Button btn) {
         if (AllWordsChosen())
             return false;
         var newText = btn.GetComponentInChildren<Text>();
@@ -31,13 +29,11 @@ public class ButtonBar : MonoBehaviour
         return true;
     }
 
-    public void AssignLocalPlayer(PlayerConnection localPlayer)
-    {
+    public void AssignLocalPlayer (PlayerConnection localPlayer) {
         this.localPlayer = localPlayer;
     }
 
-    public void WordClicked(Button button)
-    {
+    public void WordClicked (Button button) {
         Button wordSeaButton;
         if (!buttonMap.TryGetValue(button, out wordSeaButton))
             return; // Todo Fix. Clicking a btn without a word. TODO this could hide error if we a re out of sync?
@@ -51,12 +47,9 @@ public class ButtonBar : MonoBehaviour
         goButton.interactable = false;
     }
 
-    private void ShiftWordsLeft()
-    {
-        for (int i = 0; i < currentButton - 1; i++)
-        {
-            if (!buttonMap.ContainsKey(buttons[i]))
-            {
+    private void ShiftWordsLeft () {
+        for (int i = 0; i < currentButton - 1; i++) {
+            if (!buttonMap.ContainsKey(buttons[i])) {
                 var leftButtonText = buttons[i].GetComponentInChildren<Text>();
                 var rightButtonText = buttons[i + 1].GetComponentInChildren<Text>();
 
@@ -72,37 +65,30 @@ public class ButtonBar : MonoBehaviour
         }
     }
 
-    public void Reset()
-    {
-        foreach (var btn in buttons)
-        {
+    public void Reset () {
+        foreach (var btn in buttons) {
             btn.GetComponentInChildren<Text>().text = "";
         }
         currentButton = 0;
         buttonMap.Clear();
     }
 
-    public void TryAcceptLine()
-    {
-        if (AllWordsChosen())
-        {
+    public void TryAcceptLine () {
+        if (AllWordsChosen()) {
             goButton.interactable = false;
             localPlayer.WordsChosen(GetWords());
         }
     }
 
-    private string[] GetWords()
-    {
+    private string[] GetWords () {
         string[] words = new string[buttons.Length];
-        for (int i = 0; i < buttons.Length; i++)
-        {
+        for (int i = 0; i < buttons.Length; i++) {
             words[i] = buttons[i].GetComponentInChildren<Text>().text;
         }
         return words;
     }
 
-    private bool AllWordsChosen()
-    {
+    private bool AllWordsChosen () {
         return currentButton == buttons.Length;
     }
 }

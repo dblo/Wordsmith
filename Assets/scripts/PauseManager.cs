@@ -1,22 +1,17 @@
 ﻿using UnityEngine;
 
-public class PauseManager : MonoBehaviour
-{
+public class PauseManager : MonoBehaviour {
     public GameObject pauseMenuPrefab;
 
     private GameObject pauseMenu;
 
-    public void ToggleShowPauseMenu()
-    {
+    public void ToggleShowPauseMenu () {
         var gm = GameObject.Find("GameManager");
-        if (GamePaused())
-        {
+        if (GamePaused()) {
             Destroy(pauseMenu);
             if (gm != null)
                 gm.GetComponent<GameManager>().SetUIButtonsInteractable(true);
-        }
-        else
-        {
+        } else {
             if (gm != null)
                 gm.GetComponent<GameManager>().SetUIButtonsInteractable(false);
             GameObject canvas = GameObject.Find("Canvas");
@@ -24,8 +19,7 @@ public class PauseManager : MonoBehaviour
         }
     }
 
-    private bool GamePaused()
-    {
+    private bool GamePaused () {
         return pauseMenu != null;
     }
 }

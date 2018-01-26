@@ -1,16 +1,13 @@
 ﻿using System;
 using UnityEngine;
 
-public static class JsonArrayHelper
-{
-    public static T[] FromJson<T>(string json)
-    {
+public static class JsonArrayHelper {
+    public static T[] FromJson<T> (string json) {
         Wrapper<T> wrapper = JsonUtility.FromJson<Wrapper<T>>(json);
         return wrapper.Items;
     }
 
-    public static string ToJson<T>(T[] array, bool prettyPrint = false)
-    {
+    public static string ToJson<T> (T[] array, bool prettyPrint = false) {
         Wrapper<T> wrapper = new Wrapper<T>
         {
             Items = array
@@ -19,8 +16,7 @@ public static class JsonArrayHelper
     }
 
     [Serializable]
-    private class Wrapper<T>
-    {
+    private class Wrapper<T> {
         public T[] Items;
     }
 }

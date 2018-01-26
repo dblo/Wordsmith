@@ -3,10 +3,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Linq;
 
-public class GameOverScreen : MonoBehaviour
-{
-    private void Awake()
-    {
+public class GameOverScreen : MonoBehaviour {
+    private void Awake () {
         Button rematchButton = GameObject.Find("RematchButton").GetComponent<Button>();
         rematchButton.onClick.AddListener(Rematch);
 
@@ -14,8 +12,7 @@ public class GameOverScreen : MonoBehaviour
         mainMenuButton.onClick.AddListener(LaunchMainMenu);
     }
 
-    public void AddData(string p1Name, string p2Name, string p1Lines, string p2Lines, int[] scores)
-    {
+    public void AddData (string p1Name, string p2Name, string p1Lines, string p2Lines, int[] scores) {
         Text p1LinesText = GameObject.Find("Player1Lines").GetComponent<Text>();
         Text p2LinesText = GameObject.Find("Player2Lines").GetComponent<Text>();
         Text scorePerLineText = GameObject.Find("ScorePerLine").GetComponent<Text>();
@@ -29,8 +26,7 @@ public class GameOverScreen : MonoBehaviour
         p1LinesText.text = p1Lines;
         p2LinesText.text = p2Lines;
 
-        for (int i = 0; i < scores.Length - 1; i++)
-        {
+        for (int i = 0; i < scores.Length - 1; i++) {
             scorePerLineText.text = scorePerLineText.text + scores[i].ToString() + "\n";
         }
         scorePerLineText.text = scorePerLineText.text + scores[scores.Length - 1].ToString();
@@ -38,13 +34,11 @@ public class GameOverScreen : MonoBehaviour
         scoreTotalText.text = scores.Aggregate((sum, next) => sum += next).ToString();
     }
 
-    private void Rematch()
-    {
+    private void Rematch () {
         SceneManager.LoadScene("main");
     }
 
-    private void LaunchMainMenu()
-    {
+    private void LaunchMainMenu () {
         SceneManager.LoadScene("main_menu");
     }
 }

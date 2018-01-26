@@ -3,27 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MainMenu : MonoBehaviour
-{
-    private void Awake()
-    {
+public class MainMenu : MonoBehaviour {
+    private void Awake () {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
 
-    public void LaunchMultiPlayer()
-    {
+    public void LaunchMultiPlayer () {
         MyNetworkManager.ExpectedPlayerCount = 2;
         SceneManager.LoadScene("main");
     }
 
-    public void LaunchSinglePlayer()
-    {
+    public void LaunchSinglePlayer () {
         MyNetworkManager.ExpectedPlayerCount = 1;
         SceneManager.LoadScene("main");
     }
 
-    public void QuitGame()
-    {
+    public void QuitGame () {
         Application.Quit();
     }
 }

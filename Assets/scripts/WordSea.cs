@@ -2,8 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class WordSea : MonoBehaviour
-{
+public class WordSea : MonoBehaviour {
     public ButtonBar buttonBar;
     public List<Button> buttons;
 
@@ -20,36 +19,30 @@ public class WordSea : MonoBehaviour
                                          "same", "double", "road" };
     string[] library2 = new string[] { "is", "are", "you", "what", "when", "like", "a", "your" };
 
-    public void ReturnWord(Button btn)
-    {
+    public void ReturnWord (Button btn) {
         var text = btn.GetComponentInChildren<Text>();
         SetTextAlpha(text, 1f);
         btn.interactable = true;
     }
 
-    public void WordClicked(Button btn)
-    {
+    public void WordClicked (Button btn) {
         var text = btn.GetComponentInChildren<Text>();
-        if (buttonBar.TryAdd(btn))
-        {
+        if (buttonBar.TryAdd(btn)) {
             SetTextAlpha(text, 0f);
             btn.interactable = false;
         }
     }
 
-    private void SetTextAlpha(Text text, float alpha)
-    {
+    private void SetTextAlpha (Text text, float alpha) {
         var c = text.color;
         var newColor = new Color(c.r, c.g, c.b, alpha);
         text.color = newColor;
     }
 
-    public void SetNewSea(string[] words)
-    {
+    public void SetNewSea (string[] words) {
         currentSea.Clear();
 
-        for (int i = 0; i < words.Length; i++)
-        {
+        for (int i = 0; i < words.Length; i++) {
             var text = buttons[i].GetComponentInChildren<Text>();
             text.text = words[i];
             SetTextAlpha(text, 1f);
@@ -58,8 +51,7 @@ public class WordSea : MonoBehaviour
         }
     }
 
-    public string[] GenerateNewSea()
-    {
+    public string[] GenerateNewSea () {
         var words1 = GenerateUniqueWords(buttons.Count - 3, library);
         var words2 = GenerateUniqueWords(3, library2);
         string[] words = new string[words1.Length + words2.Length];
@@ -68,22 +60,18 @@ public class WordSea : MonoBehaviour
         return words;
     }
 
-    public string[] PickRandomWordsFromSea(int count)
-    {
+    public string[] PickRandomWordsFromSea (int count) {
         return GenerateUniqueWords(count, currentSea.ToArray());
     }
 
-    private string[] GenerateUniqueWords(int aSize, string[] aLibrary)
-    {
+    private string[] GenerateUniqueWords (int aSize, string[] aLibrary) {
         HashSet<int> indices = new HashSet<int>();
         string[] words = new string[aSize];
 
         System.Random rng = new System.Random();
-        for (int i = 0; i < aSize; i++)
-        {
+        for (int i = 0; i < aSize; i++) {
             int r = rng.Next(aLibrary.Length);
-            while (indices.Contains(r))
-            {
+            while (indices.Contains(r)) {
                 r = rng.Next(aLibrary.Length);
             }
             indices.Add(r);

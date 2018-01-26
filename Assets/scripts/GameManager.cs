@@ -6,8 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
-public class GameManager : NetworkBehaviour
-{
+public class GameManager : NetworkBehaviour {
     public int linesPerGame;
     public WordSea wordSea;
     public ButtonBar buttonBar;
@@ -17,44 +16,46 @@ public class GameManager : NetworkBehaviour
     private const int wordsPerLine = 4;
     private const int perfectScoreBonus = 2;
     private List<LineLog> lineLogs = new List<LineLog>();
-    private List<int> scores = new List<int>();
+    private List<int> lineScores = new List<int>();
     private List<PlayerConnection> players;
 
-    public override void OnStartServer()
-    {
+    public override void OnStartServer () {
         players = new List<PlayerConnection>();
     }
 
     // Only called on server
-    public void PlayerSetupDone(PlayerConnection player)
-    {
+    public void PlayerSetupDone (PlayerConnection player) {
         players.Add(player);
         if (!IsGameFull())
             return;
 
-        foreach (var p in players)
-        {
-            p.CmdSynchronizeName();
-        }
-
-        var newWordSea = wordSea.GenerateNewSea();
-        var dataJson = JsonArrayHelper.ToJson(newWordSea);
-        RpcOnAllPlayersJoined(dataJson);
+        players.ForEach((p) => p.CmdSynchronizeName());
+        var newWordSea = String.Join(" ", wordSea.GenerateNewSea());
+        RpcOnAllPlayersJoined(newWordSea);
     }
 
     [ClientRpc]
-    void RpcOnAllPlayersJoined(string newWordSeaJson)
-    {
-        var newWordSea = JsonArrayHelper.FromJson<string>(newWordSeaJson);
+    private void RpcOnAllPlayersJoined (string newWordSea) {
         players = FindSortedPlayers();
         CreateLineLogs();
-        wordSea.SetNewSea(newWordSea);
+        wordSea.SetNewSea(newWordSea.Split(' '));
     }
 
-    private void CreateLineLogs()
-    {
-        switch (players.Count)
-        {
+    private List<PlayerConnection> FindSortedPlayers () {
+        var pcs = new List<PlayerConnection>();
+        var gos = GameObject.FindGameObjectsWithTag("Player");
+        foreach (var go in gos) {
+            var pc = go.GetComponent<PlayerConnection>();
+            if (pc.isLocalPlayer)
+                pcs.Insert(0, pc);
+            else
+                pcs.Add(pc);
+        }
+        return pcs;
+    }
+
+    private void CreateLineLogs () {
+        switch (players.Count) {
             case 1:
                 lineLogs.Add(CreateLineLog(0f, 1f, players[0].PlayerName));
                 break;
@@ -67,27 +68,10 @@ public class GameManager : NetworkBehaviour
         }
     }
 
-    // Returns an array of player names sorted according to current order of playersWords
-    private List<PlayerConnection> FindSortedPlayers()
-    {
-        List<PlayerConnection> pcs = new List<PlayerConnection>();
-        var gos = GameObject.FindGameObjectsWithTag("Player");
-        foreach (var go in gos)
-        {
-            var pc = go.GetComponent<PlayerConnection>();
-            if (pc.isLocalPlayer)
-                pcs.Insert(0, pc);
-            else
-                pcs.Add(pc);
-        }
-        return pcs;
-    }
-
-    LineLog CreateLineLog(float anchorXMin, float anchorXMax, string playerName)
-    {
-        var anchorYMin = 0.65f;
-        var anchorYMax = 1f;
-        Transform canvasTrans = GameObject.Find("Canvas").transform;
+    private LineLog CreateLineLog (float anchorXMin, float anchorXMax, string playerName) {
+        const float anchorYMin = 0.65f;
+        const float anchorYMax = 1f;
+        var canvasTrans = GameObject.Find("Canvas").transform;
         var go = Instantiate(lineLogPrefab, canvasTrans, false);
         var rTrans = go.GetComponent<RectTransform>();
         rTrans.anchorMin = new Vector2(anchorXMin, anchorYMin);
@@ -99,41 +83,39 @@ public class GameManager : NetworkBehaviour
     }
 
     [Command]
-    public void CmdPlayerReady()
-    {
+    public void CmdPlayerReady () {
         if (!AllPlayersReady())
             return;
 
-        foreach (var p in players)
-        {
-            p.CmdSynchronizeWords();
-        }
-
+        players.ForEach((p) => p.CmdSynchronizeWords());
         var newWordSea = GameOver() ? null : wordSea.GenerateNewSea();
-        var newWordSeaJson = JsonArrayHelper.ToJson(newWordSea);
-        RpcAllPlayersWordsChosen(newWordSeaJson);
-    }
-
-    private string GetLocalPlayeID()
-    {
-        var gos = GameObject.FindGameObjectsWithTag("Player");
-        foreach (var go in gos)
-        {
-            var ni = go.GetComponent<NetworkIdentity>();
-            if (ni.isLocalPlayer)
-                return ni.netId.ToString();
-        }
-        return null;
+        RpcAllPlayersReady(String.Join(" ", newWordSea));
     }
 
     [ClientRpc]
-    void RpcAllPlayersWordsChosen(string newWordSeaJson)
-    {
-        var newWordSea = JsonArrayHelper.FromJson<string>(newWordSeaJson);
+    void RpcAllPlayersReady (string newWordSea) {
+        var wordColors = ComputeWordColors();
+        AddWordsToLineLogs(wordColors);
 
+        var score = ComputeScore(wordColors[0]);  // Could use any player's colors
+        lineScores.Add(score);
+
+        if (GameOver()) {
+            SetUIButtonsInteractable(false);
+            ShowGameOverScreen();
+        } else {
+            foreach (var p in players) {
+                p.Reset();
+            }
+            buttonBar.Reset();
+            wordSea.SetNewSea(newWordSea.Split(' '));
+        }
+    }
+
+    // Returns list of colors where element i correspond to the words for player i in member players
+    private List<string[]> ComputeWordColors () {
         List<string[]> wordColors;
-        switch (players.Count)
-        {
+        switch (players.Count) {
             case 1:
                 wordColors = new List<string[]>() { GetInitialColors(wordsPerLine) };
                 break;
@@ -143,54 +125,28 @@ public class GameManager : NetworkBehaviour
             default:
                 throw new ArgumentException();
         }
-        scores.Add(DetermineScore(wordColors[0])); // Could use any player's colors
 
-        var playersWords = new List<string[]>();
-        players.ForEach((p) => playersWords.Add(p.Words));
-
-        ShowLines(playersWords, wordColors);
-
-        if (GameOver())
-        {
-            SetUIButtonsInteractable(false);
-            ShowGameOverScreen();
-        }
-        else
-        {
-            foreach (var p in players)
-            {
-                p.Reset();
-            }
-            buttonBar.Reset();
-            wordSea.SetNewSea(newWordSea);
-        }
+        return wordColors;
     }
 
-    private List<string[]> Determine2PlayerColors()
-    {
-        string[] p1Words = (string[])players[0].Words.Clone();
-        string[] p2Words = (string[])players[1].Words.Clone();
+    private List<string[]> Determine2PlayerColors () {
+        string[] p1Words = (string[]) players[0].Words.Clone();
+        string[] p2Words = (string[]) players[1].Words.Clone();
         string[] p1Colors = GetInitialColors(wordsPerLine);
-        string[] p2Colors = (string[])p1Colors.Clone();
+        string[] p2Colors = (string[]) p1Colors.Clone();
 
-        for (int i = 0; i < wordsPerLine; i++)
-        {
-            if (p1Words[i].Equals(p2Words[i]))
-            {
+        for (int i = 0; i < wordsPerLine; i++) {
+            if (p1Words[i].Equals(p2Words[i])) {
                 p1Colors[i] = "green";
                 p2Colors[i] = "green";
                 p1Words[i] = null;
                 p2Words[i] = null;
             }
         }
-        for (int i = 0; i < wordsPerLine; i++)
-        {
-            if (p1Words[i] != null)
-            {
-                for (int j = 0; j < wordsPerLine; j++)
-                {
-                    if (p1Words[i].Equals(p2Words[j]))
-                    {
+        for (int i = 0; i < wordsPerLine; i++) {
+            if (p1Words[i] != null) {
+                for (int j = 0; j < wordsPerLine; j++) {
+                    if (p1Words[i].Equals(p2Words[j])) {
                         p1Colors[i] = "yellow";
                         p2Colors[j] = "yellow";
                         p2Words[j] = null;
@@ -201,16 +157,13 @@ public class GameManager : NetworkBehaviour
         return new List<string[]>() { p1Colors, p2Colors };
     }
 
-    private static string[] GetInitialColors(int length)
-    {
+    private static string[] GetInitialColors (int length) {
         return Enumerable.Repeat("red", length).ToArray();
     }
 
-    private int DetermineScore(string[] colors)
-    {
+    private int ComputeScore (string[] colors) {
         int score = 0;
-        foreach (var c in colors)
-        {
+        foreach (var c in colors) {
             if (c == "green")
                 score += 2;
             else if (c == "yellow")
@@ -221,59 +174,49 @@ public class GameManager : NetworkBehaviour
         return score;
     }
 
-    private void ShowLines(List<string[]> words, List<string[]> colors)
-    {
-        for (int i = 0; i < players.Count; i++)
-        {
-            lineLogs[i].AddLine(new Line(words[i], colors[i]));
+    private void AddWordsToLineLogs (List<string[]> colors) {
+        for (int i = 0; i < players.Count; i++) {
+            lineLogs[i].AddLine(players[i].Words, colors[i]);
         }
     }
 
-    private void ShowGameOverScreen()
-    {
+    private void ShowGameOverScreen () {
         var canvas = GameObject.Find("Canvas");
         var go = Instantiate(gameOverPrefab, canvas.transform);
 
-        switch (players.Count)
-        {
+        switch (players.Count) {
             case 1:
                 go.AddData(lineLogs[0].PlayerName, " ",
-                    lineLogs[0].GetLinesAsString(), " ", scores.ToArray());
+                    lineLogs[0].GetLinesAsString(), " ", lineScores.ToArray());
                 break;
             case 2:
                 go.AddData(lineLogs[0].PlayerName, lineLogs[1].PlayerName,
                     lineLogs[0].GetLinesAsString(), lineLogs[1].GetLinesAsString(),
-                    scores.ToArray());
+                    lineScores.ToArray());
                 break;
             default:
                 throw new ArgumentException();
         }
     }
 
-    private bool AllPlayersReady()
-    {
-        foreach (var p in players)
-        {
-            if (p.Words == null)
+    private bool AllPlayersReady () {
+        foreach (var p in players) {
+            if (!p.Ready)
                 return false;
         }
         return true;
     }
 
-    public void SetUIButtonsInteractable(bool value)
-    {
+    public void SetUIButtonsInteractable (bool value) {
         var canvas = GameObject.Find("Canvas");
         var buttons = canvas.GetComponentsInChildren<Button>();
-        foreach (var btn in buttons)
-        {
+        foreach (var btn in buttons) {
             btn.interactable = value;
         }
     }
 
-    public bool GameOver()
-    {
-        foreach (var ll in lineLogs)
-        {
+    public bool GameOver () {
+        foreach (var ll in lineLogs) {
             if (ll.LinesCount() != linesPerGame)
                 return false;
         }
@@ -281,18 +224,15 @@ public class GameManager : NetworkBehaviour
     }
 
     // True if score is such that 2 points per word was awarded
-    private static bool PerfectScore(int wordCount, int score)
-    {
+    private static bool PerfectScore (int wordCount, int score) {
         return score == wordCount * 2;
     }
 
-    private bool IsGameFull()
-    {
+    private bool IsGameFull () {
         return players.Count == MyNetworkManager.ExpectedPlayerCount;
     }
 
-    public void LaunchMainMenu()
-    {
+    public void LaunchMainMenu () {
         SceneManager.LoadScene("main_menu");
     }
 }

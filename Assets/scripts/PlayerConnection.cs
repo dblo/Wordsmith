@@ -2,27 +2,27 @@
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class PlayerConnection : NetworkBehaviour
-{
+public class PlayerConnection : NetworkBehaviour {
     public string PlayerName { get; private set; }
     public string[] Words { get; private set; }
 
     private GameManager gm;
 
-    private void Start()
-    {
+    public bool Ready {
+        get { return Words == null; }
+    }
+
+    private void Start () {
         var go = GameObject.Find("GameManager");
         gm = go.GetComponent<GameManager>();
-        go = GameObject.Find("ButtonBar");
 
-        if (isLocalPlayer)
-        {
+        if (isLocalPlayer) {
+            go = GameObject.Find("ButtonBar");
             var bb = go.GetComponent<ButtonBar>();
             bb.AssignLocalPlayer(this);
 
             var playerName = PlayerPrefs.GetString("name");
-            if (playerName.Equals(""))
-            {
+            if (playerName.Equals("")) {
                 playerName = "Player " + new System.Random().Next(100);
                 PlayerPrefs.SetString("name", playerName);
             }
@@ -30,52 +30,43 @@ public class PlayerConnection : NetworkBehaviour
         }
     }
 
-    // Nulls the player's words
-    public void Reset()
-    {
+    public void Reset () {
         Words = null;
     }
 
     [Command]
-    private void CmdLocalPlayerReady(string playerName)
-    {
+    private void CmdLocalPlayerReady (string playerName) {
         PlayerName = playerName;
         gm.PlayerSetupDone(this);
     }
 
     [Command]
-    public void CmdSynchronizeName()
-    {
+    public void CmdSynchronizeName () {
         RpcSyncronizeName(PlayerName);
     }
 
     [ClientRpc]
-    private void RpcSyncronizeName(string playerName)
-    {
+    private void RpcSyncronizeName (string playerName) {
         PlayerName = playerName;
     }
-    
-    public void WordsChosen(string[] words)
-    {
+
+    public void WordsChosen (string[] words) {
         CmdWordsChosen(String.Join(" ", words));
     }
 
     [Command]
-    private void CmdWordsChosen(string words)
-    {
+    private void CmdWordsChosen (string words) {
         Words = words.Split(' ');
         gm.CmdPlayerReady();
     }
 
     [Command]
-    public void CmdSynchronizeWords()
-    {
+    public void CmdSynchronizeWords () {
         RpcSynchronizeWords(String.Join(" ", Words));
     }
 
     [ClientRpc]
-    private void RpcSynchronizeWords(string words)
-    {
+    private void RpcSynchronizeWords (string words) {
         Words = words.Split(' ');
     }
 }
