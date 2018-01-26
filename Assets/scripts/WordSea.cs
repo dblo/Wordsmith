@@ -20,7 +20,7 @@ public class WordSea : MonoBehaviour
                                          "same", "double", "road" };
     string[] library2 = new string[] { "is", "are", "you", "what", "when", "like", "a", "your" };
 
-    internal void ReturnWord(Button btn)
+    public void ReturnWord(Button btn)
     {
         var text = btn.GetComponentInChildren<Text>();
         SetTextAlpha(text, 1f);
@@ -44,7 +44,7 @@ public class WordSea : MonoBehaviour
         text.color = newColor;
     }
 
-    internal void SetNewSea(string[] words)
+    public void SetNewSea(string[] words)
     {
         currentSea.Clear();
 
@@ -58,7 +58,7 @@ public class WordSea : MonoBehaviour
         }
     }
 
-    internal string[] GenerateNewSea()
+    public string[] GenerateNewSea()
     {
         var words1 = GenerateUniqueWords(buttons.Count - 3, library);
         var words2 = GenerateUniqueWords(3, library2);

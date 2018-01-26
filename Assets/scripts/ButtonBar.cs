@@ -14,7 +14,7 @@ public class ButtonBar : MonoBehaviour
     private Dictionary<Button, Button> buttonMap = new Dictionary<Button, Button>();
     private int currentButton;
 
-    internal bool TryAdd(Button btn)
+    public bool TryAdd(Button btn)
     {
         if (AllWordsChosen())
             return false;
@@ -31,12 +31,12 @@ public class ButtonBar : MonoBehaviour
         return true;
     }
 
-    internal void AssignLocalPlayer(PlayerConnection localPlayer)
+    public void AssignLocalPlayer(PlayerConnection localPlayer)
     {
         this.localPlayer = localPlayer;
     }
 
-    internal void WordClicked(Button button)
+    public void WordClicked(Button button)
     {
         Button wordSeaButton;
         if (!buttonMap.TryGetValue(button, out wordSeaButton))
@@ -72,7 +72,7 @@ public class ButtonBar : MonoBehaviour
         }
     }
 
-    internal void Reset()
+    public void Reset()
     {
         foreach (var btn in buttons)
         {
@@ -82,7 +82,7 @@ public class ButtonBar : MonoBehaviour
         buttonMap.Clear();
     }
 
-    internal void TryAcceptLine()
+    public void TryAcceptLine()
     {
         if (AllWordsChosen())
         {

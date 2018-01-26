@@ -4,8 +4,8 @@ using UnityEngine.Networking;
 
 public class PlayerConnection : NetworkBehaviour
 {
-    // Currently this name is only set for the server instances
-    public string playerName;
+    public string PlayerName { get; private set; }
+    public string[] Words { get; private set; }
 
     private GameManager gm;
 
@@ -26,31 +26,56 @@ public class PlayerConnection : NetworkBehaviour
                 playerName = "Player " + new System.Random().Next(100);
                 PlayerPrefs.SetString("name", playerName);
             }
-            CmdPlayerReady(playerName);
+            CmdLocalPlayerReady(playerName);
         }
     }
 
-    [Command]
-    private void CmdPlayerReady(string playerName)
+    // Nulls the player's words
+    public void Reset()
     {
-        this.playerName = playerName;
-        gm.CmdAddPlayer(netId.ToString());
+        Words = null;
     }
 
+    [Command]
+    private void CmdLocalPlayerReady(string playerName)
+    {
+        PlayerName = playerName;
+        gm.PlayerSetupDone(this);
+    }
+
+    [Command]
+    public void CmdSynchronizeName()
+    {
+        RpcSyncronizeName(PlayerName);
+    }
+
+    [ClientRpc]
+    private void RpcSyncronizeName(string playerName)
+    {
+        PlayerName = playerName;
+    }
+    
     public void WordsChosen(string[] words)
     {
-        CmdOnWordsChosen(words);
+        CmdWordsChosen(String.Join(" ", words));
     }
 
     [Command]
-    private void CmdOnWordsChosen(string[] words)
+    private void CmdWordsChosen(string words)
     {
-        var pkg = new PlayerStrings()
-        {
-            strings = words,
-            playerID = netId.Value.ToString()
-        };
-        var jsonPkg = JsonUtility.ToJson(pkg);
-        gm.CmdLineChosen(jsonPkg);
+        Words = words.Split(' ');
+        gm.CmdPlayerReady();
+    }
+
+    [Command]
+    public void CmdSynchronizeWords()
+    {
+        RpcSynchronizeWords(String.Join(" ", Words));
+    }
+
+    [ClientRpc]
+    private void RpcSynchronizeWords(string words)
+    {
+        Words = words.Split(' ');
     }
 }

@@ -18,90 +18,49 @@ public class GameManager : NetworkBehaviour
     private const int perfectScoreBonus = 2;
     private List<LineLog> lineLogs = new List<LineLog>();
     private List<int> scores = new List<int>();
-    // Mapping of client NetIds to the selected words of that client's Player
-    // The order of players in this list defines player number, i.e. player at index 0 is player1
-    private PlayerStrings[] playersWords;
-
-    private void Start()
-    {
-        Screen.sleepTimeout = SleepTimeout.NeverSleep;
-    }
+    private List<PlayerConnection> players;
 
     public override void OnStartServer()
     {
-        playersWords = new PlayerStrings[MyNetworkManager.PlayerCount];
+        players = new List<PlayerConnection>();
     }
 
-    [Command]
-    internal void CmdAddPlayer(string id)
+    // Only called on server
+    public void PlayerSetupDone(PlayerConnection player)
     {
-        for (int i = 0; i < playersWords.Length; i++)
+        players.Add(player);
+        if (!IsGameFull())
+            return;
+
+        foreach (var p in players)
         {
-            if (playersWords[i] == null)
-            {
-                playersWords[i] = new PlayerStrings()
-                {
-                    playerID = id,
-                    strings = null
-                };
-                break;
-            }
+            p.CmdSynchronizeName();
         }
-        if (IsGameFull())
-        {
-            var playerIDs = new string[playersWords.Length];
-            for (int i = 0; i < playersWords.Length; i++)
-            {
-                playerIDs[i] = playersWords[i].playerID;
-            }
-            var playerNames = GetPlayersNames();
-            var data = new SetupData()
-            {
-                playerIDs = playerIDs,
-                playerNames = playerNames,
-                wordSeaWords = wordSea.GenerateNewSea()
-            };
-            var dataJson = JsonUtility.ToJson(data);
-            RpcOnAllPlayersJoined(dataJson);
-        }
+
+        var newWordSea = wordSea.GenerateNewSea();
+        var dataJson = JsonArrayHelper.ToJson(newWordSea);
+        RpcOnAllPlayersJoined(dataJson);
     }
 
     [ClientRpc]
-    void RpcOnAllPlayersJoined(string setupDataJson)
+    void RpcOnAllPlayersJoined(string newWordSeaJson)
     {
-        var setupData = JsonUtility.FromJson<SetupData>(setupDataJson);
-        int localPlayerIndex = 0;
-
-        playersWords = new PlayerStrings[MyNetworkManager.PlayerCount];
-
-        for (int i = 0; i < playersWords.Length; i++)
-        {
-            playersWords[i] = new PlayerStrings()
-            {
-                playerID = setupData.playerIDs[i],
-                strings = null
-            };
-            if (setupData.playerIDs[i].Equals(GetLocalPlayeID()))
-                localPlayerIndex = i;
-        }
-
-        MoveLocalPlayerToFront(localPlayerIndex);
-        MoveLocalPlayerToFront(localPlayerIndex, ref setupData.playerNames);
-
-        CreateLineLogs(setupData.playerNames);
-        wordSea.SetNewSea(setupData.wordSeaWords);
+        var newWordSea = JsonArrayHelper.FromJson<string>(newWordSeaJson);
+        players = FindSortedPlayers();
+        CreateLineLogs();
+        wordSea.SetNewSea(newWordSea);
     }
 
-    private void CreateLineLogs(string[] playerNames)
+    private void CreateLineLogs()
     {
-        switch (playersWords.Length)
+        switch (players.Count)
         {
             case 1:
-                lineLogs.Add(CreateLineLog(0f, 1f, playerNames[0]));
+                lineLogs.Add(CreateLineLog(0f, 1f, players[0].PlayerName));
                 break;
             case 2:
-                lineLogs.Add(CreateLineLog(0f, 0.5f, playerNames[0]));
-                lineLogs.Add(CreateLineLog(0.5f, 1f, playerNames[1]));
+                lineLogs.Add(CreateLineLog(0f, 0.5f, players[0].PlayerName));
+                lineLogs.Add(CreateLineLog(0.5f, 1f, players[1].PlayerName));
                 break;
             default:
                 throw new ArgumentException();
@@ -109,40 +68,19 @@ public class GameManager : NetworkBehaviour
     }
 
     // Returns an array of player names sorted according to current order of playersWords
-    private string[] GetPlayersNames()
+    private List<PlayerConnection> FindSortedPlayers()
     {
-        var playerNames = new string[playersWords.Length];
-        HashSet<GameObject> players = new HashSet<GameObject>(GameObject.FindGameObjectsWithTag("Player"));
-
-        for (int i = 0; i < playersWords.Length; i++)
+        List<PlayerConnection> pcs = new List<PlayerConnection>();
+        var gos = GameObject.FindGameObjectsWithTag("Player");
+        foreach (var go in gos)
         {
-            var iter = players.GetEnumerator();
-            while (iter.MoveNext())
-            {
-                var nb = iter.Current.GetComponent<NetworkBehaviour>();
-                if (nb.netId.Value.ToString().Equals(playersWords[i].playerID))
-                {
-                    playerNames[i] = iter.Current.GetComponent<PlayerConnection>().playerName;
-                    players.Remove(iter.Current);
-                    break;
-                }
-            }
+            var pc = go.GetComponent<PlayerConnection>();
+            if (pc.isLocalPlayer)
+                pcs.Insert(0, pc);
+            else
+                pcs.Add(pc);
         }
-        return playerNames;
-    }
-
-    private void MoveLocalPlayerToFront(int localPlayerIndex)
-    {
-        PlayerStrings tmp = playersWords[0];
-        playersWords[0] = playersWords[localPlayerIndex];
-        playersWords[localPlayerIndex] = tmp;
-    }
-
-    private void MoveLocalPlayerToFront(int localPlayerIndex, ref string[] arr)
-    {
-        string tmp = arr[0];
-        arr[0] = arr[localPlayerIndex];
-        arr[localPlayerIndex] = tmp;
+        return pcs;
     }
 
     LineLog CreateLineLog(float anchorXMin, float anchorXMax, string playerName)
@@ -161,42 +99,19 @@ public class GameManager : NetworkBehaviour
     }
 
     [Command]
-    internal void CmdLineChosen(string wordPackageJson)
+    public void CmdPlayerReady()
     {
-        var wordPkg = JsonUtility.FromJson<PlayerStrings>(wordPackageJson);
-        for (int i = 0; i < playersWords.Length; i++)
-        {
-            if (playersWords[i].playerID.Equals(wordPkg.playerID))
-            {
-                playersWords[i] = wordPkg;
-                break;
-            }
-        }
-        if (AllPlayersReady())
-        {
-            DistributeRoundData();
-        }
-    }
+        if (!AllPlayersReady())
+            return;
 
-    private void DistributeRoundData()
-    {
-        var nextWordSea = GameOver() ? null : wordSea.GenerateNewSea();
-        var roundData = new RoundData()
+        foreach (var p in players)
         {
-            playerStrings = playersWords,
-            wordSeaWords = nextWordSea
-        };
-        var playersWordsJson = JsonUtility.ToJson(roundData);
-        ClearPlayersWords(); // Let's us treat host as any client in RpcAllPlayersWordsChosen()
-        RpcAllPlayersWordsChosen(playersWordsJson);
-    }
-
-    private void ClearPlayersWords()
-    {
-        for (int i = 0; i < playersWords.Length; i++)
-        {
-            playersWords[i].strings = null;
+            p.CmdSynchronizeWords();
         }
+
+        var newWordSea = GameOver() ? null : wordSea.GenerateNewSea();
+        var newWordSeaJson = JsonArrayHelper.ToJson(newWordSea);
+        RpcAllPlayersWordsChosen(newWordSeaJson);
     }
 
     private string GetLocalPlayeID()
@@ -212,28 +127,15 @@ public class GameManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void RpcAllPlayersWordsChosen(string roundDataJson)
+    void RpcAllPlayersWordsChosen(string newWordSeaJson)
     {
-        var roundData = JsonUtility.FromJson<RoundData>(roundDataJson);
-        // todo instead of below, do the one swap in roundData so it is parallell to playerWords and copy
-        for (int i = 0; i < roundData.playerStrings.Length; i++)
-        {
-            for (int j = 0; j < playersWords.Length; j++)
-            {
-                if (roundData.playerStrings[i].playerID.Equals(playersWords[j].playerID))
-                {
-                    playersWords[j] = roundData.playerStrings[i];
-                    break;
-                }
-            }
-        }
-        List<PlayerStrings> wordColors;
-        switch (playersWords.Length)
+        var newWordSea = JsonArrayHelper.FromJson<string>(newWordSeaJson);
+
+        List<string[]> wordColors;
+        switch (players.Count)
         {
             case 1:
-                wordColors = new List<PlayerStrings>() {
-                new PlayerStrings() { playerID = playersWords[0].playerID, strings = GetInitialColors(wordsPerLine) }
-            };
+                wordColors = new List<string[]>() { GetInitialColors(wordsPerLine) };
                 break;
             case 2:
                 wordColors = Determine2PlayerColors();
@@ -241,9 +143,12 @@ public class GameManager : NetworkBehaviour
             default:
                 throw new ArgumentException();
         }
+        scores.Add(DetermineScore(wordColors[0])); // Could use any player's colors
 
-        scores.Add(DetermineScore(wordColors));
-        ShowLines(wordColors);
+        var playersWords = new List<string[]>();
+        players.ForEach((p) => playersWords.Add(p.Words));
+
+        ShowLines(playersWords, wordColors);
 
         if (GameOver())
         {
@@ -252,19 +157,21 @@ public class GameManager : NetworkBehaviour
         }
         else
         {
-            ClearPlayersWords();
+            foreach (var p in players)
+            {
+                p.Reset();
+            }
             buttonBar.Reset();
-            wordSea.SetNewSea(roundData.wordSeaWords);
+            wordSea.SetNewSea(newWordSea);
         }
     }
 
-    private List<PlayerStrings> Determine2PlayerColors()
+    private List<string[]> Determine2PlayerColors()
     {
-        string[] p1Words = (string[])playersWords[0].strings.Clone();
+        string[] p1Words = (string[])players[0].Words.Clone();
+        string[] p2Words = (string[])players[1].Words.Clone();
         string[] p1Colors = GetInitialColors(wordsPerLine);
-
-        string[] p2Words = (string[])playersWords[1].strings.Clone();
-        string[] p2Colors = GetInitialColors(wordsPerLine);
+        string[] p2Colors = (string[])p1Colors.Clone();
 
         for (int i = 0; i < wordsPerLine; i++)
         {
@@ -291,11 +198,7 @@ public class GameManager : NetworkBehaviour
                 }
             }
         }
-        var wordColors = new List<PlayerStrings>() {
-            new PlayerStrings() { playerID = playersWords[0].playerID, strings = p1Colors },
-            new PlayerStrings() { playerID = playersWords[1].playerID, strings = p2Colors }
-        };
-        return wordColors;
+        return new List<string[]>() { p1Colors, p2Colors };
     }
 
     private static string[] GetInitialColors(int length)
@@ -303,14 +206,14 @@ public class GameManager : NetworkBehaviour
         return Enumerable.Repeat("red", length).ToArray();
     }
 
-    private int DetermineScore(List<PlayerStrings> wordColors)
+    private int DetermineScore(string[] colors)
     {
         int score = 0;
-        foreach (var item in wordColors[0].strings)
+        foreach (var c in colors)
         {
-            if (item == "green")
+            if (c == "green")
                 score += 2;
-            else if (item == "yellow")
+            else if (c == "yellow")
                 score += 1;
         }
         if (PerfectScore(wordsPerLine, score))
@@ -318,11 +221,11 @@ public class GameManager : NetworkBehaviour
         return score;
     }
 
-    private void ShowLines(List<PlayerStrings> wordColors)
+    private void ShowLines(List<string[]> words, List<string[]> colors)
     {
-        for (int i = 0; i < playersWords.Length; i++)
+        for (int i = 0; i < players.Count; i++)
         {
-            lineLogs[i].AddLine(new Line(playersWords[i].strings, wordColors[i].strings));
+            lineLogs[i].AddLine(new Line(words[i], colors[i]));
         }
     }
 
@@ -331,7 +234,7 @@ public class GameManager : NetworkBehaviour
         var canvas = GameObject.Find("Canvas");
         var go = Instantiate(gameOverPrefab, canvas.transform);
 
-        switch (playersWords.Length)
+        switch (players.Count)
         {
             case 1:
                 go.AddData(lineLogs[0].PlayerName, " ",
@@ -349,15 +252,15 @@ public class GameManager : NetworkBehaviour
 
     private bool AllPlayersReady()
     {
-        foreach (var p in playersWords)
+        foreach (var p in players)
         {
-            if (p.strings == null)
+            if (p.Words == null)
                 return false;
         }
         return true;
     }
 
-    internal void SetUIButtonsInteractable(bool value)
+    public void SetUIButtonsInteractable(bool value)
     {
         var canvas = GameObject.Find("Canvas");
         var buttons = canvas.GetComponentsInChildren<Button>();
@@ -385,15 +288,10 @@ public class GameManager : NetworkBehaviour
 
     private bool IsGameFull()
     {
-        foreach (var p in playersWords)
-        {
-            if (p == null)
-                return false;
-        }
-        return true;
+        return players.Count == MyNetworkManager.ExpectedPlayerCount;
     }
 
-    internal void LaunchMainMenu()
+    public void LaunchMainMenu()
     {
         SceneManager.LoadScene("main_menu");
     }

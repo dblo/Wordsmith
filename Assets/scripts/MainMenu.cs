@@ -5,15 +5,20 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
+    private void Awake()
+    {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+    }
+
     public void LaunchMultiPlayer()
     {
-        MyNetworkManager.PlayerCount = 2;
+        MyNetworkManager.ExpectedPlayerCount = 2;
         SceneManager.LoadScene("main");
     }
 
     public void LaunchSinglePlayer()
     {
-        MyNetworkManager.PlayerCount = 1;
+        MyNetworkManager.ExpectedPlayerCount = 1;
         SceneManager.LoadScene("main");
     }
 

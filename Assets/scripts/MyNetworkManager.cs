@@ -6,26 +6,26 @@ using UnityEngine.SceneManagement;
 public class MyNetworkManager : NetworkManager
 {
     public int devConnectionCount = 0; //Development helper
-    private static int playerCount = 0;
+    private static int expectedPlayerCount = 0;
 
-    public static int PlayerCount
+    public static int ExpectedPlayerCount
     {
-        get { return playerCount; }
-        set { playerCount = value; }
+        get { return expectedPlayerCount; }
+        set { expectedPlayerCount = value; }
     }
 
     private void Awake()
     {
         SceneManager.sceneLoaded += OnSceneLoaded;
         if (LaunchingSceneFromEditor())
-            playerCount = devConnectionCount;
+            expectedPlayerCount = devConnectionCount;
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if (scene.name == "main")
         {
-            if (PlayerCount == 1)
+            if (ExpectedPlayerCount == 1)
             {
                 StartHost();
             }
@@ -34,6 +34,6 @@ public class MyNetworkManager : NetworkManager
 
     private static bool LaunchingSceneFromEditor()
     {
-        return playerCount == 0;
+        return expectedPlayerCount == 0;
     }
 }
