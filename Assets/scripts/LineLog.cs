@@ -6,6 +6,8 @@ public class LineLog : MonoBehaviour {
     private Text plyerLines;
     private Text playerLabel;
     private List<string> lines = new List<string>();
+    private const float anchorYMin = 0.65f;
+    private const float anchorYMax = 1f;
 
     public string PlayerName {
         get { return playerLabel.text; }
@@ -45,5 +47,18 @@ public class LineLog : MonoBehaviour {
             str += "<color=" + colors[i] + ">" + words[i] + "</color>" + " ";
         str += "<color=" + colors[words.Length - 1] + ">" + words[words.Length - 1] + "</color>";
         return str;
+    }
+
+    // Create an instance of the LineLog prefab in the Resources the folder
+    public static LineLog Create (float anchorXMin, float anchorXMax, string playerName) {
+        var canvasTrans = GameObject.Find("Canvas").transform;
+        var go = Instantiate((GameObject) Resources.Load("LineLog"), canvasTrans, false);
+        var rTrans = go.GetComponent<RectTransform>();
+        rTrans.anchorMin = new Vector2(anchorXMin, anchorYMin);
+        rTrans.anchorMax = new Vector2(anchorXMax, anchorYMax);
+
+        var ll = go.GetComponent<LineLog>();
+        ll.PlayerName = playerName;
+        return ll;
     }
 }

@@ -11,7 +11,6 @@ public class GameManager : NetworkBehaviour {
     public WordSea wordSea;
     public ButtonBar buttonBar;
     public GameOverScreen gameOverPrefab;
-    public LineLog lineLogPrefab;
 
     private const int wordsPerLine = 4;
     private const int perfectScoreBonus = 2;
@@ -55,31 +54,10 @@ public class GameManager : NetworkBehaviour {
     }
 
     private void CreateLineLogs () {
-        switch (players.Count) {
-            case 1:
-                lineLogs.Add(CreateLineLog(0f, 1f, players[0].PlayerName));
-                break;
-            case 2:
-                lineLogs.Add(CreateLineLog(0f, 0.5f, players[0].PlayerName));
-                lineLogs.Add(CreateLineLog(0.5f, 1f, players[1].PlayerName));
-                break;
-            default:
-                throw new ArgumentException();
+        for (int i = 0; i < players.Count; i++) {
+            lineLogs.Add(LineLog.Create((float) i / players.Count, 
+                (float) (i + 1) / players.Count, players[i].PlayerName));
         }
-    }
-
-    private LineLog CreateLineLog (float anchorXMin, float anchorXMax, string playerName) {
-        const float anchorYMin = 0.65f;
-        const float anchorYMax = 1f;
-        var canvasTrans = GameObject.Find("Canvas").transform;
-        var go = Instantiate(lineLogPrefab, canvasTrans, false);
-        var rTrans = go.GetComponent<RectTransform>();
-        rTrans.anchorMin = new Vector2(anchorXMin, anchorYMin);
-        rTrans.anchorMax = new Vector2(anchorXMax, anchorYMax);
-
-        var ll = go.GetComponent<LineLog>();
-        ll.PlayerName = playerName;
-        return ll;
     }
 
     [Command]
