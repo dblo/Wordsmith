@@ -100,10 +100,12 @@ public class GameManager : NetworkBehaviour {
             case 2:
                 wordColors = Determine2PlayerColors();
                 break;
+            case 3:
+                wordColors = DetermineManyPlayerColors();
+                break;
             default:
                 throw new ArgumentException();
         }
-
         return wordColors;
     }
 
@@ -133,6 +135,63 @@ public class GameManager : NetworkBehaviour {
             }
         }
         return new List<string[]>() { p1Colors, p2Colors };
+    }
+
+    private List<string[]> DetermineManyPlayerColors () {
+        var words = new List<string[]>();
+        var colores = new List<string[]>();
+        foreach (var p in players) {
+            words.Add((string[]) p.Words.Clone());
+            colores.Add(GetInitialColors(wordsPerLine));
+        }
+
+        for (int i = 0; i < wordsPerLine; i++) {
+            var word = words[0][i];
+            int j = 1;
+            for (; j < players.Count; j++) {
+                if(!word.Equals(words[j][i])) {
+                    break;
+                }
+            }
+            if (j < players.Count)
+                continue;
+            for (int k = 0; k < players.Count; k++) {
+                colores[k][i] = "green";
+                words[k][i] = null;
+            }
+        }
+        var wordDict = new Dictionary<string, uint>();
+        foreach (var line in words) {
+            foreach (var word in line) {
+                if (word == null)
+                    continue;
+                else if (wordDict.ContainsKey(word))
+                    wordDict[word] += 1;
+                else
+                    wordDict[word] = 1;
+            }
+        }
+
+        foreach (var key in wordDict.Keys.ToList()) {
+            if (wordDict[key] < players.Count)
+                wordDict.Remove(key);
+        }
+
+        foreach (var key in wordDict.Keys.ToList()) {
+            for (int i = 0; i < words.Count; i++) {
+                for (int j = 0; j < words[i].Length; j++) {
+                    if(key.Equals(words[i][j])) {
+                        colores[i][j] = "yellow";
+                        wordDict[key] -= 1;
+                        if(wordDict[key] == 0) {
+                            goto Foo;
+                        }
+                    }
+                }
+            }
+            Foo:; // Wow
+        }
+        return colores;
     }
 
     private static string[] GetInitialColors (int length) {
@@ -168,6 +227,8 @@ public class GameManager : NetworkBehaviour {
                     lineLogs[0].GetLinesAsString(), " ", lineScores.ToArray());
                 break;
             case 2:
+            case 3:
+            case 4:
                 go.AddData(lineLogs[0].PlayerName, lineLogs[1].PlayerName,
                     lineLogs[0].GetLinesAsString(), lineLogs[1].GetLinesAsString(),
                     lineScores.ToArray());

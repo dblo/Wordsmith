@@ -141,8 +141,6 @@ MonoBehaviour:
   buttonBar: {fileID: 653412622}
   gameOverPrefab: {fileID: 114276765913125036, guid: d79cb6d6a96ffd94696f271a89e12d39,
     type: 2}
-  lineLogPrefab: {fileID: 114409999526974862, guid: b5181ea07e7034f44947ae39bc65aff8,
-    type: 2}
 --- !u!4 &2209513
 Transform:
   m_ObjectHideFlags: 0
@@ -3093,7 +3091,7 @@ Prefab:
     - target: {fileID: 114012004743998208, guid: 1e843520e1cb4c7408b52bbbe07f847f,
         type: 2}
       propertyPath: devConnectionCount
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1e843520e1cb4c7408b52bbbe07f847f, type: 2}

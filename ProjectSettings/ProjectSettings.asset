@@ -589,11 +589,12 @@ PlayerSettings:
     daydream:
       daydreamIconForeground: {fileID: 0}
       daydreamIconBackground: {fileID: 0}
-  cloudServicesEnabled: {}
+  cloudServicesEnabled:
+    UNet: 1
   facebookSdkVersion: 7.9.4
   apiCompatibilityLevel: 2
   cloudProjectId: 59a0d4e3-9e58-422f-9c76-454882893a87
-  projectName: WordSmith (1)
+  projectName: WordSmith
   organizationId: olle
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0

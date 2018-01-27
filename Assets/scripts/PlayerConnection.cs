@@ -9,7 +9,7 @@ public class PlayerConnection : NetworkBehaviour {
     private GameManager gm;
 
     public bool Ready {
-        get { return Words == null; }
+        get { return Words != null; }
     }
 
     private void Start () {
