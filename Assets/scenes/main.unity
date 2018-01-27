@@ -139,8 +139,6 @@ MonoBehaviour:
   linesPerGame: 3
   wordSea: {fileID: 1016799784}
   buttonBar: {fileID: 653412622}
-  gameOverPrefab: {fileID: 114276765913125036, guid: d79cb6d6a96ffd94696f271a89e12d39,
-    type: 2}
 --- !u!4 &2209513
 Transform:
   m_ObjectHideFlags: 0
