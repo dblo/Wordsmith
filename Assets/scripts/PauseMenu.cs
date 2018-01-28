@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour {
@@ -8,6 +9,7 @@ public class PauseMenu : MonoBehaviour {
     }
 
     public void LaunchMainMenu () {
-        SceneManager.LoadScene("main_menu");
+        var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
+        nm.StopClient();
     }
 }

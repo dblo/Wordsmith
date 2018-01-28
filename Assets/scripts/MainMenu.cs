@@ -9,13 +9,13 @@ public class MainMenu : MonoBehaviour {
     }
 
     public void LaunchMultiPlayer () {
-        MyNetworkManager.ExpectedPlayerCount = 2;
-        SceneManager.LoadScene("main");
+        GameManager.ExpectedPlayerCount = 2;
+        //SceneManager.LoadScene("main");
     }
 
     public void LaunchSinglePlayer () {
-        MyNetworkManager.ExpectedPlayerCount = 1;
-        SceneManager.LoadScene("main");
+        GameManager.ExpectedPlayerCount = 1;
+        //SceneManager.LoadScene("main");
     }
 
     public void QuitGame () {

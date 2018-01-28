@@ -35,10 +35,10 @@ public class GameOverScreen : MonoBehaviour {
     }
 
     private void Rematch () {
-        SceneManager.LoadScene("main");
+        //SceneManager.LoadScene("main");
     }
 
     private void LaunchMainMenu () {
-        SceneManager.LoadScene("main_menu");
+        //SceneManager.LoadScene("main_menu");
     }
 }

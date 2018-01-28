@@ -16,6 +16,13 @@ public class GameManager : NetworkBehaviour {
     private List<PlayerConnection> players;
     private ColorMapper colorWordMapper = new ColorMapper(wordsPerLine);
 
+    private static int expectedPlayerCount = 0;
+
+    public static int ExpectedPlayerCount {
+        get { return expectedPlayerCount; }
+        set { expectedPlayerCount = value; }
+    }
+
     public override void OnStartServer () {
         players = new List<PlayerConnection>();
     }
@@ -139,10 +146,10 @@ public class GameManager : NetworkBehaviour {
     }
     
     private bool IsGameFull () {
-        return players.Count == MyNetworkManager.ExpectedPlayerCount;
+        return players.Count == ExpectedPlayerCount;
     }
 
     public void LaunchMainMenu () {
-        SceneManager.LoadScene("main_menu");
+        //    SceneManager.LoadScene("main_menu");
     }
 }
