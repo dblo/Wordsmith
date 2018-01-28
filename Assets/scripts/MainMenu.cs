@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour {
@@ -16,6 +17,8 @@ public class MainMenu : MonoBehaviour {
     public void LaunchSinglePlayer () {
         GameManager.ExpectedPlayerCount = 1;
         //SceneManager.LoadScene("main");
+        var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
+        nm.StartHost();
     }
 
     public void QuitGame () {

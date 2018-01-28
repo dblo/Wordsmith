@@ -2,6 +2,7 @@
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Linq;
+using UnityEngine.Networking;
 
 public class GameOverScreen : MonoBehaviour {
     private void Awake () {
@@ -39,6 +40,13 @@ public class GameOverScreen : MonoBehaviour {
     }
 
     private void LaunchMainMenu () {
-        //SceneManager.LoadScene("main_menu");
+        var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
+        var gm = GameObject.Find("GameManager");
+
+        var nb = gm.GetComponent<NetworkBehaviour>();
+        if (nb.isServer)
+            nm.StopHost();
+        else
+            nm.StopClient();
     }
 }

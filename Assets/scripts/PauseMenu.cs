@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour {
     public void ResumeGame () {
@@ -10,6 +9,11 @@ public class PauseMenu : MonoBehaviour {
 
     public void LaunchMainMenu () {
         var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
-        nm.StopClient();
+        var gm = GameObject.Find("GameManager");
+        var nb = gm.GetComponent<NetworkBehaviour>();
+        if (nb.isServer)
+            nm.StopHost();
+        else
+            nm.StopClient();
     }
 }

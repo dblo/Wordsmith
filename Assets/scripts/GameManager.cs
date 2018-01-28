@@ -16,7 +16,7 @@ public class GameManager : NetworkBehaviour {
     private List<PlayerConnection> players;
     private ColorMapper colorWordMapper = new ColorMapper(wordsPerLine);
 
-    private static int expectedPlayerCount = 0;
+    private static int expectedPlayerCount = 1;
 
     public static int ExpectedPlayerCount {
         get { return expectedPlayerCount; }

@@ -16,7 +16,7 @@ public class PlayerConnection : NetworkBehaviour {
         var go = GameObject.Find("GameManager");
         gm = go.GetComponent<GameManager>();
 
-        if (isLocalPlayer) {
+        if (isLocalPlayer || GameManager.ExpectedPlayerCount == 1) {
             go = GameObject.Find("ButtonBar");
             var bb = go.GetComponent<ButtonBar>();
             bb.AssignLocalPlayer(this);
@@ -51,12 +51,15 @@ public class PlayerConnection : NetworkBehaviour {
     }
 
     public void WordsChosen (string[] words) {
-        CmdWordsChosen(String.Join(" ", words));
+        //CmdWordsChosen(String.Join(" ", words));
+        CmdWordsChosen(words);
     }
 
     [Command]
-    private void CmdWordsChosen (string words) {
-        Words = words.Split(' ');
+    private void CmdWordsChosen (string[] words) {
+        //private void CmdWordsChosen (string words) {
+        //Words = words.Split(' ');
+        Words = words;
         gm.CmdPlayerReady();
     }
 
