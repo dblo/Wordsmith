@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class LineLog : MonoBehaviour {
-    private Text plyerLines;
+    private Text playerLines;
     private Text playerLabel;
     private List<string> lines = new List<string>();
     private const float anchorYMin = 0.65f;
@@ -19,14 +19,14 @@ public class LineLog : MonoBehaviour {
     }
 
     public string GetLinesAsString () {
-        return plyerLines.text;
+        return playerLines.text;
     }
 
     private void Awake () {
         var gos = GetComponentsInChildren<Text>();
         foreach (var go in gos) {
             if (go.name == "Log")
-                plyerLines = go;
+                playerLines = go;
             else if (go.name == "Label")
                 playerLabel = go;
         }
@@ -35,10 +35,26 @@ public class LineLog : MonoBehaviour {
     public void AddLine (string[] words, string[] colors) {
         var line = CreateRichText(words, colors);
         if (lines.Count > 0)
-            plyerLines.text = plyerLines.text + "\n" + line.ToString();
+            playerLines.text = playerLines.text + "\n" + line.ToString();
         else
-            plyerLines.text = line.ToString();
+            playerLines.text = line.ToString();
         lines.Add(line);
+    }
+
+    public void AddTemporaryLine(string[] words, string[] colors) {
+        var line = CreateRichText(words, colors);
+        if (lines.Count > 0)
+            playerLines.text = playerLines.text + "\n" + line.ToString();
+        else
+            playerLines.text = line.ToString();
+    }
+
+    public void RemoveTemporaryLine() {
+        var ix = playerLines.text.LastIndexOf('\n');
+        if (ix < 0)
+            playerLines.text = "";
+        else
+            playerLines.text = playerLines.text.Remove(ix);
     }
 
     private static string CreateRichText(string[] words, string[]colors) {

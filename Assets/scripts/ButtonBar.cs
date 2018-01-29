@@ -10,8 +10,26 @@ public class ButtonBar : MonoBehaviour {
     public WordSea wordSea;
     public GameManager gm;
 
+    private Text waitingText;
     private Dictionary<Button, Button> buttonMap = new Dictionary<Button, Button>();
     private int currentButton;
+
+    private void Awake () {
+        waitingText = GameObject.Find("WaitingText").GetComponent<Text>();
+    }
+
+    void SetShowButtons (bool value) {
+        foreach (var b in buttons) {
+            b.gameObject.SetActive(value);
+        }
+        goButton.gameObject.SetActive(value);
+
+        if (gm.GameOver()) {
+            //Todo show home and rematch? buttons
+        } else {
+            waitingText.enabled = !value;
+        }
+    }
 
     public bool TryAdd (Button btn) {
         if (AllWordsChosen())
@@ -66,6 +84,7 @@ public class ButtonBar : MonoBehaviour {
     }
 
     public void Reset () {
+        SetShowButtons(true);
         foreach (var btn in buttons) {
             btn.GetComponentInChildren<Text>().text = "";
         }
@@ -75,8 +94,9 @@ public class ButtonBar : MonoBehaviour {
 
     public void TryAcceptLine () {
         if (AllWordsChosen()) {
-            goButton.interactable = false;
             localPlayer.WordsChosen(GetWords());
+            SetShowButtons(false);
+
         }
     }
 

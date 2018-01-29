@@ -96,6 +96,10 @@ public class ColorMapper {
         return Enumerable.Repeat("red", length).ToArray();
     }
 
+    public static string[] GetTemporaryWordColors (int length) {
+        return Enumerable.Repeat("white", length).ToArray();
+    }
+
     // True if score is such that 2 points per word was awarded
     private static bool PerfectScore (int wordCount, int score) {
         return score == wordCount * 2;

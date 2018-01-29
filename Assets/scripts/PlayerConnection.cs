@@ -51,25 +51,23 @@ public class PlayerConnection : NetworkBehaviour {
     }
 
     public void WordsChosen (string[] words) {
-        //CmdWordsChosen(String.Join(" ", words));
+        gm.AddTemporaryWordsToLineLog(words);
         CmdWordsChosen(words);
     }
 
     [Command]
     private void CmdWordsChosen (string[] words) {
-        //private void CmdWordsChosen (string words) {
-        //Words = words.Split(' ');
         Words = words;
         gm.CmdPlayerReady();
     }
 
     [Command]
     public void CmdSynchronizeWords () {
-        RpcSynchronizeWords(String.Join(" ", Words));
+        RpcSynchronizeWords(Words);
     }
 
     [ClientRpc]
-    private void RpcSynchronizeWords (string words) {
-        Words = words.Split(' ');
+    private void RpcSynchronizeWords (string[] words) {
+        Words = words;
     }
 }

@@ -74,11 +74,13 @@ public class GameManager : NetworkBehaviour {
 
         players.ForEach((p) => p.CmdSynchronizeWords());
         var newWordSea = GameOver() ? null : wordSea.GenerateNewSea();
-        RpcAllPlayersReady(String.Join(" ", newWordSea));
+        RpcAllPlayersReady(newWordSea);
     }
 
     [ClientRpc]
-    void RpcAllPlayersReady (string newWordSea) {
+    void RpcAllPlayersReady (string[] newWordSea) {
+        RemoveTemporaryWords();
+
         colorWordMapper.ComputeColors(players);
         colorWordMapper.ComputeScore(0);
         AddWordsToLineLogs(colorWordMapper.GetColors());
@@ -91,7 +93,26 @@ public class GameManager : NetworkBehaviour {
                 p.Reset();
             }
             buttonBar.Reset();
-            wordSea.SetNewSea(newWordSea.Split(' '));
+            wordSea.SetNewSea(newWordSea);
+        }
+    }
+
+    public void AddTemporaryWordsToLineLog(string[] words) {
+        for (int i = 0; i < players.Count; i++) {
+            if (players[i].isLocalPlayer) {
+                var tempColors = ColorMapper.GetTemporaryWordColors(words.Length);
+                lineLogs[i].AddTemporaryLine(words, tempColors);
+                break;
+            }
+        }
+    }
+
+    private void RemoveTemporaryWords () {
+        for (int i = 0; i < players.Count; i++) {
+            if (players[i].isLocalPlayer) {
+                lineLogs[i].RemoveTemporaryLine();
+                break;
+            }
         }
     }
 
