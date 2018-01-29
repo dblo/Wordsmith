@@ -38,7 +38,6 @@ GameObject:
   - component: {fileID: 224988696182108516}
   - component: {fileID: 222998175121788070}
   - component: {fileID: 114028670418718156}
-  - component: {fileID: 114933846703765790}
   m_Layer: 5
   m_Name: ScoreHeader
   m_TagString: Untagged
@@ -194,7 +193,6 @@ GameObject:
   - component: {fileID: 224423954502955780}
   - component: {fileID: 222214810196470956}
   - component: {fileID: 114523866631731470}
-  - component: {fileID: 114997683496929370}
   m_Layer: 5
   m_Name: ScoreTotal
   m_TagString: Untagged
@@ -669,17 +667,6 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Rematch
---- !u!114 &114933846703765790
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1174798428204696}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5234644b3ea6e842aa53d100f2c140d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &114996001872053376
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -713,17 +700,6 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 
---- !u!114 &114997683496929370
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1744931937989600}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5234644b3ea6e842aa53d100f2c140d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!222 &222214810196470956
 CanvasRenderer:
   m_ObjectHideFlags: 1

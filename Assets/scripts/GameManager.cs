@@ -34,15 +34,17 @@ public class GameManager : NetworkBehaviour {
             return;
 
         players.ForEach((p) => p.CmdSynchronizeName());
-        var newWordSea = String.Join(" ", wordSea.GenerateNewSea());
-        RpcOnAllPlayersJoined(newWordSea);
+        var newWordSea = wordSea.GenerateNewSea();
+        RpcOnAllPlayersJoined(newWordSea, expectedPlayerCount);
     }
 
     [ClientRpc]
-    private void RpcOnAllPlayersJoined (string newWordSea) {
+    private void RpcOnAllPlayersJoined (string[] newWordSea, int playercount) {
+        expectedPlayerCount = playercount;
         players = FindSortedPlayers();
+
         CreateLineLogs();
-        wordSea.SetNewSea(newWordSea.Split(' '));
+        wordSea.SetNewSea(newWordSea);
     }
 
     private List<PlayerConnection> FindSortedPlayers () {

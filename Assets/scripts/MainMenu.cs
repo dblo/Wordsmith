@@ -1,24 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour {
+    public MultiplayerLobby lobbyPrefab;
+
     private void Awake () {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
     }
 
-    public void LaunchMultiPlayer () {
-        GameManager.ExpectedPlayerCount = 2;
-        //SceneManager.LoadScene("main");
+    public void LaunchLobby () {
+        var canvas = GameObject.Find("Canvas");
+        Instantiate(lobbyPrefab, canvas.transform);
     }
 
-    public void LaunchSinglePlayer () {
-        GameManager.ExpectedPlayerCount = 1;
-        //SceneManager.LoadScene("main");
+    public void JoinAnyGame () {
+        GameManager.ExpectedPlayerCount = 2;
         var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
-        nm.StartHost();
+        nm.StartClient();
     }
 
     public void QuitGame () {
