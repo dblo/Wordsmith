@@ -7,7 +7,6 @@ using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour {
-    public int linesPerGame;
     public WordSea wordSea;
     public ButtonBar buttonBar;
 
@@ -17,10 +16,16 @@ public class GameManager : NetworkBehaviour {
     private ColorMapper colorWordMapper = new ColorMapper(wordsPerLine);
 
     private static int expectedPlayerCount = 1;
+    private static int linesPerGame = 3;
 
     public static int ExpectedPlayerCount {
         get { return expectedPlayerCount; }
         set { expectedPlayerCount = value; }
+    }
+
+    public static int LinesPerGame {
+        get { return linesPerGame; }
+        set { linesPerGame = value; }
     }
 
     public override void OnStartServer () {
@@ -62,7 +67,7 @@ public class GameManager : NetworkBehaviour {
 
     private void CreateLineLogs () {
         for (int i = 0; i < players.Count; i++) {
-            lineLogs.Add(LineLog.Create((float) i / players.Count, 
+            lineLogs.Add(LineLog.Create((float) i / players.Count,
                 (float) (i + 1) / players.Count, players[i].PlayerName));
         }
     }
@@ -84,9 +89,10 @@ public class GameManager : NetworkBehaviour {
         colorWordMapper.ComputeColors(players);
         colorWordMapper.ComputeScore(0);
         AddWordsToLineLogs(colorWordMapper.GetColors());
-        
+
         if (GameOver()) {
             SetUIButtonsInteractable(false);
+            buttonBar.OnGameOver();
             ShowGameOverScreen();
         } else {
             foreach (var p in players) {
@@ -97,7 +103,7 @@ public class GameManager : NetworkBehaviour {
         }
     }
 
-    public void AddTemporaryWordsToLineLog(string[] words) {
+    public void AddTemporaryWordsToLineLog (string[] words) {
         for (int i = 0; i < players.Count; i++) {
             if (players[i].isLocalPlayer) {
                 var tempColors = ColorMapper.GetTemporaryWordColors(words.Length);
@@ -162,12 +168,12 @@ public class GameManager : NetworkBehaviour {
 
     public bool GameOver () {
         foreach (var ll in lineLogs) {
-            if (ll.LinesCount() != linesPerGame)
+            if (ll.LinesCount() != LinesPerGame)
                 return false;
         }
         return true;
     }
-    
+
     private bool IsGameFull () {
         return players.Count == ExpectedPlayerCount;
     }

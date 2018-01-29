@@ -136,7 +136,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9844fe8214fbafd498fb64a3845d94a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  linesPerGame: 3
   wordSea: {fileID: 1016799784}
   buttonBar: {fileID: 653412622}
 --- !u!4 &2209513

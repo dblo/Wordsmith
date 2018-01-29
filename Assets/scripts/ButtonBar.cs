@@ -18,17 +18,16 @@ public class ButtonBar : MonoBehaviour {
         waitingText = GameObject.Find("WaitingText").GetComponent<Text>();
     }
 
-    void SetShowButtons (bool value) {
+   private void SetShowButtons (bool value) {
         foreach (var b in buttons) {
             b.gameObject.SetActive(value);
         }
         goButton.gameObject.SetActive(value);
+    }
 
-        if (gm.GameOver()) {
-            //Todo show home and rematch? buttons
-        } else {
-            waitingText.enabled = !value;
-        }
+    public void OnGameOver() {
+        waitingText.enabled = false;//temp
+        //Todo show home and rematch? buttons
     }
 
     public bool TryAdd (Button btn) {
