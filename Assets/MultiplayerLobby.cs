@@ -7,14 +7,17 @@ public class MultiplayerLobby : MonoBehaviour {
 
     void Start () {
         gameSizeSlider = GameObject.Find("GameSizeSlider").GetComponent<Slider>();
-        gameSizeSlider.onValueChanged.AddListener(delegate { OnGameSizeSliderChange(); });
-    }
 
-    public void OnGameSizeSliderChange () {
-        GameManager.ExpectedPlayerCount = (int) gameSizeSlider.value;
+        var defaultPlayerCount = PlayerPrefs.GetInt("DefaultPlayerCount", -1);
+        if (defaultPlayerCount >= 0) {
+            gameSizeSlider.value = defaultPlayerCount;
+        }
     }
 
     public void StartGame() {
+        PlayerPrefs.SetInt("DefaultPlayerCount", (int) gameSizeSlider.value);
+        GameManager.ExpectedPlayerCount = (int) gameSizeSlider.value;
+
         var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
         nm.StartHost();
     }
