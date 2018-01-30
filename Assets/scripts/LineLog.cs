@@ -6,7 +6,7 @@ public class LineLog : MonoBehaviour {
     private Text playerLines;
     private Text playerLabel;
     private List<string> lines = new List<string>();
-    private const float anchorYMin = 0.65f;
+    private const float anchorYMin = 0f;
     private const float anchorYMax = 1f;
 
     public string PlayerName {
@@ -67,8 +67,8 @@ public class LineLog : MonoBehaviour {
 
     // Create an instance of the LineLog prefab in the Resources the folder
     public static LineLog Create (float anchorXMin, float anchorXMax, string playerName) {
-        var canvasTrans = GameObject.Find("Canvas").transform;
-        var go = Instantiate((GameObject) Resources.Load("LineLog"), canvasTrans, false);
+        var parent = GameObject.Find("LineLogs").transform;
+        var go = Instantiate((GameObject) Resources.Load("LineLog"), parent, false);
         var rTrans = go.GetComponent<RectTransform>();
         rTrans.anchorMin = new Vector2(anchorXMin, anchorYMin);
         rTrans.anchorMax = new Vector2(anchorXMax, anchorYMax);

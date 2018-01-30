@@ -3,6 +3,7 @@ using UnityEngine.Networking;
 
 public class MainMenu : MonoBehaviour {
     public MultiplayerLobby lobbyPrefab;
+    public SeaMaker seaMakerPrefab;
 
     private void Awake () {
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
@@ -11,6 +12,11 @@ public class MainMenu : MonoBehaviour {
     public void LaunchLobby () {
         var canvas = GameObject.Find("Canvas");
         Instantiate(lobbyPrefab, canvas.transform);
+    }
+
+    public void LaunchSeaMaker() {
+        var canvas = GameObject.Find("Canvas");
+        Instantiate(seaMakerPrefab, canvas.transform);
     }
 
     public void JoinAnyGame () {

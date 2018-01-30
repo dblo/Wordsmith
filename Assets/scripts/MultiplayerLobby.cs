@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class MultiplayerLobby : MonoBehaviour {
+    private Button wordSeaButton;
     private Slider gameLengthSlider;
     private Slider playercountSlider;
     private Slider seaModeSlider;
@@ -15,6 +16,7 @@ public class MultiplayerLobby : MonoBehaviour {
     private Text seaModeLabel;
     private Text seaSizeLabel;
     private Text lineLengthLabel;
+    private string selectedWordSea = "Default";
 
     void Start () {
         gameLengthSlider = GameObject.Find("GameLengthSlider").GetComponent<Slider>();
@@ -27,6 +29,12 @@ public class MultiplayerLobby : MonoBehaviour {
         seaModeLabel = GameObject.Find("SeaModeLabel").GetComponent<Text>();
         seaSizeLabel = GameObject.Find("SeaSizeLabel").GetComponent<Text>();
         lineLengthLabel = GameObject.Find("LineLengthLabel").GetComponent<Text>();
+        wordSeaButton = GameObject.Find("LobbyWordSeaListButton").GetComponent<Button>();
+
+        wordSeaButton.onClick.AddListener(() => WordSeaListButtonClicked("Default"));
+
+        var closeLobbyButton = GameObject.Find("LobbyCloseButton").GetComponent<Button>();
+        closeLobbyButton.onClick.AddListener(() => Destroy(gameObject));
 
         gameLengthSlider.onValueChanged.AddListener(
             (value) => gameLengthLabel.text = "Game length: " + value);
@@ -55,7 +63,29 @@ public class MultiplayerLobby : MonoBehaviour {
 
         var defaultGameLength = PlayerPrefs.GetInt("DefaultGameLength", -1);
         if (defaultGameLength >= 0) {
+            if (gameLengthSlider.value == defaultGameLength) {
+                gameLengthLabel.text = "Game length: " + defaultGameLength;
+            }
             gameLengthSlider.value = defaultGameLength;
+        } else {
+            gameLengthLabel.text = "Game length: " + gameLengthSlider.value;
+        }
+        SetupLibraries();
+    }
+
+    public void WordSeaListButtonClicked(string libraryName) {
+        selectedWordSea = libraryName;
+    }
+
+    private void SetupLibraries () {
+        var libraryNames = PlayerPrefs.GetString(WordSea.PP_LIBRARY_NAMES);
+        if (libraryNames == "")
+            return;
+
+        foreach (var name in libraryNames.Split(';')) {
+            var go = Instantiate(wordSeaButton, wordSeaButton.transform.parent);
+            go.GetComponentInChildren<Text>().text = name;
+            go.GetComponent<Button>().onClick.AddListener(() => WordSeaListButtonClicked(name));
         }
     }
 
@@ -65,6 +95,9 @@ public class MultiplayerLobby : MonoBehaviour {
 
         PlayerPrefs.SetInt("DefaultGameLength", (int) gameLengthSlider.value);
         GameManager.LinesPerGame = (int) gameLengthSlider.value;
+
+        //Todo startgame button invalid until wordsea chosen
+        WordSea.currentLibrary = selectedWordSea;
 
         var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
         nm.StartHost();

@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class WordSea : MonoBehaviour {
+    public static string currentLibrary = "";
+    public const string PP_LIBRARY_NAMES = "pp_libary_names";
+
     public ButtonBar buttonBar;
     public List<Button> buttons;
 
@@ -52,12 +55,20 @@ public class WordSea : MonoBehaviour {
     }
 
     public string[] GenerateNewSea () {
-        var words1 = GenerateUniqueWords(buttons.Count - 3, library);
-        var words2 = GenerateUniqueWords(3, library2);
-        string[] words = new string[words1.Length + words2.Length];
-        words1.CopyTo(words, 0);
-        words2.CopyTo(words, words1.Length);
-        return words;
+        if (currentLibrary == "Default") {
+            var words1 = GenerateUniqueWords(buttons.Count - 3, library);
+            var words2 = GenerateUniqueWords(3, library2);
+            string[] words = new string[words1.Length + words2.Length];
+            words1.CopyTo(words, 0);
+            words2.CopyTo(words, words1.Length);
+            return words;
+        } else if (currentLibrary != "") {
+            var library = PlayerPrefs.GetString(currentLibrary);
+            if (library == "")
+                throw new System.InvalidOperationException("Empty library in WordSea.GenerateNewSea");
+            return library.Split(';');
+        }
+        throw new System.InvalidOperationException("Empty currenLibrary in WordSea.GenerateNewSea");
     }
 
     public string[] PickRandomWordsFromSea (int count) {
