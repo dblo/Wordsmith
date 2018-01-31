@@ -70,10 +70,13 @@ public class MultiplayerLobby : MonoBehaviour {
         } else {
             gameLengthLabel.text = "Game length: " + gameLengthSlider.value;
         }
+        
+        seaSizeLabel.text = "Sea size: " + seaSizeSlider.value;
+        lineLengthLabel.text = "Line length " + lineLengthSlider.value;
         SetupLibraries();
     }
 
-    public void WordSeaListButtonClicked(string libraryName) {
+    public void WordSeaListButtonClicked (string libraryName) {
         selectedWordSea = libraryName;
     }
 
@@ -97,7 +100,10 @@ public class MultiplayerLobby : MonoBehaviour {
         GameManager.LinesPerGame = (int) gameLengthSlider.value;
 
         //Todo startgame button invalid until wordsea chosen
-        WordSea.currentLibrary = selectedWordSea;
+        WordSea.currentLibraryName = selectedWordSea;
+
+        ButtonBar.lineLength = (int) lineLengthSlider.value;
+        WordSea.wordSeaSize = (int) seaSizeSlider.value;
 
         var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
         nm.StartHost();

@@ -3,14 +3,17 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class WordSea : MonoBehaviour {
-    public static string currentLibrary = "";
+    public static string currentLibraryName = "";
+    public static int wordSeaSize = 12;
     public const string PP_LIBRARY_NAMES = "pp_libary_names";
 
     public ButtonBar buttonBar;
     public List<Button> buttons;
 
     private List<string> currentSea = new List<string>();
-
+    public const int seaRows = 3;
+    public const int seaCols = 4;
+    private const int maxWordSizeSize = 12;
     string[] library = new string[]{ "copper","explain", "ill-fated", "truck", "neat",
                                          "unite", "branch", "educated", "tenuous",
                                          "hum", "decisive", "notice", "yell",
@@ -22,18 +25,18 @@ public class WordSea : MonoBehaviour {
                                          "same", "double", "road" };
     string[] library2 = new string[] { "is", "are", "you", "what", "when", "like", "a", "your" };
 
+    private void Start () {
+        for (int i = wordSeaSize; i < maxWordSizeSize; i++) {
+            buttons[i].interactable = false;
+        }
+    }
+
     public void ReturnWord (Button btn) {
-        var text = btn.GetComponentInChildren<Text>();
-        SetTextAlpha(text, 1f);
-        btn.interactable = true;
+        btn.GetComponent<WordButton>().MoveToWordSea(WordClicked);
     }
 
     public void WordClicked (Button btn) {
-        var text = btn.GetComponentInChildren<Text>();
-        if (buttonBar.TryAdd(btn)) {
-            SetTextAlpha(text, 0f);
-            btn.interactable = false;
-        }
+        buttonBar.TryAdd(btn);
     }
 
     private void SetTextAlpha (Text text, float alpha) {
@@ -48,26 +51,25 @@ public class WordSea : MonoBehaviour {
         for (int i = 0; i < words.Length; i++) {
             var text = buttons[i].GetComponentInChildren<Text>();
             text.text = words[i];
-            SetTextAlpha(text, 1f);
             currentSea.Add(words[i]);
-            buttons[i].interactable = true;
         }
     }
 
     public string[] GenerateNewSea () {
-        if (currentLibrary == "Default") {
+        if (currentLibraryName == "Default") {
             var words1 = GenerateUniqueWords(buttons.Count - 3, library);
             var words2 = GenerateUniqueWords(3, library2);
-            string[] words = new string[words1.Length + words2.Length];
-            words1.CopyTo(words, 0);
-            words2.CopyTo(words, words1.Length);
-            return words;
-        } else if (currentLibrary != "") {
-            var library = PlayerPrefs.GetString(currentLibrary);
+            var newSea = new string[words1.Length + words2.Length];
+            words1.CopyTo(newSea, 0);
+            words2.CopyTo(newSea, words1.Length);
+            return newSea;
+        }
+        if (currentLibraryName != "") {
+            var library = PlayerPrefs.GetString(currentLibraryName);
             if (library == "")
                 throw new System.InvalidOperationException("Empty library in WordSea.GenerateNewSea");
             return library.Split(';');
-        }
+        } 
         throw new System.InvalidOperationException("Empty currenLibrary in WordSea.GenerateNewSea");
     }
 

@@ -90,6 +90,7 @@
     <Compile Include="Assets\scripts\PauseMenu.cs" />
     <Compile Include="Assets\scripts\PlayerConnection.cs" />
     <Compile Include="Assets\scripts\SeaMaker.cs" />
+    <Compile Include="Assets\scripts\WordButton.cs" />
     <Compile Include="Assets\scripts\WordSea.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
