@@ -27,7 +27,7 @@ public class ButtonBar : MonoBehaviour {
         if (AllWordsChosen())
             return false;
 
-        btn.GetComponent<WordButton>().MoveToButtonBar(buttons.Count, WordClicked);
+        btn.GetComponent<WordButton>().MoveToButtonBar(transform, buttons.Count, WordClicked);
         buttons.Add(btn);
 
         if (AllWordsChosen())
@@ -35,15 +35,14 @@ public class ButtonBar : MonoBehaviour {
         return true;
     }
 
-
     public void AssignLocalPlayer (PlayerConnection localPlayer) {
         this.localPlayer = localPlayer;
     }
 
     public void WordClicked (Button btn) {
-        wordSea.ReturnWord(btn);
         ShiftWordsLeft(btn);
         buttons.Remove(btn);
+        wordSea.ReturnWord(btn);
         goButton.interactable = false;
     }
 
@@ -78,9 +77,9 @@ public class ButtonBar : MonoBehaviour {
         var minAnchorX = rTrans.anchorMin.x;
         int btnIndex = (int)(minAnchorX / 0.2f);
 
-        for (int i = btnIndex; i < buttons.Count - 1; i++) {
-            var rTransLeft = buttons[i].GetComponent<RectTransform>();
-            var rTransRight = buttons[i+1].GetComponent<RectTransform>();
+        for (int i = buttons.Count - 1; i > btnIndex; i--) {
+            var rTransRight = buttons[i].GetComponent<RectTransform>();
+            var rTransLeft = buttons[i-1].GetComponent<RectTransform>();
             rTransRight.anchorMin = rTransLeft.anchorMin;
             rTransRight.anchorMax = rTransLeft.anchorMax;
         }

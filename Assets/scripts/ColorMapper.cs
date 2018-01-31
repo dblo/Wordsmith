@@ -3,14 +3,9 @@ using System.Linq;
 
 public class ColorMapper {
     private const int perfectScoreBonus = 2;
-    private readonly int wordsPerLine;
     private List<string[]> words;
     private List<string[]> colors;
     private List<int> scorePerLine = new List<int>();
-
-    public ColorMapper (int wordsPerLine) {
-        this.wordsPerLine = wordsPerLine;
-    }
 
     public int[] GetScores () {
         return scorePerLine.ToArray();
@@ -28,9 +23,9 @@ public class ColorMapper {
 
         foreach (var p in players) {
             words.Add((string[]) p.Words.Clone());
-            colors.Add(GetInitialColors(wordsPerLine));
+            colors.Add(GetInitialColors(ButtonBar.lineLength));
         }
-        for (int i = 0; i < wordsPerLine; i++) {
+        for (int i = 0; i < ButtonBar.lineLength; i++) {
             var word = words[0][i];
             int j = 1;
             for (; j < players.Count; j++) {
@@ -66,7 +61,7 @@ public class ColorMapper {
     }
 
     private void MarkWordYellow (Dictionary<string, uint> wordDict, string key) {
-        for (int i = 0; i < wordsPerLine; i++) {
+        for (int i = 0; i < ButtonBar.lineLength; i++) {
             for (int j = 0; j < words[i].Length; j++) {
                 if (key.Equals(words[i][j])) {
                     colors[i][j] = "yellow";
@@ -87,7 +82,7 @@ public class ColorMapper {
             else if (c == "yellow")
                 score += 1;
         }
-        if (PerfectScore(wordsPerLine, score))
+        if (PerfectScore(ButtonBar.lineLength, score))
             score += perfectScoreBonus;
         scorePerLine.Add(score);
     }

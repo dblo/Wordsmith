@@ -19,7 +19,7 @@ static class SceneAutoLoader {
     // Static constructor binds a playmode-changed callback.
     // [InitializeOnLoad] above makes sure this gets executed.
     static SceneAutoLoader () {
-        EditorApplication.playmodeStateChanged += OnPlayModeChanged;
+        EditorApplication.playModeStateChanged += delegate { OnPlayModeChanged(); };
     }
 
     // Menu items to select the "master" scene and control whether or not to load it.

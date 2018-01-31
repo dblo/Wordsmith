@@ -10,10 +10,9 @@ public class GameManager : NetworkBehaviour {
     public WordSea wordSea;
     public ButtonBar buttonBar;
 
-    private const int wordsPerLine = 4;
     private List<LineLog> lineLogs = new List<LineLog>();
     private List<PlayerConnection> players;
-    private ColorMapper colorWordMapper = new ColorMapper(wordsPerLine);
+    private ColorMapper colorWordMapper = new ColorMapper();
 
     private static int expectedPlayerCount = 1;
     private static int linesPerGame = 3;

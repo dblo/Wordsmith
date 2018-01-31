@@ -26,13 +26,16 @@ public class WordSea : MonoBehaviour {
     string[] library2 = new string[] { "is", "are", "you", "what", "when", "like", "a", "your" };
 
     private void Start () {
+        foreach (var b in buttons) {
+            b.onClick.AddListener(delegate { WordClicked(b); });
+        }
         for (int i = wordSeaSize; i < maxWordSizeSize; i++) {
             buttons[i].interactable = false;
         }
     }
 
     public void ReturnWord (Button btn) {
-        btn.GetComponent<WordButton>().MoveToWordSea(WordClicked);
+        btn.GetComponent<WordButton>().MoveToWordSea(transform, WordClicked);
     }
 
     public void WordClicked (Button btn) {
@@ -57,7 +60,7 @@ public class WordSea : MonoBehaviour {
 
     public string[] GenerateNewSea () {
         if (currentLibraryName == "Default") {
-            var words1 = GenerateUniqueWords(buttons.Count - 3, library);
+            var words1 = GenerateUniqueWords(wordSeaSize - 3, library);
             var words2 = GenerateUniqueWords(3, library2);
             var newSea = new string[words1.Length + words2.Length];
             words1.CopyTo(newSea, 0);
@@ -69,7 +72,7 @@ public class WordSea : MonoBehaviour {
             if (library == "")
                 throw new System.InvalidOperationException("Empty library in WordSea.GenerateNewSea");
             return library.Split(';');
-        } 
+        }
         throw new System.InvalidOperationException("Empty currenLibrary in WordSea.GenerateNewSea");
     }
 
