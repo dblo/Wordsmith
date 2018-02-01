@@ -51,7 +51,7 @@ public class MultiplayerLobby : MonoBehaviour {
         lineLengthSlider.onValueChanged.AddListener(
              (value) => lineLengthLabel.text = "Line length: " + value);
 
-        var defaultPlayerCount = PlayerPrefs.GetInt("DefaultPlayerCount", -1);
+        var defaultPlayerCount = PlayerPrefs.GetInt(PreferencesKeys.DefaultPlayerCount, -1);
         if (defaultPlayerCount >= 0) {
             if (playercountSlider.value == defaultPlayerCount) {
                 playerCountLabel.text = "Players: " + defaultPlayerCount;
@@ -61,7 +61,7 @@ public class MultiplayerLobby : MonoBehaviour {
             playerCountLabel.text = "Players: " + playercountSlider.value;
         }
 
-        var defaultGameLength = PlayerPrefs.GetInt("DefaultGameLength", -1);
+        var defaultGameLength = PlayerPrefs.GetInt(PreferencesKeys.DefaultGameLength, -1);
         if (defaultGameLength >= 0) {
             if (gameLengthSlider.value == defaultGameLength) {
                 gameLengthLabel.text = "Game length: " + defaultGameLength;
@@ -81,7 +81,7 @@ public class MultiplayerLobby : MonoBehaviour {
     }
 
     private void SetupLibraries () {
-        var libraryNames = PlayerPrefs.GetString(WordSea.PP_LIBRARY_NAMES);
+        var libraryNames = PlayerPrefs.GetString(PreferencesKeys.StoredLibraryNames);
         if (libraryNames == "")
             return;
 
@@ -93,10 +93,10 @@ public class MultiplayerLobby : MonoBehaviour {
     }
 
     public void StartGame () {
-        PlayerPrefs.SetInt("DefaultPlayerCount", (int) playercountSlider.value);
+        PlayerPrefs.SetInt(PreferencesKeys.DefaultPlayerCount,(int) playercountSlider.value);
         GameManager.ExpectedPlayerCount = (int) playercountSlider.value;
 
-        PlayerPrefs.SetInt("DefaultGameLength", (int) gameLengthSlider.value);
+        PlayerPrefs.SetInt(PreferencesKeys.DefaultGameLength, (int) gameLengthSlider.value);
         GameManager.LinesPerGame = (int) gameLengthSlider.value;
 
         //Todo startgame button invalid until wordsea chosen

@@ -28,7 +28,7 @@ public class GameManager : NetworkBehaviour {
     }
 
     private void Awake () {
-        SoundMuted = PlayerPrefs.GetInt("SoundMuted", 0) > 0;
+        SoundMuted = PlayerPrefs.GetInt(PreferencesKeys.SoundcMuted, 0) > 0;
     }
 
     public override void OnStartServer () {

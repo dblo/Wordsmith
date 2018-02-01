@@ -21,10 +21,10 @@ public class PlayerConnection : NetworkBehaviour {
             var bb = go.GetComponent<ButtonBar>();
             bb.AssignLocalPlayer(this);
 
-            var playerName = PlayerPrefs.GetString("name");
+            var playerName = PlayerPrefs.GetString(PreferencesKeys.PlayerName);
             if (playerName.Equals("")) {
                 playerName = "Player " + new System.Random().Next(100);
-                PlayerPrefs.SetString("name", playerName);
+                PlayerPrefs.SetString(PreferencesKeys.PlayerName, playerName);
             }
             CmdLocalPlayerReady(playerName);
         }

@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class WordSea : MonoBehaviour {
     public static string currentLibraryName = "";
     public static int wordSeaSize = 12;
-    public const string PP_LIBRARY_NAMES = "pp_libary_names";
 
     public ButtonBar buttonBar;
     public List<Button> buttons;

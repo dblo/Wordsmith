@@ -34,12 +34,12 @@ public class SeaMaker : MonoBehaviour {
     public void OnClickSaveButton () {
         //Todo check not placehold text
         if (seaName.text != "" && seaContent.text != "") {
-            var libraryNames = PlayerPrefs.GetString(WordSea.PP_LIBRARY_NAMES);
+            var libraryNames = PlayerPrefs.GetString(PreferencesKeys.StoredLibraryNames);
             //Todo dont allow ; in seaName
             if (libraryNames == "") {
-                PlayerPrefs.SetString(WordSea.PP_LIBRARY_NAMES, seaName.text);
+                PlayerPrefs.SetString(PreferencesKeys.StoredLibraryNames, seaName.text);
             } else {
-                PlayerPrefs.SetString(WordSea.PP_LIBRARY_NAMES, libraryNames + ";" + seaName.text);
+                PlayerPrefs.SetString(PreferencesKeys.StoredLibraryNames, libraryNames + ";" + seaName.text);
             }
             PlayerPrefs.SetString(seaName.text, seaContent.text);
         }
