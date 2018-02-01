@@ -13,8 +13,16 @@ public class SeaMaker : MonoBehaviour {
         var saveButton = GameObject.Find("SeaMakerSaveButton").GetComponent<Button>();
         saveButton.onClick.AddListener(OnClickSaveButton);
 
+        Action cancelBtnAction = () => {
+            var parent = GameObject.Find("Canvas").transform;
+            var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), parent);
+
+            go.GetComponent<ConfirmationDialog>().SetOnConfirmAction(() => {
+                Destroy(gameObject);
+            });
+        };
         var cancelButton = GameObject.Find("SeaMakerCancelButton").GetComponent<Button>();
-        cancelButton.onClick.AddListener(() => Destroy(gameObject));
+        cancelButton.onClick.AddListener(delegate { cancelBtnAction(); });
 
         var newButton = GameObject.Find("SeaMakerNewButton").GetComponent<Button>();
         newButton.onClick.AddListener(OnClickNewButton);
@@ -25,10 +33,10 @@ public class SeaMaker : MonoBehaviour {
 
     public void OnClickSaveButton () {
         //Todo check not placehold text
-        if(seaName.text != "" && seaContent.text != "") {
+        if (seaName.text != "" && seaContent.text != "") {
             var libraryNames = PlayerPrefs.GetString(WordSea.PP_LIBRARY_NAMES);
             //Todo dont allow ; in seaName
-            if(libraryNames == "") {
+            if (libraryNames == "") {
                 PlayerPrefs.SetString(WordSea.PP_LIBRARY_NAMES, seaName.text);
             } else {
                 PlayerPrefs.SetString(WordSea.PP_LIBRARY_NAMES, libraryNames + ";" + seaName.text);
@@ -37,11 +45,14 @@ public class SeaMaker : MonoBehaviour {
         }
     }
 
-    public void OnClickNewButton() {
-        var contentInput = GameObject.Find("SeaContentInput").GetComponent<InputField>();
-        contentInput.text = "";
-
-        var nameInput = GameObject.Find("SeaNameInput").GetComponent<InputField>();
-        nameInput.text = "";
+    public void OnClickNewButton () {
+        var parent = GameObject.Find("Canvas").transform;
+        var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), parent);
+        go.GetComponent<ConfirmationDialog>().SetOnConfirmAction(() => {
+            var contentInput = GameObject.Find("SeaContentInput").GetComponent<InputField>();
+            contentInput.text = "";
+            var nameInput = GameObject.Find("SeaNameInput").GetComponent<InputField>();
+            nameInput.text = "";
+        });
     }
 }
