@@ -22,15 +22,12 @@ public class WordSea : MonoBehaviour {
                                          "trade", "suspend", "train", "brash",
                                          "insurance", "groan", "remarkable", "print",
                                          "cow", "wrench", "tremble", "surround",
-                                         "same", "double", "road" };
-    string[] library2 = new string[] { "is", "are", "you", "what", "when", "like", "a", "your" };
+                                         "same", "double", "road", "is", "are", "you",
+                                         "what", "when", "like", "a", "your" };
 
     private void Start () {
         foreach (var b in buttons) {
             b.onClick.AddListener(delegate { WordClicked(b); });
-        }
-        for (int i = wordSeaSize; i < maxWordSizeSize; i++) {
-            buttons[i].interactable = false;
         }
     }
 
@@ -48,9 +45,15 @@ public class WordSea : MonoBehaviour {
         text.color = newColor;
     }
 
+    public void ConfigureSea() {
+        for (int i = wordSeaSize; i < maxWordSizeSize; i++) {
+            buttons[i].interactable = false;
+        }
+    }
+
     public void SetNewSea (string[] words) {
         currentSea.Clear();
-
+        
         for (int i = 0; i < words.Length; i++) {
             var text = buttons[i].GetComponentInChildren<Text>();
             text.text = words[i];
@@ -60,11 +63,7 @@ public class WordSea : MonoBehaviour {
 
     public string[] GenerateNewSea () {
         if (currentLibraryName == "Default") {
-            var words1 = GenerateUniqueWords(wordSeaSize - 3, library);
-            var words2 = GenerateUniqueWords(3, library2);
-            var newSea = new string[words1.Length + words2.Length];
-            words1.CopyTo(newSea, 0);
-            words2.CopyTo(newSea, words1.Length);
+            var newSea = GenerateUniqueWords(wordSeaSize , library);
             return newSea;
         }
         if (currentLibraryName != "") {

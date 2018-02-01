@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,13 +13,18 @@ public class ButtonBar : MonoBehaviour {
 
     private void Awake () {
         waitingText = GameObject.Find("WaitingText").GetComponent<Text>();
+        goButton.onClick.AddListener(OnGoButtonClicked);
     }
 
     // Return the number of buttons in the buttonBar incluing wordButtons and the Go button.
     public static int ButtonCols { get { return lineLength + 1; } }
 
     public void OnGameOver () {
-        waitingText.enabled = false;
+        OnNewSea();
+        goButton.interactable = true;
+        goButton.GetComponentInChildren<Text>().text = "Home";
+        goButton.onClick.RemoveAllListeners();
+        goButton.onClick.AddListener(OnHomeButtonClicked);
     }
 
     public bool TryAdd (Button btn) {
@@ -46,7 +50,7 @@ public class ButtonBar : MonoBehaviour {
         goButton.interactable = false;
     }
 
-    public void Reset () {
+    public void OnNewSea () {
         foreach (var b in buttons) {
             wordSea.ReturnWord(b);
         }
@@ -54,10 +58,16 @@ public class ButtonBar : MonoBehaviour {
         waitingText.enabled = false;
     }
 
-    public void AcceptLine () {
+    public void OnGoButtonClicked () {
         localPlayer.WordsChosen(GetWords());
+        OnNewSea();
         goButton.interactable = false;
         waitingText.enabled = true;
+    }
+
+    public void OnHomeButtonClicked () {
+        var gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+        gm.LaunchMainMenu();
     }
 
     private string[] GetWords () {

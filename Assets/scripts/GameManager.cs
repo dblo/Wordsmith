@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour {
     public WordSea wordSea;
     public ButtonBar buttonBar;
+    public ScorePanel scorePanelPrefab;
+
+    internal int[] GetScores () {
+        return colorWordMapper.GetScores();
+    }
 
     private List<LineLog> lineLogs = new List<LineLog>();
     private List<PlayerConnection> players;
-    private ColorMapper colorWordMapper = new ColorMapper();
+    private ColorMapper colorWordMapper;
 
     private static int expectedPlayerCount = 1;
     private static int linesPerGame = 3;
@@ -26,7 +28,7 @@ public class GameManager : NetworkBehaviour {
         get { return linesPerGame; }
         set { linesPerGame = value; }
     }
-
+    
     public override void OnStartServer () {
         players = new List<PlayerConnection>();
     }
@@ -39,16 +41,21 @@ public class GameManager : NetworkBehaviour {
 
         players.ForEach((p) => p.CmdSynchronizeName());
         var newWordSea = wordSea.GenerateNewSea();
-        RpcOnAllPlayersJoined(newWordSea, expectedPlayerCount);
+        RpcOnAllPlayersJoined(newWordSea, expectedPlayerCount, LinesPerGame, ButtonBar.lineLength);
     }
 
     [ClientRpc]
-    private void RpcOnAllPlayersJoined (string[] newWordSea, int playercount) {
+    private void RpcOnAllPlayersJoined (string[] newWordSea, int playercount, int gameLength, int lineLength) {
         expectedPlayerCount = playercount;
+        LinesPerGame = gameLength;
+        ButtonBar.lineLength = lineLength;
+        WordSea.wordSeaSize = newWordSea.Length;
         players = FindSortedPlayers();
+        colorWordMapper = new ColorMapper(playercount);
 
         CreateLineLogs();
         wordSea.SetNewSea(newWordSea);
+        wordSea.ConfigureSea();
     }
 
     private List<PlayerConnection> FindSortedPlayers () {
@@ -86,18 +93,17 @@ public class GameManager : NetworkBehaviour {
         RemoveTemporaryWords();
 
         colorWordMapper.ComputeColors(players);
-        colorWordMapper.ComputeScore(0);
+        colorWordMapper.ComputeScore();
         AddWordsToLineLogs(colorWordMapper.GetColors());
 
         if (GameOver()) {
-            SetUIButtonsInteractable(false);
             buttonBar.OnGameOver();
             ShowGameOverScreen();
         } else {
             foreach (var p in players) {
                 p.Reset();
             }
-            buttonBar.Reset(); 
+            buttonBar.OnNewSea(); 
             wordSea.SetNewSea(newWordSea);
         }
     }
@@ -128,25 +134,14 @@ public class GameManager : NetworkBehaviour {
     }
 
     private void ShowGameOverScreen () {
-        var canvas = GameObject.Find("Canvas");
-        var go = Instantiate((GameObject) Resources.Load("GameOverScreen"), canvas.transform);
-        var gos = go.GetComponent<GameOverScreen>();
+        var lineLogsGO = GameObject.Find("LineLogs");
+        var rTrans = lineLogsGO.GetComponent<RectTransform>();
+        rTrans.anchorMin = new Vector2(0, 0.3f);
 
-        switch (players.Count) {
-            case 1:
-                gos.AddData(lineLogs[0].PlayerName, " ",
-                    lineLogs[0].GetLinesAsString(), " ", colorWordMapper.GetScores());
-                break;
-            case 2:
-            case 3:
-            case 4:
-                gos.AddData(lineLogs[0].PlayerName, lineLogs[1].PlayerName,
-                    lineLogs[0].GetLinesAsString(), lineLogs[1].GetLinesAsString(),
-                    colorWordMapper.GetScores());
-                break;
-            default:
-                throw new ArgumentException();
-        }
+        wordSea.gameObject.SetActive(false);
+
+        var canvas = GameObject.Find("Canvas");
+        Instantiate(scorePanelPrefab, canvas.transform);
     }
 
     private bool AllPlayersReady () {
@@ -178,6 +173,10 @@ public class GameManager : NetworkBehaviour {
     }
 
     public void LaunchMainMenu () {
-        //    SceneManager.LoadScene("main_menu");
+        var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
+        if (isServer)
+            nm.StopHost();
+        else
+            nm.StopClient();
     }
 }

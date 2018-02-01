@@ -8,12 +8,7 @@ public class PauseMenu : MonoBehaviour {
     }
 
     public void LaunchMainMenu () {
-        var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
         var gm = GameObject.Find("GameManager");
-        var nb = gm.GetComponent<NetworkBehaviour>();
-        if (nb.isServer)
-            nm.StopHost();
-        else
-            nm.StopClient();
+        gm.GetComponent<GameManager>().LaunchMainMenu();
     }
 }

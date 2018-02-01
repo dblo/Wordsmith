@@ -143,6 +143,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   wordSea: {fileID: 1016799784}
   buttonBar: {fileID: 653412622}
+  scorePanelPrefab: {fileID: 114117712239548240, guid: 7b5f5abdc55864440a081c94c8cfe92c,
+    type: 2}
 --- !u!4 &2209513
 Transform:
   m_ObjectHideFlags: 0
@@ -2461,22 +2463,11 @@ MonoBehaviour:
     m_HighlightedTrigger: Highlighted
     m_PressedTrigger: Pressed
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1126274668}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 653412622}
-        m_MethodName: AcceptLine
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1126274668

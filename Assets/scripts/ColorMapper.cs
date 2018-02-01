@@ -3,12 +3,16 @@ using System.Linq;
 
 public class ColorMapper {
     private const int perfectScoreBonus = 2;
-    private List<string[]> words;
+    private List<string[]> playersWords;
     private List<string[]> colors;
-    private List<int> scorePerLine = new List<int>();
+    private List<int> playersScore;
+
+    public ColorMapper (int playerCount) {
+        playersScore = new List<int>(Enumerable.Repeat(0, playerCount).ToArray());
+    }
 
     public int[] GetScores () {
-        return scorePerLine.ToArray();
+        return playersScore.ToArray();
     }
 
     // Returns list where element i contains the colors that correspond to the 
@@ -18,18 +22,18 @@ public class ColorMapper {
     }
 
     public void ComputeColors (List<PlayerConnection> players) {
-        words = new List<string[]>(players.Count);
+        playersWords = new List<string[]>(players.Count);
         colors = new List<string[]>(players.Count);
 
         foreach (var p in players) {
-            words.Add((string[]) p.Words.Clone());
+            playersWords.Add((string[]) p.Words.Clone());
             colors.Add(GetInitialColors(ButtonBar.lineLength));
         }
         for (int i = 0; i < ButtonBar.lineLength; i++) {
-            var word = words[0][i];
+            var word = playersWords[0][i];
             int j = 1;
             for (; j < players.Count; j++) {
-                if (!word.Equals(words[j][i])) {
+                if (!word.Equals(playersWords[j][i])) {
                     break;
                 }
             }
@@ -37,12 +41,13 @@ public class ColorMapper {
                 continue;
             for (int k = 0; k < players.Count; k++) {
                 colors[k][i] = "green";
-                words[k][i] = null;
+                playersWords[k][i] = null;
             }
         }
+        // Count the number of occurances for each word in all player's chosen words
         var wordDict = new Dictionary<string, uint>();
-        foreach (var line in words) {
-            foreach (var word in line) {
+        foreach (var words in playersWords) {
+            foreach (var word in words) {
                 if (word == null)
                     continue;
                 else if (wordDict.ContainsKey(word))
@@ -51,6 +56,7 @@ public class ColorMapper {
                     wordDict[word] = 1;
             }
         }
+        // Remove all words not chosen by all players
         foreach (var key in wordDict.Keys.ToList()) {
             if (wordDict[key] < players.Count)
                 wordDict.Remove(key);
@@ -61,9 +67,9 @@ public class ColorMapper {
     }
 
     private void MarkWordYellow (Dictionary<string, uint> wordDict, string key) {
-        for (int i = 0; i < ButtonBar.lineLength; i++) {
-            for (int j = 0; j < words[i].Length; j++) {
-                if (key.Equals(words[i][j])) {
+        for (int i = 0; i < playersWords.Count; i++) {
+            for (int j = 0; j < playersWords[i].Length; j++) {
+                if (key.Equals(playersWords[i][j])) {
                     colors[i][j] = "yellow";
                     wordDict[key] -= 1;
                     if (wordDict[key] == 0) {
@@ -74,17 +80,19 @@ public class ColorMapper {
         }
     }
 
-    public void ComputeScore (int playerIx) {
-        int score = 0;
-        foreach (var c in colors[playerIx]) {
-            if (c == "green")
-                score += 2;
-            else if (c == "yellow")
-                score += 1;
+    public void ComputeScore () {
+        for (int i = 0; i < colors.Count; i++) {
+            int score = 0;
+            foreach (var c in colors[i]) {
+                if (c == "green")
+                    score += 2;
+                else if (c == "yellow")
+                    score += 1;
+            }
+            if (PerfectScore(ButtonBar.lineLength, score))
+                score += perfectScoreBonus;
+            playersScore[i] += score;
         }
-        if (PerfectScore(ButtonBar.lineLength, score))
-            score += perfectScoreBonus;
-        scorePerLine.Add(score);
     }
 
     private static string[] GetInitialColors (int length) {
