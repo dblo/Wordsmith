@@ -14,4 +14,9 @@ public class PauseMenu : MonoBehaviour {
             gm.GetComponent<GameManager>().LaunchMainMenu();
         });
     }
+
+    public void LaunchSettings () {
+        var parent = GameObject.Find("Canvas").transform;
+        Instantiate(Resources.Load("SettingsDialog"), parent);
+    }
 }

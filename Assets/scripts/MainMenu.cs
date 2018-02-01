@@ -25,7 +25,8 @@ public class MainMenu : MonoBehaviour {
         nm.StartClient();
     }
 
-    public void QuitGame () {
-        Application.Quit();
+    public void LaunchSettings() {
+        var parent = GameObject.Find("Canvas").transform;
+        Instantiate(Resources.Load("SettingsDialog"), parent);
     }
 }

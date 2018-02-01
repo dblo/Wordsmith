@@ -2,22 +2,20 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using System;
 
 public class GameManager : NetworkBehaviour {
     public WordSea wordSea;
     public ButtonBar buttonBar;
     public ScorePanel scorePanelPrefab;
 
-    internal int[] GetScores () {
-        return colorWordMapper.GetScores();
-    }
-
     private List<LineLog> lineLogs = new List<LineLog>();
     private List<PlayerConnection> players;
     private ColorMapper colorWordMapper;
-
     private static int expectedPlayerCount = 1;
     private static int linesPerGame = 3;
+
+    public bool SoundMuted { get; private set; }
 
     public static int ExpectedPlayerCount {
         get { return expectedPlayerCount; }
@@ -28,9 +26,17 @@ public class GameManager : NetworkBehaviour {
         get { return linesPerGame; }
         set { linesPerGame = value; }
     }
-    
+
+    private void Awake () {
+        SoundMuted = PlayerPrefs.GetInt("SoundMuted", 0) > 0;
+    }
+
     public override void OnStartServer () {
         players = new List<PlayerConnection>();
+    }
+
+    internal int[] GetScores () {
+        return colorWordMapper.GetScores();
     }
 
     // Only called on server
@@ -42,6 +48,10 @@ public class GameManager : NetworkBehaviour {
         players.ForEach((p) => p.CmdSynchronizeName());
         var newWordSea = wordSea.GenerateNewSea();
         RpcOnAllPlayersJoined(newWordSea, expectedPlayerCount, LinesPerGame, ButtonBar.lineLength);
+    }
+
+    public void SetSoundMuted (bool value) {
+        SoundMuted = value;
     }
 
     [ClientRpc]
@@ -103,7 +113,7 @@ public class GameManager : NetworkBehaviour {
             foreach (var p in players) {
                 p.Reset();
             }
-            buttonBar.Reset(); 
+            buttonBar.Reset();
             wordSea.SetNewSea(newWordSea);
         }
     }

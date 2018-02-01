@@ -38,7 +38,7 @@ GameObject:
   - component: {fileID: 224295154014879606}
   - component: {fileID: 222792738346256848}
   - component: {fileID: 114502654997694906}
-  - component: {fileID: 114102742911959416}
+  - component: {fileID: 114184572102706160}
   m_Layer: 5
   m_Name: ConfirmationDialog
   m_TagString: Untagged
@@ -131,7 +131,7 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &114102742911959416
+--- !u!114 &114184572102706160
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -139,7 +139,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1165752485880562}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82f692d51007be149ab94e6dc8ad2e22, type: 3}
+  m_Script: {fileID: 11500000, guid: 8294db028e583614bb26391ba16db6df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &114252730478319508
@@ -241,7 +241,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114102742911959416}
+      - m_Target: {fileID: 114184572102706160}
         m_MethodName: OnClickNo
         m_Mode: 1
         m_Arguments:
@@ -353,7 +353,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 114102742911959416}
+      - m_Target: {fileID: 114184572102706160}
         m_MethodName: OnClickYes
         m_Mode: 1
         m_Arguments:

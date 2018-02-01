@@ -7,9 +7,11 @@ public class WordButton : MonoBehaviour {
     public float WordSeaCol;
 
     private AudioSource[] audioSorces;
+    private GameManager gm;
 
     private void Awake () {
         audioSorces = GetComponents<AudioSource>();
+        gm = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     public void MoveToWordSea (Transform parent, Action<Button> onClickAction) {
@@ -23,7 +25,9 @@ public class WordButton : MonoBehaviour {
         rTrans.anchorMin = anchorMin;
         rTrans.anchorMax = anchorMax;
 
-        audioSorces[1].Play();
+        if (!gm.SoundMuted) {
+            audioSorces[1].Play();
+        }
         SetListener(onClickAction);
     }
 
@@ -40,7 +44,9 @@ public class WordButton : MonoBehaviour {
     }
 
     public void PlayChoseWordSounds () {
-        audioSorces[0].Play();
+        if(!gm.SoundMuted) {
+            audioSorces[0].Play();
+        }
     }
 
     private void SetListener (Action<Button> action) {
