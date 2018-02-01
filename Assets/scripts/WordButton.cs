@@ -6,6 +6,12 @@ public class WordButton : MonoBehaviour {
     public float WordSeaRow;
     public float WordSeaCol;
 
+    private AudioSource[] audioSorces;
+
+    private void Awake () {
+        audioSorces = GetComponents<AudioSource>();
+    }
+
     public void MoveToWordSea (Transform parent, Action<Button> onClickAction) {
         var button = GetComponent<Button>();
         button.transform.SetParent(parent, false);
@@ -17,6 +23,7 @@ public class WordButton : MonoBehaviour {
         rTrans.anchorMin = anchorMin;
         rTrans.anchorMax = anchorMax;
 
+        audioSorces[1].Play();
         SetListener(onClickAction);
     }
 
@@ -29,8 +36,11 @@ public class WordButton : MonoBehaviour {
         RectTransform rTrans = GetComponent<RectTransform>();
         rTrans.anchorMin = anchorMin;
         rTrans.anchorMax = anchorMax;
-
         SetListener(onClickAction);
+    }
+
+    public void PlayChoseWordSounds () {
+        audioSorces[0].Play();
     }
 
     private void SetListener (Action<Button> action) {

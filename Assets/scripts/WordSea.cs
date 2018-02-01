@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,7 +37,9 @@ public class WordSea : MonoBehaviour {
     }
 
     public void WordClicked (Button btn) {
-        buttonBar.TryAdd(btn);
+        if(buttonBar.TryAdd(btn)) {
+            btn.GetComponent<WordButton>().PlayChoseWordSounds();
+        }
     }
 
     private void SetTextAlpha (Text text, float alpha) {
@@ -45,9 +48,15 @@ public class WordSea : MonoBehaviour {
         text.color = newColor;
     }
 
+    public void SetSeaFrozen (bool value) {
+        foreach (var b in buttons) {
+            b.interactable = !value;
+        }
+    }
+
     public void ConfigureSea() {
         for (int i = wordSeaSize; i < maxWordSizeSize; i++) {
-            buttons[i].interactable = false;
+            buttons[i].gameObject.SetActive(false);
         }
     }
 
@@ -59,6 +68,7 @@ public class WordSea : MonoBehaviour {
             text.text = words[i];
             currentSea.Add(words[i]);
         }
+        SetSeaFrozen(false);
     }
 
     public string[] GenerateNewSea () {

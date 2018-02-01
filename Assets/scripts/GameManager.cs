@@ -103,7 +103,7 @@ public class GameManager : NetworkBehaviour {
             foreach (var p in players) {
                 p.Reset();
             }
-            buttonBar.OnNewSea(); 
+            buttonBar.Reset(); 
             wordSea.SetNewSea(newWordSea);
         }
     }
