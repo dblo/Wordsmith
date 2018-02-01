@@ -11,10 +11,10 @@ public class ScorePanel : MonoBehaviour {
 
         for (int i = 0; i < scores.Length; i++) {
             var playerText = Instantiate(ScoreTextPrefab, transform);
-            playerText.text = scores.Aggregate((sum, next) => sum += next).ToString();
+            playerText.text = scores[i].ToString();
 
-            var anchorMin = new Vector2(i / scores.Length, 0);
-            var anchorMax = new Vector2((i + 1) / scores.Length, 1);
+            var anchorMin = new Vector2((float) i / scores.Length, 0);
+            var anchorMax = new Vector2((float) (i + 1) / scores.Length, 1);
             RectTransform rTrans = playerText.GetComponent<RectTransform>();
             rTrans.anchorMin = anchorMin;
             rTrans.anchorMax = anchorMax;

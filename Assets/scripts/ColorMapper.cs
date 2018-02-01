@@ -56,9 +56,9 @@ public class ColorMapper {
                     wordDict[word] = 1;
             }
         }
-        // Remove all words not chosen by all players
+        // Remove all words not chosen by at least 2 players
         foreach (var key in wordDict.Keys.ToList()) {
-            if (wordDict[key] < players.Count)
+            if (wordDict[key] < 2)
                 wordDict.Remove(key);
         }
         foreach (var key in wordDict.Keys.ToList()) {
