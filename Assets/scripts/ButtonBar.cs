@@ -20,7 +20,7 @@ public class ButtonBar : MonoBehaviour {
     public static int ButtonCols { get { return lineLength + 1; } }
 
     public void OnGameOver () {
-        Reset();
+        OnNewRound();
         goButton.interactable = true;
         goButton.GetComponentInChildren<Text>().text = "Home";
         goButton.onClick.RemoveAllListeners();
@@ -50,12 +50,15 @@ public class ButtonBar : MonoBehaviour {
         goButton.interactable = false;
     }
 
-    public void Reset () {
+    public void OnNewRound() {
+        waitingText.enabled = false;
+    }
+
+    private void Reset () {
         foreach (var b in buttons) {
             wordSea.ReturnWord(b);
         }
         buttons.Clear();
-        waitingText.enabled = false;
     }
 
     public void OnGoButtonClicked () {

@@ -6,14 +6,13 @@ using UnityEngine.UI;
 public class WordSea : MonoBehaviour {
     public static string currentLibraryName = "";
     public static int wordSeaSize = 12;
-
+    public Button wordButtonPrefab;
     public ButtonBar buttonBar;
-    public List<Button> buttons;
+    public const int MaxCols = 4;
+    public const int MaxRows = 3;
 
-    private List<string> currentSea = new List<string>();
-    public const int seaRows = 3;
-    public const int seaCols = 4;
-    private const int maxWordSizeSize = 12;
+    private List<Button> buttons;
+    private List<string> currentSea;
     string[] library = new string[]{ "copper","explain", "ill-fated", "truck", "neat",
                                          "unite", "branch", "educated", "tenuous",
                                          "hum", "decisive", "notice", "yell",
@@ -25,10 +24,9 @@ public class WordSea : MonoBehaviour {
                                          "same", "double", "road", "is", "are", "you",
                                          "what", "when", "like", "a", "your" };
 
-    private void Start () {
-        foreach (var b in buttons) {
-            b.onClick.AddListener(delegate { WordClicked(b); });
-        }
+    private void Awake () {
+        buttons = new List<Button>(wordSeaSize);
+        currentSea = new List<string>(wordSeaSize);
     }
 
     public void ReturnWord (Button btn) {
@@ -36,7 +34,7 @@ public class WordSea : MonoBehaviour {
     }
 
     public void WordClicked (Button btn) {
-        if(buttonBar.TryAdd(btn)) {
+        if (buttonBar.TryAdd(btn)) {
             btn.GetComponent<WordButton>().PlayChoseWordSounds();
         }
     }
@@ -53,15 +51,19 @@ public class WordSea : MonoBehaviour {
         }
     }
 
-    public void ConfigureSea() {
-        for (int i = wordSeaSize; i < maxWordSizeSize; i++) {
-            buttons[i].gameObject.SetActive(false);
+    public void ConfigureSea () {
+        for (int i = 0; i < wordSeaSize; i++) {
+            var btn = Instantiate(wordButtonPrefab, transform);
+            var wb = btn.GetComponent<WordButton>();
+            wb.ComputeSeaAnchors(i);
+            wb.MoveToWordSea(transform, WordClicked);
+            buttons.Add(btn);
         }
     }
 
     public void SetNewSea (string[] words) {
         currentSea.Clear();
-        
+
         for (int i = 0; i < words.Length; i++) {
             var text = buttons[i].GetComponentInChildren<Text>();
             text.text = words[i];
@@ -78,10 +80,10 @@ public class WordSea : MonoBehaviour {
         if (currentLibraryName != "") {
             var library = PlayerPrefs.GetString(currentLibraryName);
             if (library == "")
-                throw new System.InvalidOperationException("Empty library in WordSea.GenerateNewSea");
+                throw new InvalidOperationException("Empty library in WordSea.GenerateNewSea");
             return library.Split(';');
         }
-        throw new System.InvalidOperationException("Empty currenLibrary in WordSea.GenerateNewSea");
+        throw new InvalidOperationException("Empty currenLibrary in WordSea.GenerateNewSea");
     }
 
     public string[] PickRandomWordsFromSea (int count) {

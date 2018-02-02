@@ -64,8 +64,8 @@ public class GameManager : NetworkBehaviour {
         colorWordMapper = new ColorMapper(playercount);
 
         CreateLineLogs();
-        wordSea.SetNewSea(newWordSea);
         wordSea.ConfigureSea();
+        wordSea.SetNewSea(newWordSea);
     }
 
     private List<PlayerConnection> FindSortedPlayers () {
@@ -113,7 +113,7 @@ public class GameManager : NetworkBehaviour {
             foreach (var p in players) {
                 p.Reset();
             }
-            buttonBar.Reset();
+            buttonBar.OnNewRound();
             wordSea.SetNewSea(newWordSea);
         }
     }
