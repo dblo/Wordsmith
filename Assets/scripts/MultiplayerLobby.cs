@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Networking;
+using UnityEngine.Networking.Match;
 using UnityEngine.UI;
 
 public class MultiplayerLobby : MonoBehaviour {
@@ -93,7 +94,7 @@ public class MultiplayerLobby : MonoBehaviour {
     }
 
     public void StartGame () {
-        PlayerPrefs.SetInt(PreferencesKeys.DefaultPlayerCount,(int) playercountSlider.value);
+        PlayerPrefs.SetInt(PreferencesKeys.DefaultPlayerCount, (int) playercountSlider.value);
         GameManager.ExpectedPlayerCount = (int) playercountSlider.value;
 
         PlayerPrefs.SetInt(PreferencesKeys.DefaultGameLength, (int) gameLengthSlider.value);
@@ -106,6 +107,13 @@ public class MultiplayerLobby : MonoBehaviour {
         WordSea.wordSeaSize = (int) seaSizeSlider.value;
 
         var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
-        nm.StartHost();
+
+        var mm = GameObject.Find("Canvas").GetComponent<MainMenu>();
+        if(mm.InLanMode) {
+            nm.StartHost();
+        }
+        else {
+            NetworkManager.singleton.matchMaker.CreateMatch("testPlayerGame", (uint) playercountSlider.value, true, "", "", "", 0, 0, nm.OnMatchCreate);
+        }
     }
 }

@@ -5,5 +5,5 @@
     public const string DefaultGameLength = "default_game_length";
     public const string StoredLibraryNames = "stored_libary_names";
     public const string PlayerName = "player_name";
-
+    public const string LanEnabled = "lan_enabled";
 }
