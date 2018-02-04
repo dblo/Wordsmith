@@ -2,72 +2,74 @@
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class PlayerConnection : NetworkBehaviour {
-    public string PlayerName { get; private set; }
-    public string[] Words { get; private set; }
+namespace OO {
+    public class PlayerConnection : NetworkBehaviour {
+        public string PlayerName { get; private set; }
+        public string[] Words { get; private set; }
 
-    private GameManager gm;
+        private GameManager gm;
 
-    public bool Ready {
-        get { return Words != null; }
-    }
-
-    private void Start () {
-        var go = GameObject.Find("GameManager");
-        gm = go.GetComponent<GameManager>();
-
-        if (isLocalPlayer || GameManager.ExpectedPlayerCount == 1) {
-            go = GameObject.Find("ButtonBar");
-            var bb = go.GetComponent<ButtonBar>();
-            bb.AssignLocalPlayer(this);
-
-            var playerName = PlayerPrefs.GetString(PreferencesKeys.PlayerName);
-            if (playerName.Equals("")) {
-                playerName = "Player " + new System.Random().Next(100);
-                PlayerPrefs.SetString(PreferencesKeys.PlayerName, playerName);
-            }
-            CmdLocalPlayerReady(playerName);
+        public bool Ready {
+            get { return Words != null; }
         }
-    }
 
-    public void Reset () {
-        Words = null;
-    }
+        private void Start () {
+            var go = GameObject.Find("GameManager");
+            gm = go.GetComponent<GameManager>();
 
-    [Command]
-    private void CmdLocalPlayerReady (string playerName) {
-        PlayerName = playerName;
-        gm.PlayerSetupDone(this);
-    }
+            if (isLocalPlayer || GameManager.ExpectedPlayerCount == 1) {
+                go = GameObject.Find("ButtonBar");
+                var bb = go.GetComponent<ButtonBar>();
+                bb.AssignLocalPlayer(this);
 
-    [Command]
-    public void CmdSynchronizeName () {
-        RpcSyncronizeName(PlayerName);
-    }
+                var playerName = PlayerPrefs.GetString(PreferencesKeys.PlayerName);
+                if (playerName.Equals("")) {
+                    playerName = "Player " + new System.Random().Next(100);
+                    PlayerPrefs.SetString(PreferencesKeys.PlayerName, playerName);
+                }
+                CmdLocalPlayerReady(playerName);
+            }
+        }
 
-    [ClientRpc]
-    private void RpcSyncronizeName (string playerName) {
-        PlayerName = playerName;
-    }
+        public void Reset () {
+            Words = null;
+        }
 
-    public void WordsChosen (string[] words) {
-        gm.AddTemporaryWordsToLineLog(words);
-        CmdWordsChosen(words);
-    }
+        [Command]
+        private void CmdLocalPlayerReady (string playerName) {
+            PlayerName = playerName;
+            gm.PlayerSetupDone(this);
+        }
 
-    [Command]
-    private void CmdWordsChosen (string[] words) {
-        Words = words;
-        gm.CmdPlayerReady();
-    }
+        [Command]
+        public void CmdSynchronizeName () {
+            RpcSyncronizeName(PlayerName);
+        }
 
-    [Command]
-    public void CmdSynchronizeWords () {
-        RpcSynchronizeWords(Words);
-    }
+        [ClientRpc]
+        private void RpcSyncronizeName (string playerName) {
+            PlayerName = playerName;
+        }
 
-    [ClientRpc]
-    private void RpcSynchronizeWords (string[] words) {
-        Words = words;
+        public void WordsChosen (string[] words) {
+            gm.AddTemporaryWordsToLineLog(words);
+            CmdWordsChosen(words);
+        }
+
+        [Command]
+        private void CmdWordsChosen (string[] words) {
+            Words = words;
+            gm.CmdPlayerReady();
+        }
+
+        [Command]
+        public void CmdSynchronizeWords () {
+            RpcSynchronizeWords(Words);
+        }
+
+        [ClientRpc]
+        private void RpcSynchronizeWords (string[] words) {
+            Words = words;
+        }
     }
 }

@@ -265,7 +265,7 @@ GameObject:
   - component: {fileID: 316636569}
   - component: {fileID: 316636570}
   m_Layer: 5
-  m_Name: LANToggle
+  m_Name: LanToggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -599,6 +599,7 @@ GameObject:
   - component: {fileID: 722783073}
   - component: {fileID: 722783072}
   - component: {fileID: 722783078}
+  - component: {fileID: 722783079}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -731,10 +732,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58fe0854e4e725a49b373ed0b0fccb06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lobbyPrefab: {fileID: 114356686271644652, guid: 7a7a036c4d4e7a347b0677f7db391e36,
+  lobbyPrefab: {fileID: 114650646894104816, guid: 7a7a036c4d4e7a347b0677f7db391e36,
     type: 2}
   seaMakerPrefab: {fileID: 114537589630203292, guid: 52d0015fdb09c374fbf451d33a354151,
     type: 2}
+--- !u!114 &722783079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 722783071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fb23ecf4ad028d468ab1e13e3ebb39a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &863280609
 GameObject:
   m_ObjectHideFlags: 0
