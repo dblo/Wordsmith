@@ -185,9 +185,9 @@ namespace OO {
         public void LaunchMainMenu () {
             var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
             if (isServer) {
-                //nm.matchMaker.DropConnection(); todo use?
                 nm.StopHost();
             } else {
+                //nm.matchMaker.DropConnection(nm.matchInfo.networkId, nm.matchInfo.nodeId, 0, nm.OnDropConnection);
                 nm.StopClient();
             }
         }

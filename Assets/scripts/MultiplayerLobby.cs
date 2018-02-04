@@ -86,7 +86,7 @@ namespace OO {
 
             var defaultLibNames = PlayerPrefs.GetString(PreferencesKeys.DefaultLibraryNames, "").Split(';');
             if (defaultLibNames.Length == 0)
-                throw new System.InvalidOperationException("No default libraries found in MultiplayerLobby.SetupLibraries()");
+                throw new InvalidOperationException("No default libraries found in MultiplayerLobby.SetupLibraries()");
             defaultLibraryNames = new HashSet<string>(defaultLibNames);
 
             foreach (var name in defaultLibNames) {
@@ -109,37 +109,29 @@ namespace OO {
             PlayerPrefs.SetInt(PreferencesKeys.DefaultPlayerCount, GetPlayerCount());
             PlayerPrefs.SetInt(PreferencesKeys.DefaultGameLength, GetGameLength());
 
-            ChooseSettingsForAny();
-
-            GameManager.ExpectedPlayerCount = GetPlayerCount();
-            GameManager.LinesPerGame = GetGameLength();
-            WordSea.currentLibraryName = selectedLibrary;
-            ButtonBar.lineLength = GetLineLength();
-            WordSea.wordSeaSize = GetSeaSize();
-
             var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
             var mm = GameObject.Find("Canvas").GetComponent<MainMenu>();
             if (mm.InLanMode) {
+                ChooseSettingsForAny();
+                SetupHostData();
                 nm.StartHost();
             } else {
-                var roomName = CreateRoomName();
-
-                HostMMGame(nm, roomName);
-                //if (DefaultOrAnyLibraryChosen()) {
-                //    NetworkManager.singleton.matchMaker.ListMatches(0, 1, roomName, true, 0, 0, OnMatchList);
-                //} else {
-                //    HostMMGame(nm, roomName);
-                //}
+                if (DefaultOrAnyLibraryChosen()) {
+                    var roomName = CreateRoomName();
+                    NetworkManager.singleton.matchMaker.ListMatches(0, 3, roomName, true, 0, 0, OnMatchList);
+                } else {
+                    HostMMGame(nm);
+                }
             }
         }
 
         private void ChooseSettingsForAny () {
-            if(selectedLibrary == DefaultLibraryChoice) {
+            if (selectedLibrary == DefaultLibraryChoice) {
                 int ix = new System.Random().Next(defaultLibraryNames.Count);
                 var iter = defaultLibraryNames.GetEnumerator();
                 iter.MoveNext();
                 for (int i = 0; i < ix; i++) {
-                iter.MoveNext();
+                    iter.MoveNext();
                 }
                 selectedLibrary = iter.Current;
             }
@@ -162,9 +154,21 @@ namespace OO {
             return roomName;
         }
 
-        private void HostMMGame (NetworkManager nm, string roomName) {
+        private void HostMMGame (NetworkManager nm) {
+            ChooseSettingsForAny();
+            SetupHostData();
+
+            var roomName = CreateRoomName();
             NetworkManager.singleton.matchMaker.CreateMatch(roomName, (uint) GetPlayerCount(),
                 true, "", "", "", 0, 0, nm.OnMatchCreate);
+        }
+
+        private void SetupHostData () {
+            GameManager.ExpectedPlayerCount = GetPlayerCount();
+            GameManager.LinesPerGame = GetGameLength();
+            WordSea.currentLibraryName = selectedLibrary;
+            ButtonBar.lineLength = GetLineLength();
+            WordSea.wordSeaSize = GetSeaSize();
         }
 
         private void OnMatchList (bool success, string extendedInfo, List<MatchInfoSnapshot> responseData) {
@@ -173,19 +177,19 @@ namespace OO {
 
             var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
             if (responseData.Count == 0) {
-                HostMMGame(nm, CreateRoomName());
+                HostMMGame(nm);
+            } else {
+                var match = responseData[0];
+                NetworkManager.singleton.matchMaker.JoinMatch(match.networkId, "", "", "", 0, 0, nm.OnMatchJoined);
             }
-
-            var match = responseData[0];
-            NetworkManager.singleton.matchMaker.JoinMatch(match.networkId, "", "", "", 0, 0, nm.OnMatchJoined);
-        }
-
-        private bool DefaultLibraryChosen () {
-            return defaultLibraryNames.Contains(selectedLibrary);
         }
 
         private bool DefaultOrAnyLibraryChosen () {
             return DefaultLibraryChosen() || selectedLibrary == DefaultLibraryChoice;
+        }
+
+        private bool DefaultLibraryChosen () {
+            return defaultLibraryNames.Contains(selectedLibrary);
         }
 
         private int GetPlayerCount () {
