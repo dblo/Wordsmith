@@ -11,9 +11,12 @@ namespace OO {
         private List<Button> buttons = new List<Button>();
         private PlayerConnection localPlayer;
         private Text waitingText;
+        private Text infoText;
 
         private void Awake () {
             waitingText = GameObject.Find("WaitingText").GetComponent<Text>();
+            infoText = GameObject.Find("InfoText").GetComponent<Text>();
+            infoText.text = "Compose a line of " + lineLength + " words.";
             goButton.onClick.AddListener(OnGoButtonClicked);
         }
 
@@ -29,6 +32,10 @@ namespace OO {
         }
 
         public bool TryAdd (Button btn) {
+            if (infoText.gameObject.activeSelf) {
+                infoText.gameObject.SetActive(false);
+            }
+
             if (AllWordsChosen())
                 return false;
 
