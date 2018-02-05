@@ -285,6 +285,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="WordSmith.Plugins.csproj">
+      <Project>{59FD4D10-1487-7024-E797-590D822C3270}</Project>
+      <Name>WordSmith.Plugins</Name>
+    </ProjectReference>
     <ProjectReference Include="WordSmith.csproj">
       <Project>{62992DAC-3F60-CEA5-CAC8-716F974B2652}</Project>
       <Name>WordSmith</Name>
@@ -292,6 +296,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\editor\SceneAutoLoader.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Standard Assets\Environment\Water (Basic)\Shaders\FXWaterBasic.shader" />
+    <None Include="Assets\Standard Assets\Environment\Water\Water\Shaders\FXWaterPro.shader" />
+    <None Include="Assets\Standard Assets\Environment\Water\Water4\Shaders\FXWater4Advanced.shader" />
+    <None Include="Assets\Standard Assets\Environment\Water\Water4\Shaders\FXWater4Simple.shader" />
+    <None Include="Assets\Standard Assets\Environment\Water\Water4\Shaders\WaterInclude.cginc" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

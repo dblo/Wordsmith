@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2017
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordSmith", "WordSmith.csproj", "{62992DAC-3F60-CEA5-CAC8-716F974B2652}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordSmith.Plugins", "WordSmith.Plugins.csproj", "{59FD4D10-1487-7024-E797-590D822C3270}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordSmith.Editor", "WordSmith.Editor.csproj", "{7FDDAFFA-55F7-B3E9-06FF-513D1218ABB5}"
 EndProject
 Global
@@ -15,6 +17,10 @@ Global
 		{62992DAC-3F60-CEA5-CAC8-716F974B2652}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62992DAC-3F60-CEA5-CAC8-716F974B2652}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62992DAC-3F60-CEA5-CAC8-716F974B2652}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59FD4D10-1487-7024-E797-590D822C3270}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59FD4D10-1487-7024-E797-590D822C3270}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59FD4D10-1487-7024-E797-590D822C3270}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59FD4D10-1487-7024-E797-590D822C3270}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7FDDAFFA-55F7-B3E9-06FF-513D1218ABB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7FDDAFFA-55F7-B3E9-06FF-513D1218ABB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7FDDAFFA-55F7-B3E9-06FF-513D1218ABB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
