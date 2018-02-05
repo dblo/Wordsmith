@@ -80,10 +80,6 @@ namespace OO {
         }
 
         private void SetupLibraries () {
-            var anyLibGO = Instantiate(libraryElement, libraryElement.transform.parent);
-            anyLibGO.GetComponentInChildren<Text>().text = DefaultLibraryChoice;
-            anyLibGO.GetComponent<Button>().onClick.AddListener(() => WordSeaListButtonClicked(name));
-
             var defaultLibNames = PlayerPrefs.GetString(PreferencesKeys.DefaultLibraryNames, "").Split(';');
             if (defaultLibNames.Length == 0)
                 throw new InvalidOperationException("No default libraries found in MultiplayerLobby.SetupLibraries()");
@@ -94,13 +90,14 @@ namespace OO {
                 go.GetComponentInChildren<Text>().text = name;
                 go.GetComponent<Button>().onClick.AddListener(() => WordSeaListButtonClicked(name));
             }
-            var customLibNames = PlayerPrefs.GetString(PreferencesKeys.CustomLibraryNames, "")
-                .Split(GC.LibraryNameDelimiter);
-
-            foreach (var name in customLibNames) {
-                var go = Instantiate(libraryElement, libraryElement.transform.parent);
-                go.GetComponentInChildren<Text>().text = name;
-                go.GetComponent<Button>().onClick.AddListener(() => WordSeaListButtonClicked(name));
+            var customLibString = PlayerPrefs.GetString(PreferencesKeys.CustomLibraryNames, "");
+            if (customLibString != "") {
+                var customLibNames = customLibString.Split(GC.LibraryNameDelimiter);
+                foreach (var name in customLibNames) {
+                    var go = Instantiate(libraryElement, libraryElement.transform.parent);
+                    go.GetComponentInChildren<Text>().text = name;
+                    go.GetComponent<Button>().onClick.AddListener(() => WordSeaListButtonClicked(name));
+                }
             }
         }
 
@@ -110,8 +107,7 @@ namespace OO {
             PlayerPrefs.SetInt(PreferencesKeys.DefaultGameLength, GetGameLength());
 
             var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
-            var mm = GameObject.Find("Canvas").GetComponent<MainMenu>();
-            if (mm.InLanMode) {
+            if (MainMenu.InLanMode) {
                 ChooseSettingsForAny();
                 SetupHostData();
                 nm.StartHost();

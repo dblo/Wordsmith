@@ -3,12 +3,12 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.Match;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 namespace OO {
     public class MainMenu : MonoBehaviour {
-        public MultiplayerLobby lobbyPrefab;
         public SeaMaker seaMakerPrefab;
-        public bool InLanMode { get { return lanToggle.isOn; } }
+        public static bool InLanMode;
 
         private Toggle lanToggle;
 
@@ -22,8 +22,7 @@ namespace OO {
         }
 
         public void LaunchLobby () {
-            var canvas = GameObject.Find("Canvas");
-            Instantiate(lobbyPrefab, canvas.transform);
+            SceneManager.LoadScene("lobby");
         }
 
         public void LaunchSeaMaker () {
@@ -59,6 +58,7 @@ namespace OO {
         public void SetLanMode (bool value) {
             int lanEnabled = value ? 1 : 0;
             PlayerPrefs.SetInt(PreferencesKeys.LanEnabled, lanEnabled);
+            InLanMode = value;
 
             if (InLanMode) {
                 NetworkManager.singleton.StopMatchMaker();
