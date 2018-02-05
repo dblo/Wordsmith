@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Networking.Match;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace OO {
@@ -64,7 +65,7 @@ namespace OO {
             libraryElement.onClick.AddListener(() => WordSeaListButtonClicked("Default"));
 
             var closeLobbyButton = GameObject.Find("LobbyCloseButton").GetComponent<Button>();
-            closeLobbyButton.onClick.AddListener(() => Destroy(gameObject));
+            closeLobbyButton.onClick.AddListener(() => SceneManager.LoadScene("main_menu"));
 
             gameLengthSlider.onValueChanged.AddListener(
                 (value) => gameLengthLabel.text = "Game length: " + value);
