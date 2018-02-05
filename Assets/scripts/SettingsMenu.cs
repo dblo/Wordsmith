@@ -13,6 +13,9 @@ namespace OO {
             var soundToggle = GameObject.Find("SoundToggle").GetComponent<Toggle>();
             soundToggle.isOn = soundMuted;
             soundToggle.onValueChanged.AddListener(delegate { SetSoundMuted(soundToggle); });
+
+            var clearPrefsBtn = GameObject.Find("ClearPrefsButton").GetComponent<Button>();
+            clearPrefsBtn.onClick.AddListener(() => PlayerPrefs.DeleteAll());
         }
 
         public void OnClose () {

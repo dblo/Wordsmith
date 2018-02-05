@@ -7,7 +7,6 @@ using UnityEngine.SceneManagement;
 
 namespace OO {
     public class MainMenu : MonoBehaviour {
-        public SeaMaker seaMakerPrefab;
         public static bool InLanMode;
 
         private Toggle lanToggle;
@@ -26,8 +25,7 @@ namespace OO {
         }
 
         public void LaunchSeaMaker () {
-            var canvas = GameObject.Find("Canvas");
-            Instantiate(seaMakerPrefab, canvas.transform);
+            SceneManager.LoadScene("seamaker");
         }
 
         public void JoinAnyGame () {

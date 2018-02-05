@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace OO {
-    public class MultiplayerLobby : MonoBehaviour {
+    public class Lobby : MonoBehaviour {
         private Button libraryElement;
         private Slider gameLengthSlider;
         private Slider playerCountSlider;
@@ -95,6 +95,8 @@ namespace OO {
             if (customLibString != "") {
                 var customLibNames = customLibString.Split(GC.LibraryNameDelimiter);
                 foreach (var name in customLibNames) {
+                    if (name == "")
+                        continue; // todo remove
                     var go = Instantiate(libraryElement, libraryElement.transform.parent);
                     go.GetComponentInChildren<Text>().text = name;
                     go.GetComponent<Button>().onClick.AddListener(() => WordSeaListButtonClicked(name));

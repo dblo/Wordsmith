@@ -704,8 +704,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58fe0854e4e725a49b373ed0b0fccb06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seaMakerPrefab: {fileID: 114537589630203292, guid: 52d0015fdb09c374fbf451d33a354151,
-    type: 2}
 --- !u!114 &722783079
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1137,7 +1135,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Play Now
+  m_Text: Quick Play
 --- !u!222 &1421307107
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1835,7 +1833,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Seamaker
+  m_Text: SeaMaker
 --- !u!222 &2106113266
 CanvasRenderer:
   m_ObjectHideFlags: 0
