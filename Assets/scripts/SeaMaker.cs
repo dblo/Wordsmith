@@ -52,6 +52,7 @@ namespace OO {
                 var newLibraryJson = JsonArrayHelper.ToJson(seaContent.text.Split(' '));
                 PlayerPrefs.SetString(seaName.text, newLibraryJson);
             }
+            libraryList.AddListElement(seaName.text);
         }
 
         public void OnClickNewButton () {
