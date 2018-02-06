@@ -107,6 +107,11 @@ namespace OO {
             var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
             if (MainMenu.InLanMode) {
                 ChooseSettingsForAny();
+
+                //todo make sure seasize <= length of selected library size
+                if (SeaSize < LineLength)
+                    LineLength = SeaSize;
+
                 SetupHostData();
                 nm.StartHost();
             } else {
@@ -138,12 +143,15 @@ namespace OO {
                 PlayerCount = rng.Next(1, (int) playerCountSlider.maxValue + 1);
 
             if (SeaSize == DefaultSliderValue) {
-                //todo make sure seasize <= length of selected library size
-                SeaSize = rng.Next(1, (int) seaSizeSlider.maxValue + 1);
+                var seaSizeMin = 1;
+                if (LineLength != DefaultSliderValue) {
+                    seaSizeMin = LineLength;
+                }
+                SeaSize = rng.Next(seaSizeMin, (int) seaSizeSlider.maxValue + 1);
             }
             if (LineLength == DefaultSliderValue) {
-                var lineLengthMax = Math.Min((int) lineLengthSlider.maxValue + 1, SeaSize);
-                LineLength = rng.Next(1, lineLengthMax);
+                var lineLengthMin = Math.Min((int) lineLengthSlider.maxValue, SeaSize);
+                LineLength = rng.Next(1, lineLengthMin + 1);
             }
         }
 
