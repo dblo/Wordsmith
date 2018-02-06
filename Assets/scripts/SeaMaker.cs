@@ -7,21 +7,18 @@ namespace OO {
     public class SeaMaker : MonoBehaviour {
         [SerializeField]
         private LibraryList libraryList;
+        private Text seaName;
+        private Text seaContent;
 
         void Start () {
+            seaName = GameObject.Find("SeaNameInputText").GetComponent<Text>();
+            seaContent = GameObject.Find("SeaContentInputText").GetComponent<Text>();
+
             var saveButton = GameObject.Find("SeaMakerSaveButton").GetComponent<Button>();
             saveButton.onClick.AddListener(OnClickSaveButton);
 
-            Action cancelBtnAction = () => {
-                var parent = GameObject.Find("Canvas").transform;
-                var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), parent);
-
-                go.GetComponent<ConfirmationDialog>().SetOnConfirmAction(() => {
-                    SceneManager.LoadScene("main_menu");
-                });
-            };
             var cancelButton = GameObject.Find("SeaMakerCloseButton").GetComponent<Button>();
-            cancelButton.onClick.AddListener(delegate { cancelBtnAction(); });
+            cancelButton.onClick.AddListener(OnClickCloseButton);
 
             var newButton = GameObject.Find("SeaMakerNewButton").GetComponent<Button>();
             newButton.onClick.AddListener(OnClickNewButton);
@@ -36,12 +33,24 @@ namespace OO {
             }
         }
 
-        public void OnClickSaveButton () {
-            Text seaName = GameObject.Find("SeaNameInputText").GetComponent<Text>();
-            Text seaContent = GameObject.Find("SeaContentInputText").GetComponent<Text>();
+        public void OnClickCloseButton () {
+            if (NoChangesPending()) {
+                SceneManager.LoadScene("main_menu");
+            }
 
+            var parent = GameObject.Find("Canvas").transform;
+            var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), parent);
+            go.GetComponent<ConfirmationDialog>().SetOnConfirmAction(() => {
+                SceneManager.LoadScene("main_menu");
+            });
+        }
+
+        private bool NoChangesPending () {
+            return seaName.text == "" && seaContent.text == "";
+        }
+
+        public void OnClickSaveButton () {
             if (seaName.text != "" && seaContent.text != "") {
-                var libraries = Preferences.GetArray(Preferences.CustomLibraryNames);
                 Preferences.AddToArray(Preferences.CustomLibraryNames, seaName.text);
                 Preferences.SetArray(seaName.text, seaContent.text.Split(' '));
             }

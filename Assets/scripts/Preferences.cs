@@ -9,13 +9,16 @@ namespace OO {
         public const string DefaultGameLength = "default_game_length";
         public const string DefaultSeaSize = "default_sea_size";
         public const string DefaultLineLength = "default_line_length";
-        public const string DefaultLibraryNames = "default_libary_names";
-        public const string CustomLibraryNames = "custom_libary_names";
+        public const string DefaultLibraryNames = "default_library_names";
+        public const string CustomLibraryNames = "custom_library_names";
         public const string PlayerName = "player_name";
         public const string LanEnabled = "lan_enabled";
 
         public static string[] GetArray (string key) {
             var json = PlayerPrefs.GetString(key);
+            if (json == "")
+                return new string[0];
+
             var data = JsonArrayHelper.FromJson<string>(json);
             return data;
         }

@@ -3,11 +3,10 @@ using UnityEngine;
 
 namespace OO {
     public class LibrarySeeder : MonoBehaviour {
-        private string[] libraries;
 
         private void Start () {
-            libraries = Preferences.GetArray(Preferences.DefaultLibraryNames);
-            if (libraries.Length == 0)
+            var defaultLibrary = PlayerPrefs.GetString("Default");
+            if (defaultLibrary == "")
                 SeedLibraries();
         }
 
