@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using System;
 
 namespace OO {
     public class GameManager : NetworkBehaviour {
@@ -13,7 +14,9 @@ namespace OO {
         private List<PlayerConnection> players;
         private ColorMapper colorWordMapper;
         private static int expectedPlayerCount = 1;
-        private static int linesPerGame = 3;
+        private static int roundsPerGame = 3;
+        private Text roundDisplay;
+        private int currentRound = 1;
 
         public bool SoundMuted { get; private set; }
 
@@ -23,14 +26,15 @@ namespace OO {
         }
 
         public static int LinesPerGame {
-            get { return linesPerGame; }
-            set { linesPerGame = value; }
+            get { return roundsPerGame; }
+            set { roundsPerGame = value; }
         }
 
         private void Awake () {
             SoundMuted = PlayerPrefs.GetInt(PreferencesKeys.SoundcMuted, 0) > 0;
+            roundDisplay = GameObject.Find("RoundDisplayText").GetComponent<Text>();
         }
-
+        
         public override void OnStartServer () {
             players = new List<PlayerConnection>();
         }
@@ -63,6 +67,7 @@ namespace OO {
             players = FindSortedPlayers();
             colorWordMapper = new ColorMapper(playercount);
 
+            UpdateRoundDisplay();
             CreateLineLogs();
             wordSea.ConfigureSea();
             wordSea.SetNewSea(newWordSea);
@@ -105,17 +110,23 @@ namespace OO {
             colorWordMapper.ComputeColors(players);
             colorWordMapper.ComputeScore();
             AddWordsToLineLogs(colorWordMapper.GetColors());
+            currentRound++;
 
             if (GameOver()) {
                 buttonBar.OnGameOver();
                 ShowGameOverScreen();
             } else {
+                UpdateRoundDisplay();
                 foreach (var p in players) {
                     p.Reset();
                 }
                 buttonBar.OnNewRound();
                 wordSea.SetNewSea(newWordSea);
             }
+        }
+
+        private void UpdateRoundDisplay () {
+            roundDisplay.text = currentRound + "/" + LinesPerGame;
         }
 
         public void AddTemporaryWordsToLineLog (string[] words) {
@@ -171,11 +182,7 @@ namespace OO {
         }
 
         public bool GameOver () {
-            foreach (var ll in lineLogs) {
-                if (ll.LinesCount() != LinesPerGame)
-                    return false;
-            }
-            return true;
+            return currentRound > roundsPerGame;
         }
 
         private bool IsGameFull () {

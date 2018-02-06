@@ -8,7 +8,8 @@ using UnityEngine.UI;
 
 namespace OO {
     public class Lobby : MonoBehaviour {
-        private Button libraryElement;
+        public Button listElementPrefab;
+
         private Slider gameLengthSlider;
         private Slider playerCountSlider;
         private Slider seaSizeSlider;
@@ -17,9 +18,13 @@ namespace OO {
         private Text playerCountLabel;
         private Text seaSizeLabel;
         private Text lineLengthLabel;
-        private const string DefaultLibraryChoice = "Any";
-        private string selectedLibrary = DefaultLibraryChoice;
-        private HashSet<string> defaultLibraryNames;
+        private string selectedLibrary = DefaultSelectedLibrary;
+        private List<string> defaultLibraryNames;
+        private System.Random rng = new System.Random();
+        private int customLibraryCount = 0;
+
+        private const string DefaultSelectedLibrary = "Any";
+        private const int DefaultSliderValue = 0;
 
         void Start () {
             gameLengthSlider = GameObject.Find("GameLengthSlider").GetComponent<Slider>();
@@ -30,7 +35,6 @@ namespace OO {
             playerCountLabel = GameObject.Find("PlayerCountLabel").GetComponent<Text>();
             seaSizeLabel = GameObject.Find("SeaSizeLabel").GetComponent<Text>();
             lineLengthLabel = GameObject.Find("LineLengthLabel").GetComponent<Text>();
-            libraryElement = GameObject.Find("LobbyWordSeaListButton").GetComponent<Button>();
 
             SetupOnClickListeners();
             UsePrefsValuesIfPresent();
@@ -38,56 +42,48 @@ namespace OO {
         }
 
         private void UsePrefsValuesIfPresent () {
-            var defaultPlayerCount = PlayerPrefs.GetInt(PreferencesKeys.DefaultPlayerCount, -1);
-            if (defaultPlayerCount >= 0) {
-                if (GetPlayerCount() == defaultPlayerCount) {
-                    playerCountLabel.text = "Players: " + defaultPlayerCount;
-                }
-                playerCountSlider.value = defaultPlayerCount;
-            } else {
-                playerCountLabel.text = "Players: " + GetPlayerCount();
-            }
+            var gameLengthPref = PlayerPrefs.GetInt(PreferencesKeys.DefaultGameLength, DefaultSliderValue);
+            if (gameLengthPref > DefaultSliderValue)
+                GameLength = gameLengthPref;
+            OnGameLengthChange(GameLength);
 
-            var defaultGameLength = PlayerPrefs.GetInt(PreferencesKeys.DefaultGameLength, -1);
-            if (defaultGameLength >= 0) {
-                if (GetGameLength() == defaultGameLength) {
-                    gameLengthLabel.text = "Game length: " + defaultGameLength;
-                }
-                gameLengthSlider.value = defaultGameLength;
-            } else {
-                gameLengthLabel.text = "Game length: " + GetGameLength();
-            }
-            seaSizeLabel.text = "Sea size: " + GetSeaSize();
-            lineLengthLabel.text = "Line length " + GetLineLength();
+            var playerCountPref = PlayerPrefs.GetInt(PreferencesKeys.DefaultPlayerCount, DefaultSliderValue);
+            if (playerCountPref > DefaultSliderValue)
+                PlayerCount = playerCountPref;
+            OnPlayerCountChange(PlayerCount);
+
+            var seaSizePref = PlayerPrefs.GetInt(PreferencesKeys.DefaultSeaSize, DefaultSliderValue);
+            if (seaSizePref > DefaultSliderValue)
+                SeaSize = seaSizePref;
+            OnSeaSizeChange(SeaSize);
+
+            var lineLengthPref = PlayerPrefs.GetInt(PreferencesKeys.DefaultLineLength, DefaultSliderValue);
+            if (lineLengthPref > DefaultSliderValue)
+                LineLength = lineLengthPref;
+            OnLineLengthChange(LineLength);
         }
 
         private void SetupOnClickListeners () {
-            libraryElement.onClick.AddListener(() => WordSeaListButtonClicked("Default"));
+            var anyLibraryListElement = GameObject.Find("LobbyWordSeaListButton").GetComponent<Button>();
+            anyLibraryListElement.onClick.AddListener(() => WordSeaListButtonClicked("Default"));
 
             var closeLobbyButton = GameObject.Find("LobbyCloseButton").GetComponent<Button>();
             closeLobbyButton.onClick.AddListener(() => SceneManager.LoadScene("main_menu"));
 
-            gameLengthSlider.onValueChanged.AddListener(
-                (value) => gameLengthLabel.text = "Game length: " + value);
-
-            playerCountSlider.onValueChanged.AddListener(
-                 (value) => playerCountLabel.text = "Players: " + value);
-
-            seaSizeSlider.onValueChanged.AddListener(
-                 (value) => seaSizeLabel.text = "Sea size: " + value);
-
-            lineLengthSlider.onValueChanged.AddListener(
-                 (value) => lineLengthLabel.text = "Line length: " + value);
+            gameLengthSlider.onValueChanged.AddListener(OnGameLengthChange);
+            playerCountSlider.onValueChanged.AddListener(OnPlayerCountChange);
+            seaSizeSlider.onValueChanged.AddListener(OnSeaSizeChange);
+            lineLengthSlider.onValueChanged.AddListener(OnLineLengthChange);
         }
 
         private void SetupLibraries () {
-            var defaultLibNames = PlayerPrefs.GetString(PreferencesKeys.DefaultLibraryNames, "").Split(';');
-            if (defaultLibNames.Length == 0)
+            defaultLibraryNames = new List<string>(PlayerPrefs.GetString(PreferencesKeys.DefaultLibraryNames, "").Split(';'));
+            if (defaultLibraryNames.Count == 0)
                 throw new InvalidOperationException("No default libraries found in MultiplayerLobby.SetupLibraries()");
-            defaultLibraryNames = new HashSet<string>(defaultLibNames);
 
-            foreach (var name in defaultLibNames) {
-                var go = Instantiate(libraryElement, libraryElement.transform.parent);
+            var parent = GameObject.Find("LobbyWordSeaListButton").transform.parent;
+            foreach (var name in defaultLibraryNames) {
+                var go = Instantiate(listElementPrefab, parent);
                 go.GetComponentInChildren<Text>().text = name;
                 go.GetComponent<Button>().onClick.AddListener(() => WordSeaListButtonClicked(name));
             }
@@ -97,7 +93,9 @@ namespace OO {
                 foreach (var name in customLibNames) {
                     if (name == "")
                         continue; // todo remove
-                    var go = Instantiate(libraryElement, libraryElement.transform.parent);
+
+                    customLibraryCount++;
+                    var go = Instantiate(listElementPrefab, parent);
                     go.GetComponentInChildren<Text>().text = name;
                     go.GetComponent<Button>().onClick.AddListener(() => WordSeaListButtonClicked(name));
                 }
@@ -105,9 +103,10 @@ namespace OO {
         }
 
         public void StartGame () {
-            //Todo startgame button invalid until wordsea chosen
-            PlayerPrefs.SetInt(PreferencesKeys.DefaultPlayerCount, GetPlayerCount());
-            PlayerPrefs.SetInt(PreferencesKeys.DefaultGameLength, GetGameLength());
+            PlayerPrefs.SetInt(PreferencesKeys.DefaultPlayerCount, PlayerCount);
+            PlayerPrefs.SetInt(PreferencesKeys.DefaultGameLength, GameLength);
+            PlayerPrefs.SetInt(PreferencesKeys.DefaultSeaSize, SeaSize);
+            PlayerPrefs.SetInt(PreferencesKeys.DefaultLineLength, LineLength);
 
             var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
             if (MainMenu.InLanMode) {
@@ -115,7 +114,7 @@ namespace OO {
                 SetupHostData();
                 nm.StartHost();
             } else {
-                if (DefaultOrAnyLibraryChosen()) {
+                if (DefaultLibrarySelected() || AnyLibrarySelected()) {
                     var roomName = CreateRoomName();
                     NetworkManager.singleton.matchMaker.ListMatches(0, 3, roomName, true, 0, 0, OnMatchList);
                 } else {
@@ -125,31 +124,47 @@ namespace OO {
         }
 
         private void ChooseSettingsForAny () {
-            if (selectedLibrary == DefaultLibraryChoice) {
-                int ix = new System.Random().Next(defaultLibraryNames.Count);
-                var iter = defaultLibraryNames.GetEnumerator();
-                iter.MoveNext();
-                for (int i = 0; i < ix; i++) {
-                    iter.MoveNext();
+            if (AnyLibrarySelected()) {
+                int randomIndex = rng.Next(defaultLibraryNames.Count + customLibraryCount);
+                string libName;
+                if (randomIndex < defaultLibraryNames.Count) {
+                    libName = defaultLibraryNames[randomIndex];
+                } else {
+                    var customLibString = PlayerPrefs.GetString(PreferencesKeys.CustomLibraryNames, "");
+                    var customLibNames = customLibString.Split(GC.LibraryNameDelimiter);
+                    libName = customLibNames[customLibraryCount - randomIndex];
                 }
-                selectedLibrary = iter.Current;
+                selectedLibrary = libName;
             }
-            //todo handle any settings on the rest
+            if (GameLength == DefaultSliderValue)
+                GameLength = rng.Next(1, (int) gameLengthSlider.maxValue + 1);
+
+            if (PlayerCount == DefaultSliderValue)
+                PlayerCount = rng.Next(1, (int) playerCountSlider.maxValue + 1);
+
+            if (SeaSize == DefaultSliderValue) {
+                //todo make sure seasize <= length of selected library size
+                SeaSize = rng.Next(1, (int) seaSizeSlider.maxValue + 1);
+            }
+            if (LineLength == DefaultSliderValue) {
+                var lineLengthMax = Math.Min((int) lineLengthSlider.maxValue + 1, SeaSize);
+                LineLength = rng.Next(1, lineLengthMax);
+            }
         }
 
         private string CreateRoomName () {
             string roomName = "";
-            if (DefaultLibraryChosen()) {
+            if (DefaultLibrarySelected()) {
                 roomName = selectedLibrary;
             }
-            if (GetPlayerCount() != GC.Any)
-                roomName += GC.PlayerCountDelimiter + GetPlayerCount().ToString();
-            if (GetGameLength() != GC.Any)
-                roomName += GC.GameLengthDelimiter + GetGameLength().ToString();
-            if (GetSeaSize() != GC.Any)
-                roomName += GC.SeaSizeDelimiter + GetSeaSize().ToString();
-            if (GetLineLength() != GC.Any)
-                roomName += GC.LineLengthDelimiter + GetLineLength().ToString();
+            if (PlayerCount != DefaultSliderValue)
+                roomName += GC.PlayerCountDelimiter + PlayerCount.ToString();
+            if (GameLength != DefaultSliderValue)
+                roomName += GC.GameLengthDelimiter + GameLength.ToString();
+            if (SeaSize != DefaultSliderValue)
+                roomName += GC.SeaSizeDelimiter + SeaSize.ToString();
+            if (LineLength != DefaultSliderValue)
+                roomName += GC.LineLengthDelimiter + LineLength.ToString();
             return roomName;
         }
 
@@ -158,16 +173,16 @@ namespace OO {
             SetupHostData();
 
             var roomName = CreateRoomName();
-            NetworkManager.singleton.matchMaker.CreateMatch(roomName, (uint) GetPlayerCount(),
+            NetworkManager.singleton.matchMaker.CreateMatch(roomName, (uint) PlayerCount,
                 true, "", "", "", 0, 0, nm.OnMatchCreate);
         }
 
         private void SetupHostData () {
-            GameManager.ExpectedPlayerCount = GetPlayerCount();
-            GameManager.LinesPerGame = GetGameLength();
+            GameManager.ExpectedPlayerCount = PlayerCount;
+            GameManager.LinesPerGame = GameLength;
             WordSea.currentLibraryName = selectedLibrary;
-            ButtonBar.lineLength = GetLineLength();
-            WordSea.wordSeaSize = GetSeaSize();
+            ButtonBar.lineLength = LineLength;
+            WordSea.wordSeaSize = SeaSize;
         }
 
         private void OnMatchList (bool success, string extendedInfo, List<MatchInfoSnapshot> responseData) {
@@ -183,32 +198,68 @@ namespace OO {
             }
         }
 
-        private bool DefaultOrAnyLibraryChosen () {
-            return DefaultLibraryChosen() || selectedLibrary == DefaultLibraryChoice;
-        }
-
-        private bool DefaultLibraryChosen () {
+        private bool DefaultLibrarySelected () {
             return defaultLibraryNames.Contains(selectedLibrary);
         }
 
-        private int GetPlayerCount () {
-            return (int) playerCountSlider.value;
+        private bool AnyLibrarySelected () {
+            return selectedLibrary == DefaultSelectedLibrary;
         }
 
-        private int GetSeaSize () {
-            return (int) seaSizeSlider.value;
+        private int GameLength {
+            get { return (int) gameLengthSlider.value; }
+            set { gameLengthSlider.value = value; }
         }
 
-        private int GetGameLength () {
-            return (int) gameLengthSlider.value;
+        private int PlayerCount {
+            get { return (int) playerCountSlider.value; }
+            set { playerCountSlider.value = value; }
+        }
+
+        private int SeaSize {
+            get { return (int) seaSizeSlider.value; }
+            set { seaSizeSlider.value = value; }
+        }
+
+        private int LineLength {
+            get { return (int) lineLengthSlider.value; }
+            set { lineLengthSlider.value = value; }
         }
 
         private void WordSeaListButtonClicked (string libraryName) {
             selectedLibrary = libraryName;
         }
 
-        private int GetLineLength () {
-            return (int) lineLengthSlider.value;
+        private void OnGameLengthChange (float value) {
+            if (value == DefaultSliderValue) {
+                gameLengthLabel.text = "Game length: Any";
+            } else {
+                gameLengthLabel.text = "Game length: " + value;
+            }
+        }
+
+        private void OnPlayerCountChange (float value) {
+            if (value == DefaultSliderValue) {
+                playerCountLabel.text = "Players: Any";
+            } else {
+                playerCountLabel.text = "Players: " + value;
+            }
+        }
+
+        private void OnSeaSizeChange (float value) {
+            if (value == DefaultSliderValue) {
+                seaSizeLabel.text = "Sea size: Any";
+            } else {
+                seaSizeLabel.text = "Sea size: " + value;
+            }
+        }
+
+        private void OnLineLengthChange (float value) {
+            if (value == DefaultSliderValue) {
+                lineLengthLabel.text = "Line length: Any";
+            } else {
+                lineLengthLabel.text = "Line length: " + value;
+            }
         }
     }
 }

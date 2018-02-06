@@ -6,6 +6,5 @@
         public const char GameLengthDelimiter = ')';
         public const char SeaSizeDelimiter = '{';
         public const char LineLengthDelimiter = '}';
-        public const int Any = 0;
     }
 }
