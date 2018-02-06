@@ -13,10 +13,11 @@ namespace OO {
 
         private void Awake () {
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
-            var lanEnabled = PlayerPrefs.GetInt(PreferencesKeys.LanEnabled, 0);
+            var lanEnabled = Preferences.GetBool(Preferences.LanEnabled);
+
             lanToggle = GameObject.Find("LanToggle").GetComponent<Toggle>();
-            lanToggle.isOn = lanEnabled > 0;
-            SetLanMode(lanEnabled > 0);
+            lanToggle.isOn = lanEnabled;
+            SetLanMode(lanEnabled);
             lanToggle.onValueChanged.AddListener(SetLanMode);
         }
 
@@ -54,8 +55,7 @@ namespace OO {
         }
 
         public void SetLanMode (bool value) {
-            int lanEnabled = value ? 1 : 0;
-            PlayerPrefs.SetInt(PreferencesKeys.LanEnabled, lanEnabled);
+            Preferences.Set(Preferences.LanEnabled, value);
             InLanMode = value;
 
             if (InLanMode) {

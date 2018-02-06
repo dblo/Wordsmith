@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace OO {
     public class WordSea : MonoBehaviour {
-        public static string currentLibraryName = "";
+        public static string libraryName = "";
         public static int wordSeaSize = 12;
         public Button wordButtonPrefab;
         public ButtonBar buttonBar;
@@ -65,11 +65,10 @@ namespace OO {
 
         //todo dont read lib from prefs each round
         public string[] GenerateNewSea () {
-            if (currentLibraryName == "")
+            if (libraryName == "")
                 throw new InvalidOperationException("Empty currenLibrary in WordSea.GenerateNewSea");
 
-            var libraryJson = PlayerPrefs.GetString(currentLibraryName, "");
-            var library = JsonArrayHelper.FromJson<string>(libraryJson);
+            var library = Preferences.GetArray(libraryName);
             if (library.Length == 0)
                 throw new InvalidOperationException("Empty library in WordSea.GenerateNewSea");
             return GenerateUniqueWords(wordSeaSize, library);

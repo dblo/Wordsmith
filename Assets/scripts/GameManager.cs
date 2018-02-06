@@ -31,7 +31,7 @@ namespace OO {
         }
 
         private void Awake () {
-            SoundMuted = PlayerPrefs.GetInt(PreferencesKeys.SoundcMuted, 0) > 0;
+            SoundMuted = Preferences.GetBool(Preferences.SoundMuted);
             roundDisplay = GameObject.Find("RoundDisplayText").GetComponent<Text>();
         }
         

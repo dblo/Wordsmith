@@ -3,18 +3,15 @@ using UnityEngine;
 
 namespace OO {
     public class LibrarySeeder : MonoBehaviour {
+        private string[] libraries;
+
         private void Start () {
-            if (PrefsAlreadySeeded())
-                return;
-            SeedPreferences();
+            libraries = Preferences.GetArray(Preferences.DefaultLibraryNames);
+            if (libraries.Length == 0)
+                SeedLibraries();
         }
 
-        private static bool PrefsAlreadySeeded () {
-            var libraryNames = PlayerPrefs.GetString(PreferencesKeys.DefaultLibraryNames);
-            return libraryNames != "";
-        }
-
-        private void SeedPreferences () {
+        private void SeedLibraries () {
             string[] nouns = { "time","person","year","way","day","thing","man","world","life","hand","part","child","eye","woman","place","work","week","case","point","company","number" };
             string[] verbs = { "be","have","do","say","get","make","go","know","take","see","come","think","look","want","give","use","find","tell","ask","work","seem","feel","try","leave","call" };
             string[] adjectives = { "good", "first", "new", "last", "long", "great", "little", "own", "other", "old", "right", "big", "high", "different", "small", "large", "next", "early", "young", "important", "few", "public", "bad", "same", "able" };
@@ -29,17 +26,8 @@ namespace OO {
             ix += adjectives.Length;
             Array.Copy(prepositions, 0, library, ix, prepositions.Length);
 
-            //Todo dont allow ; in library names
-            var libraryNames = PlayerPrefs.GetString(PreferencesKeys.DefaultLibraryNames);
-            if (libraryNames == "") {
-                PlayerPrefs.SetString(PreferencesKeys.DefaultLibraryNames, "Default");
-            } else {
-                PlayerPrefs.SetString(PreferencesKeys.DefaultLibraryNames, libraryNames + 
-                    GC.LibraryNameDelimiter + "Default");
-            }
-
-            var foo = JsonArrayHelper.ToJson(library);
-            PlayerPrefs.SetString("Default", foo);
+            Preferences.AddToArray(Preferences.DefaultLibraryNames, "Default");
+            Preferences.SetArray("Default", library);
         }
     }
 }

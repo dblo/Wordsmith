@@ -40,17 +40,10 @@ namespace OO {
             Text seaName = GameObject.Find("SeaNameInputText").GetComponent<Text>();
             Text seaContent = GameObject.Find("SeaContentInputText").GetComponent<Text>();
 
-            //Todo check not placehold text
             if (seaName.text != "" && seaContent.text != "") {
-                var libraryNames = PlayerPrefs.GetString(PreferencesKeys.CustomLibraryNames);
-                //Todo dont allow ; in library names
-                if (libraryNames == "") {
-                    PlayerPrefs.SetString(PreferencesKeys.CustomLibraryNames, seaName.text + ";");
-                } else {
-                    PlayerPrefs.SetString(PreferencesKeys.CustomLibraryNames, libraryNames + seaName.text + ";");
-                }
-                var newLibraryJson = JsonArrayHelper.ToJson(seaContent.text.Split(' '));
-                PlayerPrefs.SetString(seaName.text, newLibraryJson);
+                var libraries = Preferences.GetArray(Preferences.CustomLibraryNames);
+                Preferences.AddToArray(Preferences.CustomLibraryNames, seaName.text);
+                Preferences.SetArray(seaName.text, seaContent.text.Split(' '));
             }
             libraryList.AddListElement(seaName.text);
         }

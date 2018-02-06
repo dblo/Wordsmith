@@ -21,10 +21,10 @@ namespace OO {
                 var bb = go.GetComponent<ButtonBar>();
                 bb.AssignLocalPlayer(this);
 
-                var playerName = PlayerPrefs.GetString(PreferencesKeys.PlayerName);
+                var playerName = PlayerPrefs.GetString(Preferences.PlayerName);
                 if (playerName.Equals("")) {
                     playerName = "Player " + new System.Random().Next(100);
-                    PlayerPrefs.SetString(PreferencesKeys.PlayerName, playerName);
+                    PlayerPrefs.SetString(Preferences.PlayerName, playerName);
                 }
                 CmdLocalPlayerReady(playerName);
             }

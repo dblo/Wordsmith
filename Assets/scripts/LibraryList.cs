@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,22 +16,14 @@ namespace OO {
         }
 
         private void SetupLibraries () {
-            var defaultLibNames = PlayerPrefs.GetString(PreferencesKeys.DefaultLibraryNames, "")
-                .Split(GC.LibraryNameDelimiter);
-            if (defaultLibNames.Length == 0)
-                throw new InvalidOperationException("No default libraries found in MultiplayerLobby.SetupLibraries()");
-
-            foreach (var name in defaultLibNames) {
+            var defaultLibraries = Preferences.GetArray(Preferences.DefaultLibraryNames);
+            foreach (var name in defaultLibraries) {
                 AddListElement(name);
             }
 
-            var customLibString = PlayerPrefs.GetString(PreferencesKeys.CustomLibraryNames, "");
-            if (customLibString != "") {
-                var customLibNames = customLibString.Split(GC.LibraryNameDelimiter);
-                foreach (var name in customLibNames) {
-                    if (name != "")
-                        AddListElement(name);
-                }
+            var customLibraries = Preferences.GetArray(Preferences.CustomLibraryNames);
+            foreach (var name in customLibraries) {
+                AddListElement(name);
             }
         }
 
@@ -59,9 +52,9 @@ namespace OO {
         internal void DeleteSelected () {
             var libraryName = SelectedListElement.GetComponentInChildren<Text>().text;
             PlayerPrefs.DeleteKey(libraryName);
-            var customLibraryNames = PlayerPrefs.GetString(PreferencesKeys.CustomLibraryNames);
-            customLibraryNames = customLibraryNames.Replace(libraryName + ";", "");
-            PlayerPrefs.SetString(PreferencesKeys.CustomLibraryNames, customLibraryNames);
+
+            // todo handle user cannot delete default libs? gray out button? handle return false below?
+            Preferences.DeleteFromArray(Preferences.CustomLibraryNames, libraryName);
 
             Destroy(SelectedListElement.gameObject);
             SetSelectedListElement(null);

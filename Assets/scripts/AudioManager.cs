@@ -12,7 +12,7 @@ namespace OO {
             instance = this;
             DontDestroyOnLoad(gameObject);
 
-            var musicMuted = PlayerPrefs.GetInt(PreferencesKeys.MusicMuted, 0) > 0;
+            var musicMuted = Preferences.GetBool(Preferences.MusicMuted);
             if (!musicMuted) {
                 var audioSource = GetComponent<AudioSource>();
                 audioSource.Play();

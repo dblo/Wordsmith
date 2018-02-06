@@ -4,12 +4,12 @@ using UnityEngine.UI;
 namespace OO {
     public class SettingsMenu : MonoBehaviour {
         private void Awake () {
-            var musicMuted = PlayerPrefs.GetInt(PreferencesKeys.MusicMuted) > 0;
+            var musicMuted = Preferences.GetBool(Preferences.MusicMuted);
             var musicToggle = GameObject.Find("MusicToggle").GetComponent<Toggle>();
             musicToggle.isOn = musicMuted;
             musicToggle.onValueChanged.AddListener(delegate { SetMusicMuted(musicToggle); });
 
-            var soundMuted = PlayerPrefs.GetInt(PreferencesKeys.SoundcMuted) > 0;
+            var soundMuted = Preferences.GetBool(Preferences.SoundMuted);
             var soundToggle = GameObject.Find("SoundToggle").GetComponent<Toggle>();
             soundToggle.isOn = soundMuted;
             soundToggle.onValueChanged.AddListener(delegate { SetSoundMuted(soundToggle); });
@@ -29,15 +29,14 @@ namespace OO {
             } else {
                 am.Play();
             }
-            int numVal = toggle.isOn ? 1 : 0;
-            PlayerPrefs.SetInt(PreferencesKeys.MusicMuted, numVal);
+            Preferences.Set(Preferences.MusicMuted, toggle.isOn);
         }
 
         private void SetSoundMuted (Toggle toggle) {
-            int numVal = toggle.isOn ? 1 : 0;
-            PlayerPrefs.SetInt(PreferencesKeys.SoundcMuted, numVal);
+            Preferences.Set(Preferences.SoundMuted, toggle.isOn);
             var gmGO = GameObject.Find("GameManager");
             if (gmGO != null) {
+                // Atm there are no sound effect outside game scene so this is sufficient
                 var gm = gmGO.GetComponent<GameManager>();
                 gm.SetSoundMuted(toggle.isOn);
             }
