@@ -20,9 +20,6 @@ namespace OO {
             goButton.onClick.AddListener(OnGoButtonClicked);
         }
 
-        // Return the number of buttons in the buttonBar incluing wordButtons and the Go button.
-        public static int ButtonCols { get { return lineLength + 1; } }
-
         public void OnGameOver () {
             OnNewRound();
             goButton.interactable = true;

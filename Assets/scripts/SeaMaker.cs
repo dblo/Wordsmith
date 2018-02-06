@@ -36,6 +36,7 @@ namespace OO {
         public void OnClickCloseButton () {
             if (NoChangesPending()) {
                 SceneManager.LoadScene("main_menu");
+                return;
             }
 
             var parent = GameObject.Find("Canvas").transform;

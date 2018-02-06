@@ -39,8 +39,31 @@ namespace OO {
             var button = GetComponent<Button>();
             button.transform.SetParent(parent, false);
 
-            var anchorMin = new Vector2(xIndex / ButtonBar.ButtonCols, 0);
-            var anchorMax = new Vector2((xIndex + 1) / ButtonBar.ButtonCols, 1);
+            float xMin = 0;
+            float xMax = 0;
+            switch (ButtonBar.lineLength) {
+                case 1:
+                    xMin = 0.3f;
+                    xMax = 0.5f;
+                    break;
+                case 2:
+                    xMin = 0.2f * (xIndex + 1);
+                    xMax = 0.2f * (xIndex + 2);
+                    break;
+                case 3:
+                    xMin = 0.1f + 0.2f * xIndex;
+                    xMax = 0.1f + 0.2f * (xIndex + 1);
+                    break;
+                case 4:
+                    xMin = 0.2f * xIndex;
+                    xMax = 0.2f * (xIndex + 1);
+                    break;
+                default:
+                    throw new InvalidOperationException("Invalid ButtonBar.lineLength");
+            }
+            var anchorMin = new Vector2(xMin, 0);
+            var anchorMax = new Vector2(xMax, 1);
+
             RectTransform rTrans = GetComponent<RectTransform>();
             rTrans.anchorMin = anchorMin;
             rTrans.anchorMax = anchorMax;
