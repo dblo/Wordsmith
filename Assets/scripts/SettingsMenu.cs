@@ -35,11 +35,9 @@ namespace OO {
         private void SetSoundMuted (Toggle toggle) {
             Preferences.Set(Preferences.SoundMuted, toggle.isOn);
             var gmGO = GameObject.Find("GameManager");
-            if (gmGO != null) {
-                // Atm there are no sound effect outside game scene so this is sufficient
-                var gm = gmGO.GetComponent<GameManager>();
-                gm.SetSoundMuted(toggle.isOn);
-            }
+            if (gmGO == null)
+                return; // Settings opened via main menu, no sound effects to handle atm
+            gmGO.GetComponent<GameManager>().SetSoundMuted(toggle.isOn);
         }
     }
 }

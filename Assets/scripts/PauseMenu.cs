@@ -8,8 +8,7 @@ namespace OO {
         }
 
         public void LaunchMainMenu () {
-            var parent = GameObject.Find("Canvas").transform;
-            var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), parent);
+            var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), transform.parent);
             go.GetComponent<ConfirmationDialog>().SetOnConfirmAction(() => {
                 var gm = GameObject.Find("GameManager");
                 gm.GetComponent<GameManager>().LaunchMainMenu();
@@ -17,8 +16,7 @@ namespace OO {
         }
 
         public void LaunchSettings () {
-            var parent = GameObject.Find("Canvas").transform;
-            Instantiate(Resources.Load("SettingsDialog"), parent);
+            Instantiate(Resources.Load("SettingsDialog"), transform.parent);
         }
     }
 }

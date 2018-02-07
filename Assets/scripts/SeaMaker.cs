@@ -38,9 +38,7 @@ namespace OO {
                 SceneManager.LoadScene("main_menu");
                 return;
             }
-
-            var parent = GameObject.Find("Canvas").transform;
-            var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), parent);
+            var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), transform.parent);
             go.GetComponent<ConfirmationDialog>().SetOnConfirmAction(() => {
                 SceneManager.LoadScene("main_menu");
             });
@@ -59,12 +57,11 @@ namespace OO {
         }
 
         public void OnClickNewButton () {
-            var parent = GameObject.Find("Canvas").transform;
-            var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), parent);
+            var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), transform.parent);
             go.GetComponent<ConfirmationDialog>().SetOnConfirmAction(() => {
-                var contentInput = GameObject.Find("SeaContentInput").GetComponent<InputField>();
+                var contentInput = transform.Find("SeaContentInput").GetComponent<InputField>();
                 contentInput.text = "";
-                var nameInput = GameObject.Find("SeaNameInput").GetComponent<InputField>();
+                var nameInput = transform.Find("SeaNameInput").GetComponent<InputField>();
                 nameInput.text = "";
             });
         }

@@ -10,8 +10,7 @@ namespace OO {
             if (GamePaused()) {
                 Destroy(pauseMenu);
             } else {
-                GameObject canvas = GameObject.Find("Canvas");
-                pauseMenu = Instantiate(pauseMenuPrefab, canvas.transform);
+                pauseMenu = Instantiate(pauseMenuPrefab, transform.parent);
             }
         }
 

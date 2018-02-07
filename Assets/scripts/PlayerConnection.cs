@@ -13,12 +13,10 @@ namespace OO {
         }
 
         private void Start () {
-            var go = GameObject.Find("GameManager");
-            gm = go.GetComponent<GameManager>();
+            gm = GameObject.Find("GameManager").GetComponent<GameManager>();
 
             if (isLocalPlayer || GameManager.ExpectedPlayerCount == 1) {
-                go = GameObject.Find("ButtonBar");
-                var bb = go.GetComponent<ButtonBar>();
+                var bb = GameObject.Find("ButtonBar").GetComponent<ButtonBar>();
                 bb.AssignLocalPlayer(this);
 
                 var playerName = PlayerPrefs.GetString(Preferences.PlayerName);
