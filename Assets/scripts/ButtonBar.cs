@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 namespace OO {
     public class ButtonBar : MonoBehaviour {
-        public static int lineLength = 4;
         public Button goButton;
         public WordSea wordSea;
 
@@ -16,7 +15,7 @@ namespace OO {
         private void Awake () {
             waitingText = GameObject.Find("WaitingText").GetComponent<Text>();
             infoText = GameObject.Find("InfoText").GetComponent<Text>();
-            infoText.text = "Compose a line of " + lineLength + " words.";
+            infoText.text = "Compose a line of " + GameData.Instance.GetLineLength() + " words.";
             goButton.onClick.AddListener(OnGoButtonClicked);
         }
 
@@ -88,7 +87,7 @@ namespace OO {
         }
 
         private bool AllWordsChosen () {
-            return buttons.Count == lineLength;
+            return buttons.Count == GameData.Instance.GetLineLength();
         }
 
         private void ShiftWordsLeft (Button btn) {

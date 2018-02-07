@@ -28,9 +28,9 @@ namespace OO {
 
             foreach (var p in players) {
                 playersWords.Add((string[]) p.Words.Clone());
-                colors.Add(GetInitialColors(ButtonBar.lineLength));
+                colors.Add(GetInitialColors(GameData.Instance.GetLineLength()));
             }
-            for (int i = 0; i < ButtonBar.lineLength; i++) {
+            for (int i = 0; i < GameData.Instance.GetLineLength(); i++) {
                 var word = playersWords[0][i];
                 int j = 1;
                 for (; j < players.Count; j++) {
@@ -90,7 +90,7 @@ namespace OO {
                     else if (c == "yellow")
                         score += 1;
                 }
-                if (PerfectScore(ButtonBar.lineLength, score))
+                if (PerfectScore(GameData.Instance.GetLineLength(), score))
                     score += perfectScoreBonus;
                 playersScore[i] += score;
             }

@@ -30,7 +30,6 @@ namespace OO {
         }
 
         public void JoinAnyGame () {
-            GameManager.ExpectedPlayerCount = 2;
             var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
 
             if (InLanMode) {

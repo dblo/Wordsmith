@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 namespace OO {
     public class WordSea : MonoBehaviour {
-        public static string libraryName = "";
-        public static int wordSeaSize = 12;
         public Button wordButtonPrefab;
         public ButtonBar buttonBar;
         public const int MaxCols = 4;
@@ -16,8 +14,8 @@ namespace OO {
         private List<string> currentSea;
 
         private void Awake () {
-            buttons = new List<Button>(wordSeaSize);
-            currentSea = new List<string>(wordSeaSize);
+            buttons = new List<Button>(GameData.Instance.GetSeaSize());
+            currentSea = new List<string>(GameData.Instance.GetSeaSize());
         }
 
         public void ReturnWord (Button btn) {
@@ -43,7 +41,7 @@ namespace OO {
         }
 
         public void ConfigureSea () {
-            for (int i = 0; i < wordSeaSize; i++) {
+            for (int i = 0; i < GameData.Instance.GetSeaSize(); i++) {
                 var btn = Instantiate(wordButtonPrefab, transform);
                 var wb = btn.GetComponent<WordButton>();
                 wb.ComputeSeaAnchors(i);
@@ -63,15 +61,9 @@ namespace OO {
             SetSeaFrozen(false);
         }
 
-        //todo dont read lib from prefs each round
         public string[] GenerateNewSea () {
-            if (libraryName == "")
-                throw new InvalidOperationException("Empty currenLibrary in WordSea.GenerateNewSea");
-
-            var library = Preferences.GetArray(libraryName);
-            if (library.Length == 0)
-                throw new InvalidOperationException("Empty library in WordSea.GenerateNewSea");
-            return GenerateUniqueWords(wordSeaSize, library);
+            return GenerateUniqueWords(GameData.Instance.GetSeaSize(), 
+                GameData.Instance.GetSelectedLibrary().words);
         }
 
         private string[] GenerateUniqueWords (int aSize, string[] aLibrary) {

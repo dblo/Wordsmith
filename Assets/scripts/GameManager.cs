@@ -9,26 +9,13 @@ namespace OO {
         public WordSea wordSea;
         public ButtonBar buttonBar;
         public ScorePanel scorePanelPrefab;
+        public bool SoundMuted { get; private set; }
 
         private List<LineLog> lineLogs = new List<LineLog>();
         private List<PlayerConnection> players;
         private ColorMapper colorWordMapper;
-        private static int expectedPlayerCount = 1;
-        private static int roundsPerGame = 3;
         private Text roundDisplay;
         private int currentRound = 1;
-
-        public bool SoundMuted { get; private set; }
-
-        public static int ExpectedPlayerCount {
-            get { return expectedPlayerCount; }
-            set { expectedPlayerCount = value; }
-        }
-
-        public static int LinesPerGame {
-            get { return roundsPerGame; }
-            set { roundsPerGame = value; }
-        }
 
         private void Awake () {
             SoundMuted = Preferences.GetBool(Preferences.SoundMuted);
@@ -51,7 +38,7 @@ namespace OO {
 
             players.ForEach((p) => p.CmdSynchronizeName());
             var newWordSea = wordSea.GenerateNewSea();
-            RpcOnAllPlayersJoined(newWordSea, expectedPlayerCount, LinesPerGame, ButtonBar.lineLength);
+            RpcOnAllPlayersJoined(newWordSea, GameData.Instance.GetRoomSize(), GameData.Instance.GetGameLength(), GameData.Instance.GetLineLength());
         }
 
         public void SetSoundMuted (bool value) {
@@ -60,10 +47,7 @@ namespace OO {
 
         [ClientRpc]
         private void RpcOnAllPlayersJoined (string[] newWordSea, int playercount, int gameLength, int lineLength) {
-            expectedPlayerCount = playercount;
-            LinesPerGame = gameLength;
-            ButtonBar.lineLength = lineLength;
-            WordSea.wordSeaSize = newWordSea.Length;
+            GameData.Instance.NewGame(playercount, gameLength, newWordSea.Length, lineLength);
             players = FindSortedPlayers();
             colorWordMapper = new ColorMapper(playercount);
 
@@ -126,7 +110,7 @@ namespace OO {
         }
 
         private void UpdateRoundDisplay () {
-            roundDisplay.text = currentRound + "/" + LinesPerGame;
+            roundDisplay.text = currentRound + "/" + GameData.Instance.GetGameLength();
         }
 
         public void AddTemporaryWordsToLineLog (string[] words) {
@@ -182,11 +166,11 @@ namespace OO {
         }
 
         public bool GameOver () {
-            return currentRound > roundsPerGame;
+            return currentRound > GameData.Instance.GetGameLength();
         }
 
         private bool IsGameFull () {
-            return players.Count == ExpectedPlayerCount;
+            return players.Count == GameData.Instance.GetRoomSize();
         }
 
         public void LaunchMainMenu () {

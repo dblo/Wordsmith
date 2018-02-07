@@ -1,12 +1,10 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace OO {
     public class SeaMaker : MonoBehaviour {
-        [SerializeField]
-        private LibraryList libraryList;
+        public LibraryList libraryList;
         private Text seaName;
         private Text seaContent;
 
@@ -50,8 +48,8 @@ namespace OO {
 
         public void OnClickSaveButton () {
             if (seaName.text != "" && seaContent.text != "") {
-                Preferences.AddToArray(Preferences.CustomLibraryNames, seaName.text);
-                Preferences.SetArray(seaName.text, seaContent.text.Split(' '));
+                var library = new Library() { name = seaName.text, playerMade = true, words = seaContent.text.Split(' ') };
+                GameData.Instance.AddLibrary(library);
             }
             libraryList.AddListElement(seaName.text);
         }

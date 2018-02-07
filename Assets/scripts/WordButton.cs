@@ -41,7 +41,7 @@ namespace OO {
 
             float xMin = 0;
             float xMax = 0;
-            switch (ButtonBar.lineLength) {
+            switch (GameData.Instance.GetLineLength()) {
                 case 1:
                     xMin = 0.3f;
                     xMax = 0.5f;

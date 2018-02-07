@@ -5,8 +5,7 @@ namespace OO {
     public class LibrarySeeder : MonoBehaviour {
 
         private void Start () {
-            var defaultLibrary = PlayerPrefs.GetString("Default");
-            if (defaultLibrary == "")
+            if (GameData.Instance.GetLibraries().Count == 0)
                 SeedLibraries();
         }
 
@@ -25,8 +24,7 @@ namespace OO {
             ix += adjectives.Length;
             Array.Copy(prepositions, 0, library, ix, prepositions.Length);
 
-            Preferences.AddToArray(Preferences.DefaultLibraryNames, "Default");
-            Preferences.SetArray("Default", library);
+            GameData.Instance.AddLibrary(new Library() { name = "Default", playerMade = false, words = library });
         }
     }
 }

@@ -16,14 +16,8 @@ namespace OO {
         }
 
         private void SetupLibraries () {
-            var defaultLibraries = Preferences.GetArray(Preferences.DefaultLibraryNames);
-            foreach (var name in defaultLibraries) {
-                AddListElement(name);
-            }
-
-            var customLibraries = Preferences.GetArray(Preferences.CustomLibraryNames);
-            foreach (var name in customLibraries) {
-                AddListElement(name);
+            foreach (var lib in GameData.Instance.GetLibraries()) {
+                AddListElement(lib.name);
             }
         }
 
@@ -50,11 +44,9 @@ namespace OO {
         }
 
         internal void DeleteSelected () {
-            var libraryName = SelectedListElement.GetComponentInChildren<Text>().text;
-            PlayerPrefs.DeleteKey(libraryName);
-
             // todo handle user cannot delete default libs? gray out button? handle return false below?
-            Preferences.DeleteFromArray(Preferences.CustomLibraryNames, libraryName);
+            var libraryName = SelectedListElement.GetComponentInChildren<Text>().text;
+            GameData.Instance.DeleteLibrary(libraryName);
 
             Destroy(SelectedListElement.gameObject);
             SetSelectedListElement(null);

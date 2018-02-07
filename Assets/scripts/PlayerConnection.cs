@@ -15,7 +15,7 @@ namespace OO {
         private void Start () {
             gm = GameObject.Find("GameManager").GetComponent<GameManager>();
 
-            if (isLocalPlayer || GameManager.ExpectedPlayerCount == 1) {
+            if (isLocalPlayer) {
                 var bb = GameObject.Find("ButtonBar").GetComponent<ButtonBar>();
                 bb.AssignLocalPlayer(this);
 
