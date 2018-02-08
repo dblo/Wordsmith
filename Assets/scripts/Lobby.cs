@@ -12,11 +12,11 @@ namespace OO {
         public Transform libraryContent;
 
         private Slider gameLengthSlider;
-        private Slider playerCountSlider;
+        private Slider roomSizeSlider;
         private Slider seaSizeSlider;
         private Slider lineLengthSlider;
         private Text gameLengthLabel;
-        private Text playerCountLabel;
+        private Text roomSizeLabel;
         private Text seaSizeLabel;
         private Text lineLengthLabel;
         private string selectedLibrary = DefaultSelectedLibrary;
@@ -32,30 +32,38 @@ namespace OO {
 
         void Start () {
             gameLengthSlider = GameObject.Find("GameLengthSlider").GetComponent<Slider>();
-            playerCountSlider = GameObject.Find("PlayerCountSlider").GetComponent<Slider>();
+            roomSizeSlider = GameObject.Find("PlayerCountSlider").GetComponent<Slider>();
             seaSizeSlider = GameObject.Find("SeaSizeSlider").GetComponent<Slider>();
             lineLengthSlider = GameObject.Find("LineLengthSlider").GetComponent<Slider>();
             gameLengthLabel = GameObject.Find("GameLengthLabel").GetComponent<Text>();
-            playerCountLabel = GameObject.Find("PlayerCountLabel").GetComponent<Text>();
+            roomSizeLabel = GameObject.Find("PlayerCountLabel").GetComponent<Text>();
             seaSizeLabel = GameObject.Find("SeaSizeLabel").GetComponent<Text>();
             lineLengthLabel = GameObject.Find("LineLengthLabel").GetComponent<Text>();
 
             SetupOnClickListeners();
-            UseLastUsedSettings();
+            UsePrefsValuesIfPresent();
             SetupLibraries();
         }
 
-        private void UseLastUsedSettings () {
-            GameLength = GameData.Instance.GetGameLength(); ;
+        private void UsePrefsValuesIfPresent () {
+            var gameLengthPref = PlayerPrefs.GetInt(Preferences.DefaultGameLength, DefaultSliderValue);
+            if (gameLengthPref > DefaultSliderValue)
+                GameLength = gameLengthPref;
             OnGameLengthChange(GameLength);
 
-            PlayerCount = GameData.Instance.GetRoomSize();
+            var playerCountPref = PlayerPrefs.GetInt(Preferences.DefaultPlayerCount, DefaultSliderValue);
+            if (playerCountPref > DefaultSliderValue)
+                PlayerCount = playerCountPref;
             OnPlayerCountChange(PlayerCount);
 
-            SeaSize = GameData.Instance.GetSeaSize();
+            var seaSizePref = PlayerPrefs.GetInt(Preferences.DefaultSeaSize, DefaultSliderValue);
+            if (seaSizePref > DefaultSliderValue)
+                SeaSize = seaSizePref;
             OnSeaSizeChange(SeaSize);
 
-            LineLength = GameData.Instance.GetLineLength();
+            var lineLengthPref = PlayerPrefs.GetInt(Preferences.DefaultLineLength, DefaultSliderValue);
+            if (lineLengthPref > DefaultSliderValue)
+                LineLength = lineLengthPref;
             OnLineLengthChange(LineLength);
         }
 
@@ -64,7 +72,7 @@ namespace OO {
             closeLobbyButton.onClick.AddListener(() => SceneManager.LoadScene("main_menu"));
 
             gameLengthSlider.onValueChanged.AddListener(OnGameLengthChange);
-            playerCountSlider.onValueChanged.AddListener(OnPlayerCountChange);
+            roomSizeSlider.onValueChanged.AddListener(OnPlayerCountChange);
             seaSizeSlider.onValueChanged.AddListener(OnSeaSizeChange);
             lineLengthSlider.onValueChanged.AddListener(OnLineLengthChange);
         }
@@ -81,15 +89,14 @@ namespace OO {
         }
 
         public void StartGame () {
+            PlayerPrefs.SetInt(Preferences.DefaultPlayerCount, PlayerCount);
+            PlayerPrefs.SetInt(Preferences.DefaultGameLength, GameLength);
+            PlayerPrefs.SetInt(Preferences.DefaultSeaSize, SeaSize);
+            PlayerPrefs.SetInt(Preferences.DefaultLineLength, LineLength);
+
             var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
             if (MainMenu.InLanMode) {
                 SetupGameParameters();
-
-                //todo make sure seasize <= length of selected library size
-                if (SeaSize < LineLength)
-                    LineLength = SeaSize;
-
-                SetupHostData();
                 nm.StartHost();
             } else {
                 if (!GameData.Instance.GetSelectedLibrary().playerMade || AnyLibrarySelected()) {
@@ -102,36 +109,44 @@ namespace OO {
         }
 
         private void SetupGameParameters () {
+            // Using locals to prevent sliders momentarily updating as the scene changes
+            int roomSize = PlayerCount,
+                gameLength = GameLength,
+                seaSize = SeaSize,
+                lineLength = LineLength;
+
             if (AnyLibrarySelected()) {
                 int randomIndex = rng.Next(GameData.Instance.GetLibraries().Count);
                 selectedLibrary = GameData.Instance.GetLibraries()[randomIndex].name;
             }
             if (GameLength == DefaultSliderValue) {
-                GameLength = rng.Next(1, (int) gameLengthSlider.maxValue + 1);
+                gameLength = rng.Next(1, (int) gameLengthSlider.maxValue + 1);
             }
             if (PlayerCount == DefaultSliderValue) {
-                PlayerCount = rng.Next(1, (int) playerCountSlider.maxValue + 1);
+                roomSize = rng.Next(1, (int) roomSizeSlider.maxValue + 1);
             }
             if (SeaSize == DefaultSliderValue && LineLength == DefaultSliderValue) {
                 var seaSizeMax = Math.Min(GameData.Instance.GetSelectedLibrary().words.Length,
                     (int) seaSizeSlider.maxValue);
-                SeaSize = rng.Next(1, seaSizeMax + 1);
+                seaSize = rng.Next(1, seaSizeMax + 1);
 
                 var lineLengthMax = Math.Min((int) lineLengthSlider.maxValue, SeaSize);
-                LineLength = rng.Next(1, lineLengthMax + 1);
+                lineLength = rng.Next(1, lineLengthMax + 1);
             } else if (SeaSize == DefaultSliderValue && LineLength != DefaultSliderValue) {
                 var seaSizeMax = Math.Min(GameData.Instance.GetSelectedLibrary().words.Length,
                     LineLength);
-                SeaSize = rng.Next(1, seaSizeMax + 1);
+                seaSize = rng.Next(1, seaSizeMax + 1);
             } else if (SeaSize != DefaultSliderValue && LineLength == DefaultSliderValue) {
-                LineLength = rng.Next(1, SeaSize + 1);
+                lineLength = rng.Next(1, SeaSize + 1);
             } else if (SeaSize != DefaultSliderValue && LineLength != DefaultSliderValue) {
             }
             // todo Make it so a player cannot choose values so belows are needed
-            if (SeaSize > GameData.Instance.GetSelectedLibrary().words.Length)
-                SeaSize = GameData.Instance.GetSelectedLibrary().words.Length;
-            if (LineLength > SeaSize)
-                LineLength = SeaSize;
+            if (seaSize > GameData.Instance.GetSelectedLibrary().words.Length)
+                seaSize = GameData.Instance.GetSelectedLibrary().words.Length;
+            if (lineLength > seaSize)
+                lineLength = seaSize;
+
+            GameData.Instance.NewGame(selectedLibrary, roomSize, gameLength, seaSize, lineLength);
         }
 
         private string CreateRoomName () {
@@ -152,17 +167,12 @@ namespace OO {
 
         private void HostMMGame (NetworkManager nm) {
             SetupGameParameters();
-            SetupHostData();
 
             var roomName = CreateRoomName();
             NetworkManager.singleton.matchMaker.CreateMatch(roomName, (uint) PlayerCount,
                 true, "", "", "", 0, 0, nm.OnMatchCreate);
         }
-
-        private void SetupHostData () {
-            GameData.Instance.NewGame(selectedLibrary, PlayerCount, GameLength, SeaSize, LineLength);
-        }
-
+        
         private void OnMatchList (bool success, string extendedInfo, List<MatchInfoSnapshot> responseData) {
             if (!success)
                 return; // todo what?
@@ -186,8 +196,8 @@ namespace OO {
         }
 
         private int PlayerCount {
-            get { return (int) playerCountSlider.value; }
-            set { playerCountSlider.value = value; }
+            get { return (int) roomSizeSlider.value; }
+            set { roomSizeSlider.value = value; }
         }
 
         private int SeaSize {
@@ -214,9 +224,9 @@ namespace OO {
 
         private void OnPlayerCountChange (float value) {
             if (value == DefaultSliderValue) {
-                playerCountLabel.text = "Players: Any";
+                roomSizeLabel.text = "Players: Any";
             } else {
-                playerCountLabel.text = "Players: " + value;
+                roomSizeLabel.text = "Players: " + value;
             }
         }
 
