@@ -23,7 +23,7 @@ namespace OO {
             roundDisplay = GameObject.Find("RoundDisplay").GetComponent<Text>();
             libraryNameDisplay = GameObject.Find("LibraryNameDisplay").GetComponent<Text>();
         }
-        
+
         public override void OnStartServer () {
             players = new List<PlayerConnection>();
         }
@@ -40,7 +40,9 @@ namespace OO {
 
             players.ForEach((p) => p.CmdSynchronizeName());
             var newWordSea = wordSea.GenerateNewSea();
-            RpcOnAllPlayersJoined(GameData.Instance.GetSelectedLibrary().name, newWordSea, GameData.Instance.GetRoomSize(), 
+
+            var libraryJson = JsonUtility.ToJson(GameData.Instance.GetSelectedLibrary());
+            RpcOnAllPlayersJoined(libraryJson, newWordSea, GameData.Instance.GetRoomSize(),
                 GameData.Instance.GetGameLength(), GameData.Instance.GetLineLength());
         }
 
@@ -49,16 +51,19 @@ namespace OO {
         }
 
         [ClientRpc]
-        private void RpcOnAllPlayersJoined (string libraryName, string[] newWordSea, int playercount, int gameLength, int lineLength) {
-            if(isClient) {
-                GameData.Instance.NewGame(libraryName, playercount, gameLength, newWordSea.Length, lineLength);
+        private void RpcOnAllPlayersJoined (string libraryJson, string[] newWordSea, int playercount, int gameLength, int lineLength) {
+            var library = JsonUtility.FromJson<Library>(libraryJson);
+            if (isClient) { // todo fix this hack
+                //GameData.Instance.AddLibrary(library);
+                GameData.Instance.NewGame(library.name, playercount, gameLength, newWordSea.Length, lineLength);
             }
             players = FindSortedPlayers();
             colorWordMapper = new ColorMapper(playercount);
 
-            libraryNameDisplay.text = libraryName;
+            libraryNameDisplay.text = library.name;
             UpdateRoundDisplay();
             CreateLineLogs();
+            buttonBar.GameStarting();
             wordSea.ConfigureSea();
             wordSea.SetNewSea(newWordSea);
         }

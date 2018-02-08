@@ -6,16 +6,18 @@ namespace OO {
     public class ButtonBar : MonoBehaviour {
         public Button goButton;
         public WordSea wordSea;
+        public Toggle SaveLibToggle;
 
         private List<Button> buttons = new List<Button>();
         private PlayerConnection localPlayer;
         private Text waitingText;
+        private GameObject playersJoiningText;
         private Text infoText;
 
         private void Awake () {
             waitingText = GameObject.Find("WaitingText").GetComponent<Text>();
+            playersJoiningText = GameObject.Find("PlayerJoiningText");
             infoText = GameObject.Find("InfoText").GetComponent<Text>();
-            infoText.text = "Compose a line of " + GameData.Instance.GetLineLength() + " words.";
             goButton.onClick.AddListener(OnGoButtonClicked);
         }
 
@@ -25,6 +27,11 @@ namespace OO {
             goButton.GetComponentInChildren<Text>().text = "Home";
             goButton.onClick.RemoveAllListeners();
             goButton.onClick.AddListener(OnHomeButtonClicked);
+
+            //var gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+            //if (gm.isClient) {
+            //    SaveLibToggle.gameObject.SetActive(true);
+            //}
         }
 
         public bool TryAdd (Button btn) {
@@ -53,6 +60,11 @@ namespace OO {
             wordSea.ReturnWord(btn);
             goButton.interactable = false;
         }
+        public void GameStarting () {
+            playersJoiningText.SetActive(false);
+            infoText.enabled = true;
+            infoText.text = "Compose a line of " + GameData.Instance.GetLineLength() + " words.";
+        }
 
         public void OnNewRound () {
             waitingText.enabled = false;
@@ -74,6 +86,9 @@ namespace OO {
         }
 
         public void OnHomeButtonClicked () {
+            //if (!SaveLibToggle.isOn) {
+            //    GameData.Instance.DeleteLibrary(GameData.Instance.GetSelectedLibrary().name);
+            //}
             var gm = GameObject.Find("GameManager").GetComponent<GameManager>();
             gm.LaunchMainMenu();
         }
