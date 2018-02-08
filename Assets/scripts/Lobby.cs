@@ -8,8 +8,7 @@ using UnityEngine.UI;
 
 namespace OO {
     public class Lobby : MonoBehaviour {
-        public Button listElementPrefab;
-        public Transform libraryContent;
+        public LibraryList libraryList;
 
         private Slider gameLengthSlider;
         private Slider roomSizeSlider;
@@ -42,7 +41,6 @@ namespace OO {
 
             SetupOnClickListeners();
             UsePrefsValuesIfPresent();
-            SetupLibraries();
         }
 
         private void UsePrefsValuesIfPresent () {
@@ -68,24 +66,13 @@ namespace OO {
         }
 
         private void SetupOnClickListeners () {
-            var closeLobbyButton = GameObject.Find("LobbyCloseButton").GetComponent<Button>();
+            var closeLobbyButton = GameObject.Find("CloseButton").GetComponent<Button>();
             closeLobbyButton.onClick.AddListener(() => SceneManager.LoadScene("main_menu"));
 
             gameLengthSlider.onValueChanged.AddListener(OnGameLengthChange);
             roomSizeSlider.onValueChanged.AddListener(OnPlayerCountChange);
             seaSizeSlider.onValueChanged.AddListener(OnSeaSizeChange);
             lineLengthSlider.onValueChanged.AddListener(OnLineLengthChange);
-        }
-
-        private void SetupLibraries () {var go = Instantiate(listElementPrefab, libraryContent);
-            go.GetComponentInChildren<Text>().text = DefaultSelectedLibrary;
-            go.GetComponent<Button>().onClick.AddListener(() => WordSeaListButtonClicked(DefaultSelectedLibrary));
-
-            foreach (var lib in GameData.Instance.GetLibraries()) {
-                go = Instantiate(listElementPrefab, libraryContent);
-                go.GetComponentInChildren<Text>().text = lib.name;
-                go.GetComponent<Button>().onClick.AddListener(() => WordSeaListButtonClicked(lib.name));
-            }
         }
 
         public void StartGame () {
@@ -114,6 +101,9 @@ namespace OO {
                 gameLength = GameLength,
                 seaSize = SeaSize,
                 lineLength = LineLength;
+
+            if(libraryList.SelectedListElement != null)
+                selectedLibrary = libraryList.SelectedListElement.GetComponentInChildren<Text>().text;
 
             if (AnyLibrarySelected()) {
                 int randomIndex = rng.Next(GameData.Instance.GetLibraries().Count);
@@ -208,10 +198,6 @@ namespace OO {
         private int LineLength {
             get { return (int) lineLengthSlider.value; }
             set { lineLengthSlider.value = value; }
-        }
-
-        private void WordSeaListButtonClicked (string library) {
-            selectedLibrary = library;
         }
 
         private void OnGameLengthChange (float value) {

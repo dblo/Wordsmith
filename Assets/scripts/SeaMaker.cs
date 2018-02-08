@@ -15,7 +15,7 @@ namespace OO {
             var saveButton = GameObject.Find("SeaMakerSaveButton").GetComponent<Button>();
             saveButton.onClick.AddListener(OnClickSaveButton);
 
-            var cancelButton = GameObject.Find("SeaMakerCloseButton").GetComponent<Button>();
+            var cancelButton = GameObject.Find("CloseButton").GetComponent<Button>();
             cancelButton.onClick.AddListener(OnClickCloseButton);
 
             var newButton = GameObject.Find("SeaMakerNewButton").GetComponent<Button>();
