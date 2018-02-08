@@ -16,10 +16,26 @@ namespace OO {
 
             var clearPrefsBtn = GameObject.Find("ClearPrefsButton").GetComponent<Button>();
             clearPrefsBtn.onClick.AddListener(() => PlayerPrefs.DeleteAll());
+
+            var playerNameInput = GameObject.Find("PlayerNameInput").GetComponent<InputField>();
+            var playerName = PlayerPrefs.GetString(Preferences.PlayerName);
+            if (playerName != "") {
+                playerNameInput.text = playerName;
+            }
+            if (GameObject.Find("GameManager") == null) {
+                playerNameInput.onEndEdit.AddListener(SetPlayerName);
+            } else {
+                // We do not allow name changes during an on-going match
+                playerNameInput.interactable = false;
+            }
         }
 
         public void OnClose () {
             Destroy(gameObject);
+        }
+
+        public void SetPlayerName (string name) {
+            PlayerPrefs.SetString(Preferences.PlayerName, name);
         }
 
         private void SetMusicMuted (Toggle toggle) {
