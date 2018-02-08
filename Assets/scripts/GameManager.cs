@@ -15,11 +15,13 @@ namespace OO {
         private List<PlayerConnection> players;
         private ColorMapper colorWordMapper;
         private Text roundDisplay;
+        private Text libraryNameDisplay;
         private int currentRound = 1;
 
         private void Awake () {
             SoundMuted = Preferences.GetBool(Preferences.SoundMuted);
-            roundDisplay = GameObject.Find("RoundDisplayText").GetComponent<Text>();
+            roundDisplay = GameObject.Find("RoundDisplay").GetComponent<Text>();
+            libraryNameDisplay = GameObject.Find("LibraryNameDisplay").GetComponent<Text>();
         }
         
         public override void OnStartServer () {
@@ -38,7 +40,8 @@ namespace OO {
 
             players.ForEach((p) => p.CmdSynchronizeName());
             var newWordSea = wordSea.GenerateNewSea();
-            RpcOnAllPlayersJoined(newWordSea, GameData.Instance.GetRoomSize(), GameData.Instance.GetGameLength(), GameData.Instance.GetLineLength());
+            RpcOnAllPlayersJoined(GameData.Instance.GetSelectedLibrary().name, newWordSea, GameData.Instance.GetRoomSize(), 
+                GameData.Instance.GetGameLength(), GameData.Instance.GetLineLength());
         }
 
         public void SetSoundMuted (bool value) {
@@ -46,11 +49,14 @@ namespace OO {
         }
 
         [ClientRpc]
-        private void RpcOnAllPlayersJoined (string[] newWordSea, int playercount, int gameLength, int lineLength) {
-            GameData.Instance.NewGame(playercount, gameLength, newWordSea.Length, lineLength);
+        private void RpcOnAllPlayersJoined (string libraryName, string[] newWordSea, int playercount, int gameLength, int lineLength) {
+            if(isClient) {
+                GameData.Instance.NewGame(libraryName, playercount, gameLength, newWordSea.Length, lineLength);
+            }
             players = FindSortedPlayers();
             colorWordMapper = new ColorMapper(playercount);
 
+            libraryNameDisplay.text = libraryName;
             UpdateRoundDisplay();
             CreateLineLogs();
             wordSea.ConfigureSea();

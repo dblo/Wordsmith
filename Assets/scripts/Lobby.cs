@@ -60,6 +60,7 @@ namespace OO {
 
         private void SetupOnClickListeners () {
             var anyLibraryListElement = GameObject.Find("LobbyWordSeaListButton").GetComponent<Button>();
+            anyLibraryListElement.GetComponentInChildren<Text>().text = DefaultSelectedLibrary;
             anyLibraryListElement.onClick.AddListener(() => WordSeaListButtonClicked(null));
 
             var closeLobbyButton = GameObject.Find("LobbyCloseButton").GetComponent<Button>();
@@ -84,7 +85,7 @@ namespace OO {
         public void StartGame () {
             var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
             if (MainMenu.InLanMode) {
-                ChooseSettingsForAny();
+                SetupGameParameters();
 
                 //todo make sure seasize <= length of selected library size
                 if (SeaSize < LineLength)
@@ -102,28 +103,37 @@ namespace OO {
             }
         }
 
-        private void ChooseSettingsForAny () {
+        private void SetupGameParameters () {
             if (AnyLibrarySelected()) {
                 int randomIndex = rng.Next(GameData.Instance.GetLibraries().Count);
                 selectedLibrary = GameData.Instance.GetLibraries()[randomIndex].name;
             }
-            if (GameLength == DefaultSliderValue)
+            if (GameLength == DefaultSliderValue) {
                 GameLength = rng.Next(1, (int) gameLengthSlider.maxValue + 1);
-
-            if (PlayerCount == DefaultSliderValue)
+            }
+            if (PlayerCount == DefaultSliderValue) {
                 PlayerCount = rng.Next(1, (int) playerCountSlider.maxValue + 1);
+            }
+            if (SeaSize == DefaultSliderValue && LineLength == DefaultSliderValue) {
+                var seaSizeMax = Math.Min(GameData.Instance.GetSelectedLibrary().words.Length,
+                    (int) seaSizeSlider.maxValue);
+                SeaSize = rng.Next(1, seaSizeMax + 1);
 
-            if (SeaSize == DefaultSliderValue) {
-                var seaSizeMin = 1;
-                if (LineLength != DefaultSliderValue) {
-                    seaSizeMin = LineLength;
-                }
-                SeaSize = rng.Next(seaSizeMin, (int) seaSizeSlider.maxValue + 1);
+                var lineLengthMax = Math.Min((int) lineLengthSlider.maxValue, SeaSize);
+                LineLength = rng.Next(1, lineLengthMax + 1);
+            } else if (SeaSize == DefaultSliderValue && LineLength != DefaultSliderValue) {
+                var seaSizeMax = Math.Min(GameData.Instance.GetSelectedLibrary().words.Length,
+                    LineLength);
+                SeaSize = rng.Next(1, seaSizeMax + 1);
+            } else if (SeaSize != DefaultSliderValue && LineLength == DefaultSliderValue) {
+                LineLength = rng.Next(1, SeaSize + 1);
+            } else if (SeaSize != DefaultSliderValue && LineLength != DefaultSliderValue) {
             }
-            if (LineLength == DefaultSliderValue) {
-                var lineLengthMin = Math.Min((int) lineLengthSlider.maxValue, SeaSize);
-                LineLength = rng.Next(1, lineLengthMin + 1);
-            }
+            // todo Make it so a player cannot choose values so belows are needed
+            if (SeaSize > GameData.Instance.GetSelectedLibrary().words.Length)
+                SeaSize = GameData.Instance.GetSelectedLibrary().words.Length;
+            if (LineLength > SeaSize)
+                LineLength = SeaSize;
         }
 
         private string CreateRoomName () {
@@ -143,7 +153,7 @@ namespace OO {
         }
 
         private void HostMMGame (NetworkManager nm) {
-            ChooseSettingsForAny();
+            SetupGameParameters();
             SetupHostData();
 
             var roomName = CreateRoomName();

@@ -1929,22 +1929,22 @@ Prefab:
     - target: {fileID: 224326338540156796, guid: 1bf44368990ced14ca6364345a551264,
         type: 2}
       propertyPath: m_AnchoredPosition.x
-      value: 354.19995
+      value: 354.8
       objectReference: {fileID: 0}
     - target: {fileID: 224326338540156796, guid: 1bf44368990ced14ca6364345a551264,
         type: 2}
       propertyPath: m_AnchoredPosition.y
-      value: -30
+      value: -45
       objectReference: {fileID: 0}
     - target: {fileID: 224326338540156796, guid: 1bf44368990ced14ca6364345a551264,
         type: 2}
       propertyPath: m_SizeDelta.x
-      value: 708.3999
+      value: 709.6
       objectReference: {fileID: 0}
     - target: {fileID: 224326338540156796, guid: 1bf44368990ced14ca6364345a551264,
         type: 2}
       propertyPath: m_SizeDelta.y
-      value: 60
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: 224326338540156796, guid: 1bf44368990ced14ca6364345a551264,
         type: 2}

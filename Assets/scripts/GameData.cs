@@ -84,17 +84,13 @@ namespace OO {
                 }
             }
         }
-
-        public void NewGame (int roomSize, int gameLength, int seaSize, int lineLength) {
+        
+        public void NewGame (string selectedLibrary, int roomSize, int gameLength, int seaSize, int lineLength) {
+            this.selectedLibrary = selectedLibrary;
             this.roomSize = roomSize;
             this.gameLength = gameLength;
             this.seaSize = seaSize;
             this.lineLength = lineLength;
-        }
-
-        public void NewGame (string selectedLibrary, int roomSize, int gameLength, int seaSize, int lineLength) {
-            this.selectedLibrary = selectedLibrary;
-            NewGame(roomSize, gameLength, seaSize, lineLength);
             Save();
         }
 
