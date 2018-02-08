@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace OO {
@@ -8,6 +6,7 @@ namespace OO {
         public Button listElementPrefab;
         public Transform contentsTransform;
         private readonly Color SelectedColor = new Color (118 / 255f, 184 / 255f, 206 / 255f, 1f);
+        private readonly Color NormalColor = new Color (69/ 255f, 166 / 255f, 234 / 255f, 1f);
 
         public Button SelectedListElement { get; private set; }
 
@@ -31,13 +30,13 @@ namespace OO {
         private void SetSelectedListElement (Button btn) {
             if (SelectedListElement != null) {
                 var colors = SelectedListElement.colors;
-                colors.normalColor = Color.white;
+                colors.normalColor = NormalColor;
                 SelectedListElement.colors = colors;
             }
             if (btn != null) {
                 var colors = btn.colors;
                 colors.normalColor = SelectedColor;
-                colors.highlightedColor = colors.normalColor;
+                colors.highlightedColor = SelectedColor;
                 btn.colors = colors;
             }
             SelectedListElement = btn;

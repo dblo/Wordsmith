@@ -9,6 +9,7 @@ using UnityEngine.UI;
 namespace OO {
     public class Lobby : MonoBehaviour {
         public Button listElementPrefab;
+        public Transform libraryContent;
 
         private Slider gameLengthSlider;
         private Slider playerCountSlider;
@@ -59,10 +60,6 @@ namespace OO {
         }
 
         private void SetupOnClickListeners () {
-            var anyLibraryListElement = GameObject.Find("LobbyWordSeaListButton").GetComponent<Button>();
-            anyLibraryListElement.GetComponentInChildren<Text>().text = DefaultSelectedLibrary;
-            anyLibraryListElement.onClick.AddListener(() => WordSeaListButtonClicked(null));
-
             var closeLobbyButton = GameObject.Find("LobbyCloseButton").GetComponent<Button>();
             closeLobbyButton.onClick.AddListener(() => SceneManager.LoadScene("main_menu"));
 
@@ -72,11 +69,12 @@ namespace OO {
             lineLengthSlider.onValueChanged.AddListener(OnLineLengthChange);
         }
 
-        private void SetupLibraries () {
-            var parent = GameObject.Find("LobbyWordSeaListButton").transform.parent;
+        private void SetupLibraries () {var go = Instantiate(listElementPrefab, libraryContent);
+            go.GetComponentInChildren<Text>().text = DefaultSelectedLibrary;
+            go.GetComponent<Button>().onClick.AddListener(() => WordSeaListButtonClicked(DefaultSelectedLibrary));
 
             foreach (var lib in GameData.Instance.GetLibraries()) {
-                var go = Instantiate(listElementPrefab, parent);
+                go = Instantiate(listElementPrefab, libraryContent);
                 go.GetComponentInChildren<Text>().text = lib.name;
                 go.GetComponent<Button>().onClick.AddListener(() => WordSeaListButtonClicked(lib.name));
             }

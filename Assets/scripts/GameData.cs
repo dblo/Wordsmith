@@ -80,6 +80,7 @@ namespace OO {
             foreach (var lib in libraries) {
                 if (lib.name.Equals(libraryName)) {
                     libraries.Remove(lib);
+                    Save();
                     return;
                 }
             }

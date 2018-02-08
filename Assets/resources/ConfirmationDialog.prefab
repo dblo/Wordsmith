@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 224290845697799686}
   - component: {fileID: 222538983064535728}
   - component: {fileID: 114772228107839594}
+  - component: {fileID: 114217695328198582}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -56,6 +57,7 @@ GameObject:
   - component: {fileID: 224696632211361650}
   - component: {fileID: 222899540048745916}
   - component: {fileID: 114593822169518214}
+  - component: {fileID: 114933815980028582}
   m_Layer: 5
   m_Name: ConfirmationText
   m_TagString: Untagged
@@ -73,6 +75,7 @@ GameObject:
   - component: {fileID: 224662954037555382}
   - component: {fileID: 222010256928979424}
   - component: {fileID: 114423083183041188}
+  - component: {fileID: 114962232616062726}
   m_Layer: 5
   m_Name: Text
   m_TagString: Untagged
@@ -144,6 +147,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8294db028e583614bb26391ba16db6df, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114217695328198582
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1053434394973122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -900027084, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1, y: -1}
+  m_UseGraphicAlpha: 1
 --- !u!114 &114252730478319508
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -428,6 +445,34 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Yea
+--- !u!114 &114933815980028582
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1515823012730146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -900027084, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1, y: -1}
+  m_UseGraphicAlpha: 1
+--- !u!114 &114962232616062726
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1670684731634508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -900027084, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
+  m_EffectDistance: {x: 1, y: -1}
+  m_UseGraphicAlpha: 1
 --- !u!114 &114971867034221454
 MonoBehaviour:
   m_ObjectHideFlags: 1
