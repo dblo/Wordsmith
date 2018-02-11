@@ -23,12 +23,20 @@ namespace OO {
 
         private void Awake () {
             contentsTransform = GetComponentInChildren<VerticalLayoutGroup>().transform;
+            var listElement = contentsTransform.GetComponentInChildren<Button>();
+            if (listElement != null) {
+                // The list has at least one element in the scene, set first as selected
+                SetSelectedListElement(listElement);
+            }
+        }
+
+        private void Start () {
             SetupLibraries();
         }
 
         private void SetupLibraries () {
             foreach (var lib in GameData.Instance.GetLibraries()) {
-                AddListElement(lib.name);
+                AddListElement(lib.name, lib.GetColor());
             }
         }
 
@@ -39,9 +47,11 @@ namespace OO {
         }
 
         // Add an element to contents and if its the first element then set it to be selected
-        public void AddListElement (string name) {
+        public void AddListElement (string name, Color color) {
             var go = Instantiate(listElementPrefab, contentsTransform);
-            go.GetComponentInChildren<Text>().text = name;
+            var text = go.GetComponentInChildren<Text>();
+            text.text = name;
+            text.color = color;
             var btn = go.GetComponent<Button>();
             btn.onClick.AddListener(() => SetSelectedListElement(btn));
 
@@ -49,7 +59,7 @@ namespace OO {
                 SetSelectedListElement(btn);
         }
 
-        private void SetSelectedListElement (Button btn) {
+        public void SetSelectedListElement (Button btn) {
             if (selectedButton != null) {
                 var colors = selectedButton.colors;
                 colors.normalColor = NormalColor;

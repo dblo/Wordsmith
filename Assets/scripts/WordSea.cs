@@ -74,7 +74,7 @@ namespace OO {
         }
 
         public static string[] GenerateNewSea (Library library, int seaSize) {
-            Debug.Assert(library.words.Length <= seaSize);
+            Debug.Assert(library.words.Length >= seaSize);
 
             int libLen = library.words.Length;
             var indices = new HashSet<int>();

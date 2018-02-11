@@ -20,6 +20,7 @@ namespace OO {
         private Text lineLengthLabel;
         private System.Random rng = new System.Random();
 
+        private const string AnyLibrary = "Any";
         private const int DefaultSliderValue = 0;
         public const char PlayerCountDelimiter = '(';
         public const char GameLengthDelimiter = ')';
@@ -27,7 +28,7 @@ namespace OO {
         public const char LineLengthDelimiter = '}';
 
 
-        void Start () {
+        private void Awake () {
             gameLengthSlider = GameObject.Find("GameLengthSlider").GetComponent<Slider>();
             roomSizeSlider = GameObject.Find("PlayerCountSlider").GetComponent<Slider>();
             seaSizeSlider = GameObject.Find("SeaSizeSlider").GetComponent<Slider>();
@@ -39,6 +40,8 @@ namespace OO {
 
             SetupOnClickListeners();
             UsePrefsValuesIfPresent();
+
+            libraryList.AddListElement(AnyLibrary, Library.GetColor(false));
         }
 
         private void UsePrefsValuesIfPresent () {
@@ -74,6 +77,9 @@ namespace OO {
         }
 
         public void StartGame () {
+            if (!libraryList.HasSelection())
+                return; // No library selected, user has deleted allt their libs. todo tell user.
+
             PlayerPrefs.SetInt(Preferences.DefaultPlayerCount, PlayerCount);
             PlayerPrefs.SetInt(Preferences.DefaultGameLength, GameLength);
             PlayerPrefs.SetInt(Preferences.DefaultSeaSize, SeaSize);
@@ -117,7 +123,7 @@ namespace OO {
                     (int) seaSizeSlider.maxValue);
                 seaSize = rng.Next(1, seaSizeMax + 1);
 
-                var lineLengthMax = Math.Min((int) lineLengthSlider.maxValue, SeaSize);
+                var lineLengthMax = Math.Min((int) lineLengthSlider.maxValue, seaSize);
                 lineLength = rng.Next(1, lineLengthMax + 1);
             } else if (SeaSize == DefaultSliderValue && LineLength != DefaultSliderValue) {
                 var seaSizeMax = Math.Min(GameData.Instance.GetSelectedLibrary().words.Length,

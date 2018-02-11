@@ -54,7 +54,7 @@ namespace OO {
 
             var library = new Library() { name = seaName.text, playerMade = true, words = seaContent.text.Split(' ') };
             GameData.Instance.AddLibrary(library);
-            libraryList.AddListElement(seaName.text);
+            libraryList.AddListElement(seaName.text, library.GetColor());
         }
 
         public void OnClickNewButton () {
