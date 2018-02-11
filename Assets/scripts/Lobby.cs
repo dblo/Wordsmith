@@ -20,10 +20,12 @@ namespace OO {
 
         private const string AnyLibrary = "Any";
         private const int DefaultSliderValue = 0;
-        public const char PlayerCountDelimiter = '(';
-        public const char GameLengthDelimiter = ')';
-        public const char SeaSizeDelimiter = '{';
-        public const char LineLengthDelimiter = '}';
+        private const int seaSizeDefaultMax = 12;
+        private const int lineLengthDefaultMax = 4;
+        private const char PlayerCountDelimiter = '(';
+        private const char GameLengthDelimiter = ')';
+        private const char SeaSizeDelimiter = '{';
+        private const char LineLengthDelimiter = '}';
 
 
         private void Awake () {
@@ -35,6 +37,9 @@ namespace OO {
             roomSizeLabel = GameObject.Find("PlayerCountLabel").GetComponent<Text>();
             seaSizeLabel = GameObject.Find("SeaSizeLabel").GetComponent<Text>();
             lineLengthLabel = GameObject.Find("LineLengthLabel").GetComponent<Text>();
+
+            seaSizeSlider.maxValue = seaSizeDefaultMax;
+            lineLengthSlider.maxValue = lineLengthDefaultMax;
 
             SetupOnClickListeners();
             UsePrefsValuesIfPresent();
@@ -79,6 +84,16 @@ namespace OO {
             roomSizeSlider.onValueChanged.AddListener(OnPlayerCountChange);
             seaSizeSlider.onValueChanged.AddListener(OnSeaSizeChange);
             lineLengthSlider.onValueChanged.AddListener(OnLineLengthChange);
+
+            libraryList.AddSelectedListener(OnLibrarySelectionChange);
+        }
+
+        public void OnLibrarySelectionChange() {
+            var selectedLibrary = libraryList.GetSelectedLibrary();
+            if (selectedLibrary == null)
+                return;
+
+            seaSizeSlider.maxValue = Math.Min(seaSizeDefaultMax, selectedLibrary.words.Length);
         }
 
         public void StartGame () {
@@ -222,6 +237,8 @@ namespace OO {
         }
 
         private void OnSeaSizeChange (float value) {
+            lineLengthSlider.maxValue = Math.Min(lineLengthDefaultMax, value);
+
             if (value == DefaultSliderValue) {
                 seaSizeLabel.text = "Sea size: Any";
             } else {
