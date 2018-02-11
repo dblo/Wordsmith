@@ -427,6 +427,7 @@ MonoBehaviour:
   goButton: {fileID: 1126274667}
   wordSea: {fileID: 1016799784}
   saveLibraryButton: {fileID: 855775354}
+  infoText: {fileID: 1543473325}
 --- !u!1 &670493574
 GameObject:
   m_ObjectHideFlags: 0

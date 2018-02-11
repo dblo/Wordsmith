@@ -7,17 +7,16 @@ namespace OO {
         public Button goButton;
         public WordSea wordSea;
         public Button saveLibraryButton;
+        public Text infoText;
 
         private List<Button> buttons = new List<Button>();
         private PlayerConnection localPlayer;
         private Text waitingText;
         private GameObject playersJoiningText;
-        private Text infoText;
 
         private void Awake () {
             waitingText = GameObject.Find("WaitingText").GetComponent<Text>();
             playersJoiningText = GameObject.Find("PlayerJoiningText");
-            infoText = GameObject.Find("InfoText").GetComponent<Text>();
             goButton.onClick.AddListener(OnGoButtonClicked);
         }
 
@@ -27,6 +26,7 @@ namespace OO {
             goButton.GetComponentInChildren<Text>().text = "Home";
             goButton.onClick.RemoveAllListeners();
             goButton.onClick.AddListener(OnHomeButtonClicked);
+            ToggleShowInfoText(false);
 
             if (!localPlayer.isServer) {
                 saveLibraryButton.gameObject.SetActive(true);
@@ -34,10 +34,7 @@ namespace OO {
         }
 
         public bool TryAdd (Button btn) {
-            if (infoText.gameObject.activeSelf) {
-                infoText.gameObject.SetActive(false);
-            }
-
+            ToggleShowInfoText(false);
             if (AllWordsChosen())
                 return false;
 
@@ -61,12 +58,19 @@ namespace OO {
         }
         public void GameStarting () {
             playersJoiningText.SetActive(false);
-            infoText.enabled = true;
-            infoText.text = "Compose a line of " + GameData.Instance.GetLineLength() + " words.";
+            ToggleShowInfoText(true);
         }
 
         public void OnNewRound () {
             waitingText.enabled = false;
+            ToggleShowInfoText(true);
+        }
+
+        private void ToggleShowInfoText (bool show) {
+            infoText.enabled = show;
+            if (show) {
+                infoText.text = "Compose a line of " + GameData.Instance.GetLineLength() + " words.";
+            }
         }
 
         private void Reset () {
@@ -89,7 +93,7 @@ namespace OO {
             gm.LaunchMainMenu();
         }
 
-        public void OnSaveLibrary() {
+        public void OnSaveLibrary () {
             saveLibraryButton.gameObject.SetActive(false);
             wordSea.SaveLibrary();
         }
