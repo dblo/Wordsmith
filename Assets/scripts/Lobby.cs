@@ -77,8 +77,8 @@ namespace OO {
         }
 
         public void StartGame () {
-            if (!libraryList.HasSelection())
-                return; // No library selected, user has deleted allt their libs. todo tell user.
+            if (GameData.Instance.GetLibraries().Count == 0)
+                return; // No library selected, user has deleted all their libs. todo tell user.
 
             PlayerPrefs.SetInt(Preferences.DefaultPlayerCount, PlayerCount);
             PlayerPrefs.SetInt(Preferences.DefaultGameLength, GameLength);
