@@ -5,12 +5,12 @@ using UnityEngine.UI;
 namespace OO {
     public class SeaMaker : MonoBehaviour {
         public LibraryList libraryList;
-        private Text seaName;
-        private Text seaContent;
+        private InputField seaName;
+        private InputField seaContent;
 
         void Start () {
-            seaName = GameObject.Find("SeaNameInputText").GetComponent<Text>();
-            seaContent = GameObject.Find("SeaContentInputText").GetComponent<Text>();
+            seaName = GameObject.Find("SeaNameInput").GetComponent<InputField>();
+            seaContent = GameObject.Find("SeaContentInput").GetComponent<InputField>();
 
             var saveButton = GameObject.Find("SeaMakerSaveButton").GetComponent<Button>();
             saveButton.onClick.AddListener(OnClickSaveButton);
@@ -23,10 +23,12 @@ namespace OO {
 
             var deleteButton = GameObject.Find("SeaMakerDeleteButton").GetComponent<Button>();
             deleteButton.onClick.AddListener(DeleteSelected);
+
+            libraryList.AddSelectedListener(OnLibrarySelected);
         }
 
         private void DeleteSelected () {
-            if (libraryList.SelectedListElement != null) {
+            if (libraryList.HasSelection()) {
                 libraryList.DeleteSelected();
             }
         }
@@ -47,10 +49,11 @@ namespace OO {
         }
 
         public void OnClickSaveButton () {
-            if (seaName.text != "" && seaContent.text != "") {
-                var library = new Library() { name = seaName.text, playerMade = true, words = seaContent.text.Split(' ') };
-                GameData.Instance.AddLibrary(library);
-            }
+            if (seaName.text == "" || seaContent.text == "")
+                return; //todo tell use
+
+            var library = new Library() { name = seaName.text, playerMade = true, words = seaContent.text.Split(' ') };
+            GameData.Instance.AddLibrary(library);
             libraryList.AddListElement(seaName.text);
         }
 
@@ -62,6 +65,14 @@ namespace OO {
                 var nameInput = transform.Find("SeaNameInput").GetComponent<InputField>();
                 nameInput.text = "";
             });
+        }
+
+        public void OnLibrarySelected () {
+            var libraryName = libraryList.GetSelectedText();
+            var library = GameData.Instance.GetLibrary(libraryName);
+            Debug.Assert(library != null);//todo what?
+            seaName.text = library.name;
+            seaContent.text = string.Join(" ", library.words);
         }
     }
 }

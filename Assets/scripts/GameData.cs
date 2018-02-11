@@ -33,7 +33,7 @@ namespace OO {
             return libraries;
         }
 
-        public void SetSelectedLibrary(string name) {
+        public void SetSelectedLibrary (string name) {
             selectedLibrary = name;
         }
 
@@ -62,12 +62,20 @@ namespace OO {
             return lineLength;
         }
 
+        public Library GetLibrary (string name) {
+            foreach (var lib in libraries) {
+                if (lib.name.Equals(name))
+                    return lib;
+            }
+            return null;
+        }
+
         public void Save () {
             var json = JsonUtility.ToJson(this);
             File.WriteAllText(savePath, json);
         }
 
-       public static GameData Load (string path) {
+        public static GameData Load (string path) {
             if (!File.Exists(path)) {
                 return new GameData() {
                     savePath = path,
@@ -89,7 +97,7 @@ namespace OO {
                 }
             }
         }
-        
+
         public void NewGame (string selectedLibrary, int roomSize, int gameLength, int seaSize, int lineLength) {
             this.selectedLibrary = selectedLibrary;
             this.roomSize = roomSize;
@@ -100,7 +108,16 @@ namespace OO {
         }
 
         public void AddLibrary (Library library) {
-            libraries.Add(library);
+            var existingLibrary = libraries.Find(l => l.name.Equals(library.name));
+            if (existingLibrary == null) {
+                libraries.Add(library);
+            } else {
+                if (existingLibrary.playerMade) {
+                    existingLibrary = library; // todo warn overwrite
+                } else {
+                    return; // todo tell user hw may not use default library names. Or allow overwrite as above.
+                }
+            }
             Save();
         }
     }

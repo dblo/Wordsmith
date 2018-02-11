@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace OO {
@@ -8,10 +9,19 @@ namespace OO {
         public Color NormalColor;
 
         private Transform contentsTransform;
+        private Button selectedButton;
+        // Callback set by externals
+        private Action onSelectedAction;
 
-        public Button SelectedListElement { get; private set; }
+        public bool HasSelection () {
+            return selectedButton != null;
+        }
 
-        void Start () {
+        public void AddSelectedListener (Action action) {
+            onSelectedAction = action;
+        }
+
+        private void Awake () {
             contentsTransform = GetComponentInChildren<VerticalLayoutGroup>().transform;
             SetupLibraries();
         }
@@ -22,6 +32,12 @@ namespace OO {
             }
         }
 
+        public string GetSelectedText () {
+            if (selectedButton == null)
+                return null;
+            return selectedButton.GetComponentInChildren<Text>().text;
+        }
+
         // Add an element to contents and if its the first element then set it to be selected
         public void AddListElement (string name) {
             var go = Instantiate(listElementPrefab, contentsTransform);
@@ -29,15 +45,15 @@ namespace OO {
             var btn = go.GetComponent<Button>();
             btn.onClick.AddListener(() => SetSelectedListElement(btn));
 
-            if (SelectedListElement == null)
+            if (selectedButton == null)
                 SetSelectedListElement(btn);
         }
 
         private void SetSelectedListElement (Button btn) {
-            if (SelectedListElement != null) {
-                var colors = SelectedListElement.colors;
+            if (selectedButton != null) {
+                var colors = selectedButton.colors;
                 colors.normalColor = NormalColor;
-                SelectedListElement.colors = colors;
+                selectedButton.colors = colors;
             }
             if (btn != null) {
                 var colors = btn.colors;
@@ -45,15 +61,19 @@ namespace OO {
                 colors.highlightedColor = SelectedColor;
                 btn.colors = colors;
             }
-            SelectedListElement = btn;
+            selectedButton = btn;
+
+            if (onSelectedAction != null) {
+                onSelectedAction();
+            }
         }
 
         public void DeleteSelected () {
             // todo handle user cannot delete default libs? gray out button? handle return false below?
-            var libraryName = SelectedListElement.GetComponentInChildren<Text>().text;
+            var libraryName = selectedButton.GetComponentInChildren<Text>().text;
             GameData.Instance.DeleteLibrary(libraryName);
 
-            Destroy(SelectedListElement.gameObject);
+            Destroy(selectedButton.gameObject);
             SetSelectedListElement(null);
         }
     }

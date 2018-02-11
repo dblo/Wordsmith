@@ -100,7 +100,7 @@ namespace OO {
                 seaSize = SeaSize,
                 lineLength = LineLength;
 
-            var selectedLibrary = libraryList.SelectedListElement.GetComponentInChildren<Text>().text;
+            var selectedLibrary = libraryList.GetSelectedText();
             if (selectedLibrary == "Any") {
                 int randomIndex = rng.Next(GameData.Instance.GetLibraries().Count);
                 selectedLibrary = GameData.Instance.GetLibraries()[randomIndex].name;
