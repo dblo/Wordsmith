@@ -6,7 +6,7 @@ namespace OO {
     public class ButtonBar : MonoBehaviour {
         public Button goButton;
         public WordSea wordSea;
-        public Toggle SaveLibToggle;
+        public Button saveLibraryButton;
 
         private List<Button> buttons = new List<Button>();
         private PlayerConnection localPlayer;
@@ -28,10 +28,9 @@ namespace OO {
             goButton.onClick.RemoveAllListeners();
             goButton.onClick.AddListener(OnHomeButtonClicked);
 
-            //var gm = GameObject.Find("GameManager").GetComponent<GameManager>();
-            //if (gm.isClient) {
-            //    SaveLibToggle.gameObject.SetActive(true);
-            //}
+            if (!localPlayer.isServer) {
+                saveLibraryButton.gameObject.SetActive(true);
+            }
         }
 
         public bool TryAdd (Button btn) {
@@ -86,11 +85,13 @@ namespace OO {
         }
 
         public void OnHomeButtonClicked () {
-            //if (!SaveLibToggle.isOn) {
-            //    GameData.Instance.DeleteLibrary(GameData.Instance.GetSelectedLibrary().name);
-            //}
             var gm = GameObject.Find("GameManager").GetComponent<GameManager>();
             gm.LaunchMainMenu();
+        }
+
+        public void OnSaveLibrary() {
+            saveLibraryButton.gameObject.SetActive(false);
+            wordSea.SaveLibrary();
         }
 
         private string[] GetWords () {

@@ -10,13 +10,10 @@ namespace OO {
         public const int MaxCols = 4;
         public const int MaxRows = 3;
 
+        private Library currentLibrary;
         private List<Button> buttons;
         private List<string> currentSea;
-
-        private void Awake () {
-            buttons = new List<Button>(GameData.Instance.GetSeaSize());
-            currentSea = new List<string>(GameData.Instance.GetSeaSize());
-        }
+        private static System.Random rng = new System.Random();
 
         public void ReturnWord (Button btn) {
             btn.GetComponent<WordButton>().MoveToWordSea(transform, WordClicked);
@@ -40,14 +37,24 @@ namespace OO {
             }
         }
 
-        public void ConfigureSea () {
-            for (int i = 0; i < GameData.Instance.GetSeaSize(); i++) {
+        public void UseNewLibrary (Library library) {
+            currentLibrary = library;
+            int seaSize = GameData.Instance.GetSeaSize();
+
+            buttons = new List<Button>(seaSize);
+            currentSea = new List<string>(seaSize);
+     
+            for (int i = 0; i < seaSize; i++) {
                 var btn = Instantiate(wordButtonPrefab, transform);
                 var wb = btn.GetComponent<WordButton>();
                 wb.ComputeSeaAnchors(i);
                 wb.MoveToWordSea(transform, WordClicked);
                 buttons.Add(btn);
             }
+        }
+
+        public void SaveLibrary(){
+            GameData.Instance.AddLibrary(currentLibrary);
         }
 
         public void SetNewSea (string[] words) {
@@ -61,23 +68,25 @@ namespace OO {
             SetSeaFrozen(false);
         }
 
-        public string[] GenerateNewSea () {
-            return GenerateUniqueWords(GameData.Instance.GetSeaSize(), 
-                GameData.Instance.GetSelectedLibrary().words);
+        public string[] GenerateNewSea()
+        {
+            return GenerateNewSea(currentLibrary, GameData.Instance.GetSeaSize());
         }
 
-        private string[] GenerateUniqueWords (int aSize, string[] aLibrary) {
-            HashSet<int> indices = new HashSet<int>();
-            string[] words = new string[aSize];
+        public static string[] GenerateNewSea (Library library, int seaSize) {
+            Debug.Assert(library.words.Length <= seaSize);
 
-            System.Random rng = new System.Random();
-            for (int i = 0; i < aSize; i++) {
-                int r = rng.Next(aLibrary.Length);
+            int libLen = library.words.Length;
+            var indices = new HashSet<int>();
+            var words = new string[seaSize];
+
+            for (int i = 0; i < seaSize; i++) {
+                int r = rng.Next(libLen);
                 while (indices.Contains(r)) {
-                    r = rng.Next(aLibrary.Length);
+                    r = rng.Next(libLen);
                 }
                 indices.Add(r);
-                words[i] = aLibrary[r];
+                words[i] = library.words[r];
             }
             return words;
         }

@@ -18,10 +18,8 @@ namespace OO {
         private Text roomSizeLabel;
         private Text seaSizeLabel;
         private Text lineLengthLabel;
-        private string selectedLibrary = DefaultSelectedLibrary;
         private System.Random rng = new System.Random();
 
-        private const string DefaultSelectedLibrary = "Any";
         private const int DefaultSliderValue = 0;
         public const char PlayerCountDelimiter = '(';
         public const char GameLengthDelimiter = ')';
@@ -86,12 +84,12 @@ namespace OO {
                 SetupGameParameters();
                 nm.StartHost();
             } else {
-                if (!GameData.Instance.GetSelectedLibrary().playerMade || AnyLibrarySelected()) {
-                    var roomName = CreateRoomName();
-                    NetworkManager.singleton.matchMaker.ListMatches(0, 3, roomName, true, 0, 0, OnMatchList);
-                } else {
+                //if (AnyLibrarySelected() || !GameData.Instance.GetSelectedLibrary().playerMade) {
+                //    var roomName = CreateRoomName();
+                //    NetworkManager.singleton.matchMaker.ListMatches(0, 3, roomName, true, 0, 0, OnMatchList);
+                //} else {
                     HostMMGame(nm);
-                }
+                //}
             }
         }
 
@@ -102,13 +100,12 @@ namespace OO {
                 seaSize = SeaSize,
                 lineLength = LineLength;
 
-            if(libraryList.SelectedListElement != null)
-                selectedLibrary = libraryList.SelectedListElement.GetComponentInChildren<Text>().text;
-
-            if (AnyLibrarySelected()) {
+            var selectedLibrary = libraryList.SelectedListElement.GetComponentInChildren<Text>().text;
+            if (selectedLibrary == "Any") {
                 int randomIndex = rng.Next(GameData.Instance.GetLibraries().Count);
                 selectedLibrary = GameData.Instance.GetLibraries()[randomIndex].name;
             }
+            GameData.Instance.SetSelectedLibrary(selectedLibrary);//todo dont
             if (GameLength == DefaultSliderValue) {
                 gameLength = rng.Next(1, (int) gameLengthSlider.maxValue + 1);
             }
@@ -141,9 +138,10 @@ namespace OO {
 
         private string CreateRoomName () {
             string roomName = "";
-            if (!GameData.Instance.GetSelectedLibrary().playerMade) {
-                roomName = selectedLibrary;
-            }
+            var lib = GameData.Instance.GetSelectedLibrary();
+            if(!lib.playerMade){
+                roomName = lib.name;
+            } // else leave as empty string
             if (PlayerCount != DefaultSliderValue)
                 roomName += PlayerCountDelimiter + PlayerCount.ToString();
             if (GameLength != DefaultSliderValue)
@@ -163,22 +161,18 @@ namespace OO {
                 true, "", "", "", 0, 0, nm.OnMatchCreate);
         }
         
-        private void OnMatchList (bool success, string extendedInfo, List<MatchInfoSnapshot> responseData) {
-            if (!success)
-                return; // todo what?
+        //private void OnMatchList (bool success, string extendedInfo, List<MatchInfoSnapshot> responseData) {
+        //    if (!success)
+        //        return; // todo what?
 
-            var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
-            if (responseData.Count == 0) {
-                HostMMGame(nm);
-            } else {
-                var match = responseData[0];
-                NetworkManager.singleton.matchMaker.JoinMatch(match.networkId, "", "", "", 0, 0, nm.OnMatchJoined);
-            }
-        }
-
-        private bool AnyLibrarySelected () {
-            return selectedLibrary.Equals(DefaultSelectedLibrary);
-        }
+        //    var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
+        //    if (responseData.Count == 0) {
+        //        HostMMGame(nm);
+        //    } else {
+        //        var match = responseData[0];
+        //        NetworkManager.singleton.matchMaker.JoinMatch(match.networkId, "", "", "", 0, 0, nm.OnMatchJoined);
+        //    }
+        //}
 
         private int GameLength {
             get { return (int) gameLengthSlider.value; }

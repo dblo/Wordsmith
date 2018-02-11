@@ -39,7 +39,7 @@ namespace OO {
                 return;
 
             players.ForEach((p) => p.CmdSynchronizeName());
-            var newWordSea = wordSea.GenerateNewSea();
+            var newWordSea = WordSea.GenerateNewSea(GameData.Instance.GetSelectedLibrary(), GameData.Instance.GetSeaSize());
 
             var libraryJson = JsonUtility.ToJson(GameData.Instance.GetSelectedLibrary());
             RpcOnAllPlayersJoined(libraryJson, newWordSea, GameData.Instance.GetRoomSize(),
@@ -51,12 +51,11 @@ namespace OO {
         }
 
         [ClientRpc]
-        private void RpcOnAllPlayersJoined (string libraryJson, string[] newWordSea, int playercount, int gameLength, int lineLength) {
+        private void RpcOnAllPlayersJoined (string libraryJson, string[] newWordSea, int playercount, 
+                                            int gameLength, int lineLength) {
             var library = JsonUtility.FromJson<Library>(libraryJson);
-            if (isClient) { // todo fix this hack
-                //GameData.Instance.AddLibrary(library);
-                GameData.Instance.NewGame(library.name, playercount, gameLength, newWordSea.Length, lineLength);
-            }
+            GameData.Instance.NewGame(library.name, playercount, gameLength, newWordSea.Length, lineLength);
+
             players = FindSortedPlayers();
             colorWordMapper = new ColorMapper(playercount);
 
@@ -64,7 +63,7 @@ namespace OO {
             UpdateRoundDisplay();
             CreateLineLogs();
             buttonBar.GameStarting();
-            wordSea.ConfigureSea();
+            wordSea.UseNewLibrary(library);
             wordSea.SetNewSea(newWordSea);
         }
 

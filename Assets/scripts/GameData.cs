@@ -33,6 +33,10 @@ namespace OO {
             return libraries;
         }
 
+        public void SetSelectedLibrary(string name) {
+            selectedLibrary = name;
+        }
+
         public Library GetSelectedLibrary () {
             foreach (var lib in libraries) {
                 if (lib.name.Equals(selectedLibrary)) {
