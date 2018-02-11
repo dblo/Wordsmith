@@ -55,5 +55,9 @@ namespace OO {
                 return; // Settings opened via main menu, no sound effects to handle atm
             gmGO.GetComponent<GameManager>().SetSoundMuted(toggle.isOn);
         }
+
+        public void SeedLibraries() {
+            LibrarySeeder.Seed();
+        }
     }
 }

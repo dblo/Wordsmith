@@ -1,15 +1,9 @@
 ﻿using System;
-using UnityEngine;
 
 namespace OO {
-    public class LibrarySeeder : MonoBehaviour {
+    public static class LibrarySeeder {
 
-        private void Start () {
-            if (GameData.Instance.GetLibraries().Count == 0)
-                SeedLibraries();
-        }
-
-        private void SeedLibraries () {
+        public static void Seed () {
             string[] nouns = { "time","person","year","way","day","thing","man","world","life","hand","part","child","eye","woman","place","work","week","case","point","company","number" };
             string[] verbs = { "be","have","do","say","get","make","go","know","take","see","come","think","look","want","give","use","find","tell","ask","work","seem","feel","try","leave","call" };
             string[] adjectives = { "good", "first", "new", "last", "long", "great", "little", "own", "other", "old", "right", "big", "high", "different", "small", "large", "next", "early", "young", "important", "few", "public", "bad", "same", "able" };

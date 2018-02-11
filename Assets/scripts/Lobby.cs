@@ -38,6 +38,15 @@ namespace OO {
 
             SetupOnClickListeners();
             UsePrefsValuesIfPresent();
+
+            if(GameData.Instance.GetLibraries().Count == 0) {
+                var playButton = transform.Find("PlayButton").GetComponent<Button>();
+                playButton.interactable = false;
+
+                var anyLibraryButton = GameObject.Find("AnyLibraryButton");
+                anyLibraryButton.gameObject.SetActive(false);
+                //todo Show no libraries found text
+            }
         }
 
         private void UsePrefsValuesIfPresent () {
@@ -73,8 +82,7 @@ namespace OO {
         }
 
         public void StartGame () {
-            if (GameData.Instance.GetLibraries().Count == 0)
-                return; // No library selected, user has deleted all their libs. todo tell user.
+            Debug.Assert(GameData.Instance.GetLibraries().Count > 0);
 
             PlayerPrefs.SetInt(Preferences.DefaultPlayerCount, PlayerCount);
             PlayerPrefs.SetInt(Preferences.DefaultGameLength, GameLength);
