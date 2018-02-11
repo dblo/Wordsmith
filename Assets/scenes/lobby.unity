@@ -1510,12 +1510,12 @@ Prefab:
     - target: {fileID: 114999992398934316, guid: 1bf44368990ced14ca6364345a551264,
         type: 2}
       propertyPath: m_Color.g
-      value: 0
+      value: 0.31764707
       objectReference: {fileID: 0}
     - target: {fileID: 114999992398934316, guid: 1bf44368990ced14ca6364345a551264,
         type: 2}
       propertyPath: m_Color.b
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114595311156985344, guid: 1bf44368990ced14ca6364345a551264,
         type: 2}
@@ -1547,6 +1547,15 @@ Prefab:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgument
       value: 
       objectReference: {fileID: 968325591}
+    - target: {fileID: 1208729983020410, guid: 1bf44368990ced14ca6364345a551264, type: 2}
+      propertyPath: m_Name
+      value: AnyLibraryButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 114999992398934316, guid: 1bf44368990ced14ca6364345a551264,
+        type: 2}
+      propertyPath: m_Color.r
+      value: 0.8784314
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1bf44368990ced14ca6364345a551264, type: 2}
   m_IsPrefabParent: 0

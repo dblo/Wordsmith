@@ -39,9 +39,9 @@ namespace OO {
                 return;
 
             players.ForEach((p) => p.CmdSynchronizeName());
-            var newWordSea = WordSea.GenerateNewSea(GameData.Instance.GetSelectedLibrary(), GameData.Instance.GetSeaSize());
+            var newWordSea = WordSea.GenerateNewSea(GameData.Instance.SelectedLibrary, GameData.Instance.GetSeaSize());
 
-            var libraryJson = JsonUtility.ToJson(GameData.Instance.GetSelectedLibrary());
+            var libraryJson = JsonUtility.ToJson(GameData.Instance.SelectedLibrary);
             RpcOnAllPlayersJoined(libraryJson, newWordSea, GameData.Instance.GetRoomSize(),
                 GameData.Instance.GetGameLength(), GameData.Instance.GetLineLength());
         }
@@ -54,7 +54,7 @@ namespace OO {
         private void RpcOnAllPlayersJoined (string libraryJson, string[] newWordSea, int playercount, 
                                             int gameLength, int lineLength) {
             var library = JsonUtility.FromJson<Library>(libraryJson);
-            GameData.Instance.NewGame(library.name, playercount, gameLength, newWordSea.Length, lineLength);
+            GameData.Instance.NewGame(library, playercount, gameLength, newWordSea.Length, lineLength);
 
             players = FindSortedPlayers();
             colorWordMapper = new ColorMapper(playercount);

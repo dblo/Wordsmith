@@ -54,7 +54,7 @@ namespace OO {
 
             var library = new Library() { name = seaName.text, playerMade = true, words = seaContent.text.Split(' ') };
             if (GameData.Instance.AddLibrary(library)) {
-                libraryList.AddListElement(seaName.text, library.GetColor());
+                libraryList.AddListElement(library);
             }
         }
 
@@ -70,8 +70,7 @@ namespace OO {
 
         public void OnLibrarySelected () {
             if (libraryList.HasSelection()) {
-                var libraryName = libraryList.GetSelectedText();
-                var library = GameData.Instance.GetLibrary(libraryName);
+                var library = libraryList.GetSelectedLibrary();
                 seaName.text = library.name;
                 seaContent.text = string.Join(" ", library.words);
             } else {

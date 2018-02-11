@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 114925222284370186}
   - component: {fileID: 114595311156985344}
   - component: {fileID: 114663821639253834}
+  - component: {fileID: 114377538166262890}
   m_Layer: 5
   m_Name: LibraryListButton
   m_TagString: Untagged
@@ -49,6 +50,17 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &114377538166262890
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1208729983020410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3966545a2f9d36e4fba433dba4941b3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114397235934977738
 MonoBehaviour:
   m_ObjectHideFlags: 1

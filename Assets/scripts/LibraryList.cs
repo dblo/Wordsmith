@@ -36,22 +36,21 @@ namespace OO {
 
         private void SetupLibraries () {
             foreach (var lib in GameData.Instance.GetLibraries()) {
-                AddListElement(lib.name, lib.GetColor());
+                AddListElement(lib);
             }
         }
 
-        public string GetSelectedText () {
+        public Library GetSelectedLibrary () {
             if (selectedButton == null)
                 return null;
-            return selectedButton.GetComponentInChildren<Text>().text;
+            return selectedButton.GetComponentInChildren<LibraryListButton>().Library;
         }
 
         // Add an element to contents and if its the first element then set it to be selected
-        public void AddListElement (string name, Color color) {
+        public void AddListElement (Library library) {
             var go = Instantiate(listElementPrefab, contentsTransform);
-            var text = go.GetComponentInChildren<Text>();
-            text.text = name;
-            text.color = color;
+            go.GetComponent<LibraryListButton>().Setup(library);
+
             var btn = go.GetComponent<Button>();
             btn.onClick.AddListener(() => SetSelectedListElement(btn));
 

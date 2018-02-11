@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
-using UnityEngine.Networking.Match;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -40,8 +38,6 @@ namespace OO {
 
             SetupOnClickListeners();
             UsePrefsValuesIfPresent();
-
-            libraryList.AddListElement(AnyLibrary, Library.GetColor(false));
         }
 
         private void UsePrefsValuesIfPresent () {
@@ -94,7 +90,7 @@ namespace OO {
                 //    var roomName = CreateRoomName();
                 //    NetworkManager.singleton.matchMaker.ListMatches(0, 3, roomName, true, 0, 0, OnMatchList);
                 //} else {
-                    HostMMGame(nm);
+                HostMMGame(nm);
                 //}
             }
         }
@@ -106,12 +102,12 @@ namespace OO {
                 seaSize = SeaSize,
                 lineLength = LineLength;
 
-            var selectedLibrary = libraryList.GetSelectedText();
-            if (selectedLibrary == "Any") {
+            var selectedLibrary = libraryList.GetSelectedLibrary();
+            if (selectedLibrary == null) {
+                Debug.Assert(GameData.Instance.GetLibraries().Count > 0);
                 int randomIndex = rng.Next(GameData.Instance.GetLibraries().Count);
-                selectedLibrary = GameData.Instance.GetLibraries()[randomIndex].name;
+                selectedLibrary = GameData.Instance.GetLibraries()[randomIndex];
             }
-            GameData.Instance.SetSelectedLibrary(selectedLibrary);//todo dont
             if (GameLength == DefaultSliderValue) {
                 gameLength = rng.Next(1, (int) gameLengthSlider.maxValue + 1);
             }
@@ -119,14 +115,14 @@ namespace OO {
                 roomSize = rng.Next(1, (int) roomSizeSlider.maxValue + 1);
             }
             if (SeaSize == DefaultSliderValue && LineLength == DefaultSliderValue) {
-                var seaSizeMax = Math.Min(GameData.Instance.GetSelectedLibrary().words.Length,
+                var seaSizeMax = Math.Min(selectedLibrary.words.Length,
                     (int) seaSizeSlider.maxValue);
                 seaSize = rng.Next(1, seaSizeMax + 1);
 
                 var lineLengthMax = Math.Min((int) lineLengthSlider.maxValue, seaSize);
                 lineLength = rng.Next(1, lineLengthMax + 1);
             } else if (SeaSize == DefaultSliderValue && LineLength != DefaultSliderValue) {
-                var seaSizeMax = Math.Min(GameData.Instance.GetSelectedLibrary().words.Length,
+                var seaSizeMax = Math.Min(selectedLibrary.words.Length,
                     LineLength);
                 seaSize = rng.Next(1, seaSizeMax + 1);
             } else if (SeaSize != DefaultSliderValue && LineLength == DefaultSliderValue) {
@@ -134,8 +130,8 @@ namespace OO {
             } else if (SeaSize != DefaultSliderValue && LineLength != DefaultSliderValue) {
             }
             // todo Make it so a player cannot choose values so belows are needed
-            if (seaSize > GameData.Instance.GetSelectedLibrary().words.Length)
-                seaSize = GameData.Instance.GetSelectedLibrary().words.Length;
+            if (seaSize > selectedLibrary.words.Length)
+                seaSize = selectedLibrary.words.Length;
             if (lineLength > seaSize)
                 lineLength = seaSize;
 
@@ -144,10 +140,11 @@ namespace OO {
 
         private string CreateRoomName () {
             string roomName = "";
-            var lib = GameData.Instance.GetSelectedLibrary();
-            if(!lib.playerMade){
-                roomName = lib.name;
+            var selectedLibrary = GameData.Instance.SelectedLibrary;
+            if (!selectedLibrary.playerMade) {
+                roomName = selectedLibrary.name;
             } // else leave as empty string
+
             if (PlayerCount != DefaultSliderValue)
                 roomName += PlayerCountDelimiter + PlayerCount.ToString();
             if (GameLength != DefaultSliderValue)
@@ -166,7 +163,7 @@ namespace OO {
             NetworkManager.singleton.matchMaker.CreateMatch(roomName, (uint) PlayerCount,
                 true, "", "", "", 0, 0, nm.OnMatchCreate);
         }
-        
+
         //private void OnMatchList (bool success, string extendedInfo, List<MatchInfoSnapshot> responseData) {
         //    if (!success)
         //        return; // todo what?

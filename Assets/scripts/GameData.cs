@@ -14,11 +14,11 @@ namespace OO {
                 return instance;
             }
         }
+        public Library SelectedLibrary { get; private set; }
+
         private static GameData instance;
         [SerializeField]
         private List<Library> libraries;
-        [SerializeField]
-        private string selectedLibrary;
         [SerializeField]
         private int roomSize;
         [SerializeField]
@@ -31,19 +31,6 @@ namespace OO {
 
         public List<Library> GetLibraries () {
             return libraries;
-        }
-
-        public void SetSelectedLibrary (string name) {
-            selectedLibrary = name;
-        }
-
-        public Library GetSelectedLibrary () {
-            foreach (var lib in libraries) {
-                if (lib.name.Equals(selectedLibrary)) {
-                    return lib;
-                }
-            }
-            return null;
         }
 
         public int GetRoomSize () {
@@ -60,14 +47,6 @@ namespace OO {
 
         public int GetLineLength () {
             return lineLength;
-        }
-
-        public Library GetLibrary (string name) {
-            foreach (var lib in libraries) {
-                if (lib.name.Equals(name))
-                    return lib;
-            }
-            return null;
         }
 
         public void Save () {
@@ -98,8 +77,8 @@ namespace OO {
             }
         }
 
-        public void NewGame (string selectedLibrary, int roomSize, int gameLength, int seaSize, int lineLength) {
-            this.selectedLibrary = selectedLibrary;
+        public void NewGame (Library selectedLibrary, int roomSize, int gameLength, int seaSize, int lineLength) {
+            SelectedLibrary = selectedLibrary;
             this.roomSize = roomSize;
             this.gameLength = gameLength;
             this.seaSize = seaSize;
