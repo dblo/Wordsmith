@@ -107,7 +107,7 @@ namespace OO {
             Save();
         }
 
-        public void AddLibrary (Library library) {
+        public bool AddLibrary (Library library) {
             var existingLibrary = libraries.Find(l => l.name.Equals(library.name));
             if (existingLibrary == null) {
                 libraries.Add(library);
@@ -115,10 +115,11 @@ namespace OO {
                 if (existingLibrary.playerMade) {
                     existingLibrary = library; // todo warn overwrite
                 } else {
-                    return; // todo tell user hw may not use default library names. Or allow overwrite as above.
+                    return false; // todo tell user hw may not use default library names. Or allow overwrite as above.
                 }
             }
             Save();
+            return true;
         }
     }
 }

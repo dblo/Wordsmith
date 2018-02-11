@@ -54,7 +54,8 @@ namespace OO {
         }
 
         public void SaveLibrary(){
-            GameData.Instance.AddLibrary(currentLibrary);
+            GameData.Instance.AddLibrary(currentLibrary); 
+            // todo handle saving host lib when same name lib already exists
         }
 
         public void SetNewSea (string[] words) {

@@ -83,8 +83,18 @@ namespace OO {
             var libraryName = selectedButton.GetComponentInChildren<Text>().text;
             GameData.Instance.DeleteLibrary(libraryName);
 
+            var index = selectedButton.transform.GetSiblingIndex();
+            Button nextSelected = null;
+            if (contentsTransform.childCount > index + 1)
+                nextSelected = contentsTransform.GetChild(index + 1).GetComponent<Button>();
+            else if (contentsTransform.childCount > 1 && index == contentsTransform.childCount - 1)
+                nextSelected = contentsTransform.GetChild(index - 1).GetComponent<Button>();
+            else if (contentsTransform.childCount > 1)
+                nextSelected = contentsTransform.GetChild(0).GetComponent<Button>();
+            // else deleting last element, do nothing
+
             Destroy(selectedButton.gameObject);
-            SetSelectedListElement(null);
+            SetSelectedListElement(nextSelected);
         }
     }
 }
