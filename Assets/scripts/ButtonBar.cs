@@ -89,8 +89,7 @@ namespace OO {
         }
 
         public void OnHomeButtonClicked () {
-            var gm = GameObject.Find("GameManager").GetComponent<GameManager>();
-            gm.LaunchMainMenu();
+            GameManager.LaunchMainMenu();
         }
 
         public void OnSaveLibrary () {

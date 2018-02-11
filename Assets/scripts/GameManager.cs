@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using System;
+using UnityEngine.SceneManagement;
 
 namespace OO {
     public class GameManager : NetworkBehaviour {
@@ -51,7 +52,7 @@ namespace OO {
         }
 
         [ClientRpc]
-        private void RpcOnAllPlayersJoined (string libraryJson, string[] newWordSea, int playercount, 
+        private void RpcOnAllPlayersJoined (string libraryJson, string[] newWordSea, int playercount,
                                             int gameLength, int lineLength) {
             var library = JsonUtility.FromJson<Library>(libraryJson);
             GameData.Instance.NewGame(library, playercount, gameLength, newWordSea.Length, lineLength);
@@ -183,14 +184,11 @@ namespace OO {
             return players.Count == GameData.Instance.GetRoomSize();
         }
 
-        public void LaunchMainMenu () {
+        public static void LaunchMainMenu () {
             var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
-            if (isServer) {
-                nm.StopHost();
-            } else {
-                //nm.matchMaker.DropConnection(nm.matchInfo.networkId, nm.matchInfo.nodeId, 0, nm.OnDropConnection);
-                nm.StopClient();
-            }
+            //nm.matchMaker.DropConnection(nm.matchInfo.networkId, nm.matchInfo.nodeId, 0, nm.OnDropConnection);
+            nm.StopHost(); // todo Why is this ok, no dropclient in case not host
+            SceneManager.LoadScene("main_menu");
         }
     }
 }
