@@ -6,16 +6,11 @@ namespace OO {
     public class ConfirmationDialog : MonoBehaviour {
         private Action yesAcition;
 
-        public static void Create (string text, Action action) {
-            var canvas = FindObjectOfType<Canvas>();
-            var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), canvas.transform);
+        public static void Create (string text, Action action, Transform parent) {
+            var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), parent);
             var textComp = go.GetComponentInChildren<Text>();
             textComp.text = text;
-            go.GetComponent<ConfirmationDialog>().SetOnConfirmAction(action);
-        }
-
-        public void SetOnConfirmAction (Action action) { //todo private
-            yesAcition = action;
+            go.GetComponent<ConfirmationDialog>().yesAcition = action;
         }
 
         public void OnClickYes () {

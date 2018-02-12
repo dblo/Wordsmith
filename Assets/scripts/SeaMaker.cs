@@ -30,25 +30,19 @@ namespace OO {
 
         private void DeleteSelected () {
             if (libraryList.HasSelection()) {
-                var selectedLibrary = libraryList.GetSelectedLibrary().Library;
-                GameData.Instance.DeleteLibrary(selectedLibrary);
-                libraryList.DeleteSelected();
+                Action delete = () => {
+                    var selectedLibrary = libraryList.GetSelectedLibrary().Library;
+                    GameData.Instance.DeleteLibrary(selectedLibrary);
+                    libraryList.DeleteSelected();
+                };
+                var msg = "Really delete " + libraryList.GetSelectedLibrary().Library.name + "?";
+                ConfirmationDialog.Create(msg, delete, transform.parent);
             }
         }
 
         public void OnClickCloseButton () {
-            if (NoChangesPending()) {
-                SceneManager.LoadScene("main_menu");
-                return;
-            }
-            var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), transform.parent);
-            go.GetComponent<ConfirmationDialog>().SetOnConfirmAction(() => {
-                SceneManager.LoadScene("main_menu");
-            });
-        }
-
-        private bool NoChangesPending () {
-            return seaName.text == "" && seaContent.text == "";
+            ConfirmationDialog.Create("Discard unsaved changes?",
+                () => SceneManager.LoadScene("main_menu"), transform.parent);
         }
 
         public void OnClickSaveButton () {
@@ -69,20 +63,20 @@ namespace OO {
                 libraryList.GetSelectedLibrary().SetLibrary(library);
             };
             if (existingLibrary.playerMade) {
-                ConfirmationDialog.Create("Overwrite?", OnOverwrite);
+                ConfirmationDialog.Create("Overwrite?", OnOverwrite, transform.parent);
             } else {
-                ConfirmationDialog.Create("Overwrite DEFAULT library?", OnOverwrite);
+                ConfirmationDialog.Create("Overwrite DEFAULT library?", OnOverwrite, transform.parent);
             }
         }
 
         public void OnClickNewButton () {
-            var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), transform.parent);
-            go.GetComponent<ConfirmationDialog>().SetOnConfirmAction(() => {
+            Action discard = () => {
                 var contentInput = transform.Find("SeaContentInput").GetComponent<InputField>();
                 contentInput.text = "";
                 var nameInput = transform.Find("SeaNameInput").GetComponent<InputField>();
                 nameInput.text = "";
-            });
+            };
+            ConfirmationDialog.Create("Discard unsaved changes?", discard, transform.parent);
         }
 
         public void OnLibrarySelected () {

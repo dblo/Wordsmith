@@ -8,10 +8,7 @@ namespace OO {
         }
 
         public void LaunchMainMenu () {
-            var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), transform.parent);
-            go.GetComponent<ConfirmationDialog>().SetOnConfirmAction(() => {
-                GameManager.LaunchMainMenu();
-            });
+            ConfirmationDialog.Create("Leave match?", () => GameManager.LaunchMainMenu(), transform.parent);
         }
 
         public void LaunchSettings () {
