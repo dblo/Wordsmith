@@ -35,8 +35,8 @@ namespace OO {
         }
 
         private void SetupLibraries () {
-            foreach (var lib in GameData.Instance.GetLibraries()) {
-                AddListElement(lib);
+            for (int i = 0; i < GameData.Instance.LibraryCount; i++) {
+                AddListElement(GameData.Instance.GetLibrary(i));
             }
         }
 

@@ -27,7 +27,6 @@ namespace OO {
         private const char SeaSizeDelimiter = '{';
         private const char LineLengthDelimiter = '}';
 
-
         private void Awake () {
             gameLengthSlider = GameObject.Find("GameLengthSlider").GetComponent<Slider>();
             roomSizeSlider = GameObject.Find("PlayerCountSlider").GetComponent<Slider>();
@@ -44,13 +43,12 @@ namespace OO {
             SetupOnClickListeners();
             UsePrefsValuesIfPresent();
 
-            if(GameData.Instance.GetLibraries().Count == 0) {
+            if(GameData.Instance.LibraryCount == 0) {
                 var playButton = transform.Find("PlayButton").GetComponent<Button>();
                 playButton.interactable = false;
 
                 var anyLibraryButton = GameObject.Find("AnyLibraryButton");
                 anyLibraryButton.gameObject.SetActive(false);
-                //todo Show no libraries found text
             }
         }
 
@@ -93,11 +91,11 @@ namespace OO {
             if (selectedLibrary == null)
                 return;
 
-            seaSizeSlider.maxValue = Math.Min(seaSizeDefaultMax, selectedLibrary.words.Length);
+            seaSizeSlider.maxValue = Math.Min(seaSizeDefaultMax, selectedLibrary.Words.Length);
         }
 
         public void StartGame () {
-            Debug.Assert(GameData.Instance.GetLibraries().Count > 0);
+            Debug.Assert(GameData.Instance.LibraryCount > 0);
 
             PlayerPrefs.SetInt(Preferences.DefaultPlayerCount, PlayerCount);
             PlayerPrefs.SetInt(Preferences.DefaultGameLength, GameLength);
@@ -127,9 +125,9 @@ namespace OO {
 
             var selectedLibrary = libraryList.GetSelectedLibrary().Library;
             if (selectedLibrary == null) {
-                Debug.Assert(GameData.Instance.GetLibraries().Count > 0);
-                int randomIndex = rng.Next(GameData.Instance.GetLibraries().Count);
-                selectedLibrary = GameData.Instance.GetLibraries()[randomIndex];
+                Debug.Assert(GameData.Instance.LibraryCount > 0);
+                int randomIndex = rng.Next(GameData.Instance.LibraryCount);
+                selectedLibrary = GameData.Instance.GetLibrary(randomIndex);
             }
             if (GameLength == DefaultSliderValue) {
                 gameLength = rng.Next(1, (int) gameLengthSlider.maxValue + 1);
@@ -138,21 +136,21 @@ namespace OO {
                 roomSize = rng.Next(1, (int) roomSizeSlider.maxValue + 1);
             }
             if (SeaSize == DefaultSliderValue && LineLength == DefaultSliderValue) {
-                var seaSizeMax = Math.Min(selectedLibrary.words.Length,
+                var seaSizeMax = Math.Min(selectedLibrary.Words.Length,
                     (int) seaSizeSlider.maxValue);
                 seaSize = rng.Next(1, seaSizeMax + 1);
 
                 var lineLengthMax = Math.Min((int) lineLengthSlider.maxValue, seaSize);
                 lineLength = rng.Next(1, lineLengthMax + 1);
             } else if (SeaSize == DefaultSliderValue && LineLength != DefaultSliderValue) {
-                var seaSizeMax = Math.Min(selectedLibrary.words.Length,
+                var seaSizeMax = Math.Min(selectedLibrary.Words.Length,
                     LineLength);
                 seaSize = rng.Next(1, seaSizeMax + 1);
             } else if (SeaSize != DefaultSliderValue && LineLength == DefaultSliderValue) {
                 lineLength = rng.Next(1, SeaSize + 1);
             } else if (SeaSize != DefaultSliderValue && LineLength != DefaultSliderValue) {
             }
-            Debug.Assert(seaSize <= selectedLibrary.words.Length);
+            Debug.Assert(seaSize <= selectedLibrary.Words.Length);
             Debug.Assert(lineLength <= seaSize);
             GameData.Instance.NewGame(selectedLibrary, roomSize, gameLength, seaSize, lineLength);
         }
@@ -160,8 +158,8 @@ namespace OO {
         private string CreateRoomName () {
             string roomName = "";
             var selectedLibrary = GameData.Instance.SelectedLibrary;
-            if (!selectedLibrary.playerMade) {
-                roomName = selectedLibrary.name;
+            if (!selectedLibrary.PlayerMade) {
+                roomName = selectedLibrary.Name;
             } // else leave as empty string
 
             if (PlayerCount != DefaultSliderValue)
@@ -185,7 +183,7 @@ namespace OO {
 
         //private void OnMatchList (bool success, string extendedInfo, List<MatchInfoSnapshot> responseData) {
         //    if (!success)
-        //        return; // todo what?
+        //        return;
 
         //    var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
         //    if (responseData.Count == 0) {

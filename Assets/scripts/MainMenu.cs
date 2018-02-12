@@ -41,7 +41,7 @@ namespace OO {
 
         private void OnMatchList (bool success, string extendedInfo, List<MatchInfoSnapshot> responseData) {
             if (!success || responseData.Count == 0)
-                return; // todo what?
+                return;
 
             var match = responseData[0];
             var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();

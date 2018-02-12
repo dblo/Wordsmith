@@ -59,7 +59,7 @@ namespace OO {
             players = FindSortedPlayers();
             colorWordMapper = new ColorMapper(playercount);
 
-            libraryNameDisplay.text = library.name;
+            libraryNameDisplay.text = library.Name;
             UpdateRoundDisplay();
             CreateLineLogs();
             buttonBar.GameStarting();
@@ -181,8 +181,7 @@ namespace OO {
 
         public static void LaunchMainMenu () {
             var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
-            //nm.matchMaker.DropConnection(nm.matchInfo.networkId, nm.matchInfo.nodeId, 0, nm.OnDropConnection);
-            nm.StopHost(); // todo Why is this ok, no dropclient in case not host
+            nm.StopHost();
             SceneManager.LoadScene("main_menu");
         }
     }

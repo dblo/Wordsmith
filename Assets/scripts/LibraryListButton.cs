@@ -9,7 +9,7 @@ namespace OO {
             Library = library;
 
             var text = GetComponentInChildren<Text>();
-            text.text = library.name;
+            text.text = library.Name;
             text.color = library.GetColor();
         }
 

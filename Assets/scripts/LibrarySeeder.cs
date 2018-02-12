@@ -18,7 +18,7 @@ namespace OO {
             ix += adjectives.Length;
             Array.Copy(prepositions, 0, library, ix, prepositions.Length);
 
-            GameData.Instance.AddLibrary(new Library() { name = "Default", playerMade = false, words = library });
+            GameData.Instance.AddLibrary(new Library("Default", false, library));
         }
     }
 }

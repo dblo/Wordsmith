@@ -15,10 +15,11 @@ namespace OO {
             }
         }
         public Library SelectedLibrary { get; private set; }
+        public int LibraryCount { get { return libraries.Count; } }
 
         private static GameData instance;
         [SerializeField]
-        private List<Library> libraries; //switch to set?
+        private List<Library> libraries;
         [SerializeField]
         private int roomSize;
         [SerializeField]
@@ -29,8 +30,8 @@ namespace OO {
         private int lineLength;
         private string savePath;
 
-        public List<Library> GetLibraries () {
-            return libraries;
+        public Library GetLibrary (int ix) {
+            return libraries[ix];
         }
 
         public int GetRoomSize () {
@@ -49,12 +50,12 @@ namespace OO {
             return lineLength;
         }
 
-       private void Save () {
+        private void Save () {
             var json = JsonUtility.ToJson(this);
             File.WriteAllText(savePath, json);
         }
 
-        public static GameData Load (string path) {
+        private static GameData Load (string path) {
             if (!File.Exists(path)) {
                 return new GameData() {
                     savePath = path,
@@ -87,12 +88,12 @@ namespace OO {
         }
 
         public Library FindLibrary (string name) {
-            return libraries.Find(l => l.name.Equals(name));
+            return libraries.Find(l => l.Name.Equals(name));
         }
 
         public void ReplaceLibrary (Library library) {
             for (int i = 0; i < libraries.Count; i++) {
-                if (libraries[i].name.Equals(library.name)) {
+                if (libraries[i].Name.Equals(library.Name)) {
                     libraries[i] = library;
                     Save();
                     return;
