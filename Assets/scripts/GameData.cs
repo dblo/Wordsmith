@@ -18,7 +18,7 @@ namespace OO {
 
         private static GameData instance;
         [SerializeField]
-        private List<Library> libraries;
+        private List<Library> libraries; //switch to set?
         [SerializeField]
         private int roomSize;
         [SerializeField]
@@ -49,7 +49,7 @@ namespace OO {
             return lineLength;
         }
 
-        public void Save () {
+       private void Save () {
             var json = JsonUtility.ToJson(this);
             File.WriteAllText(savePath, json);
         }
@@ -67,9 +67,9 @@ namespace OO {
             return data;
         }
 
-        public void DeleteLibrary (string libraryName) {
+        public void DeleteLibrary (Library library) {
             foreach (var lib in libraries) {
-                if (lib.name.Equals(libraryName)) {
+                if (lib == library) {
                     libraries.Remove(lib);
                     Save();
                     return;
@@ -86,19 +86,24 @@ namespace OO {
             Save();
         }
 
-        public bool AddLibrary (Library library) {
-            var existingLibrary = libraries.Find(l => l.name.Equals(library.name));
-            if (existingLibrary == null) {
-                libraries.Add(library);
-            } else {
-                if (existingLibrary.playerMade) {
-                    existingLibrary = library; // todo warn overwrite
-                } else {
-                    return false; // todo tell user hw may not use default library names. Or allow overwrite as above.
+        public Library FindLibrary (string name) {
+            return libraries.Find(l => l.name.Equals(name));
+        }
+
+        public void ReplaceLibrary (Library library) {
+            for (int i = 0; i < libraries.Count; i++) {
+                if (libraries[i].name.Equals(library.name)) {
+                    libraries[i] = library;
+                    Save();
+                    return;
                 }
             }
+            throw new InvalidOperationException("No library to replace was found.");
+        }
+
+        public void AddLibrary (Library library) {
+            libraries.Add(library);
             Save();
-            return true;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -29,6 +30,8 @@ namespace OO {
 
         private void DeleteSelected () {
             if (libraryList.HasSelection()) {
+                var selectedLibrary = libraryList.GetSelectedLibrary().Library;
+                GameData.Instance.DeleteLibrary(selectedLibrary);
                 libraryList.DeleteSelected();
             }
         }
@@ -49,12 +52,26 @@ namespace OO {
         }
 
         public void OnClickSaveButton () {
-            if (seaName.text == "" || seaContent.text == "")
-                return; //todo tell use
+            if (seaName.text == "" || seaContent.text == "") {
+                // todo mark text or bg red
+                return;
+            }
 
             var library = new Library() { name = seaName.text, playerMade = true, words = seaContent.text.Split(' ') };
-            if (GameData.Instance.AddLibrary(library)) {
+            var existingLibrary = GameData.Instance.FindLibrary(library.name);
+            if (existingLibrary == null) {
+                GameData.Instance.AddLibrary(library);
                 libraryList.AddListElement(library);
+                return;
+            }
+            Action OnOverwrite = () => {
+                GameData.Instance.ReplaceLibrary(library);
+                libraryList.GetSelectedLibrary().SetLibrary(library);
+            };
+            if (existingLibrary.playerMade) {
+                ConfirmationDialog.Create("Overwrite?", OnOverwrite);
+            } else {
+                ConfirmationDialog.Create("Overwrite DEFAULT library?", OnOverwrite);
             }
         }
 
@@ -70,7 +87,7 @@ namespace OO {
 
         public void OnLibrarySelected () {
             if (libraryList.HasSelection()) {
-                var library = libraryList.GetSelectedLibrary();
+                var library = libraryList.GetSelectedLibrary().Library;
                 seaName.text = library.name;
                 seaContent.text = string.Join(" ", library.words);
             } else {

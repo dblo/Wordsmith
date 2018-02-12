@@ -12,5 +12,9 @@ namespace OO {
             text.text = library.name;
             text.color = library.GetColor();
         }
+
+        public void SetLibrary(Library library) {
+            Library = library;
+        }
     }
 }

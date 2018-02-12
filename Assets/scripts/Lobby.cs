@@ -89,7 +89,7 @@ namespace OO {
         }
 
         public void OnLibrarySelectionChange() {
-            var selectedLibrary = libraryList.GetSelectedLibrary();
+            var selectedLibrary = libraryList.GetSelectedLibrary().Library;
             if (selectedLibrary == null)
                 return;
 
@@ -125,7 +125,7 @@ namespace OO {
                 seaSize = SeaSize,
                 lineLength = LineLength;
 
-            var selectedLibrary = libraryList.GetSelectedLibrary();
+            var selectedLibrary = libraryList.GetSelectedLibrary().Library;
             if (selectedLibrary == null) {
                 Debug.Assert(GameData.Instance.GetLibraries().Count > 0);
                 int randomIndex = rng.Next(GameData.Instance.GetLibraries().Count);
@@ -152,12 +152,8 @@ namespace OO {
                 lineLength = rng.Next(1, SeaSize + 1);
             } else if (SeaSize != DefaultSliderValue && LineLength != DefaultSliderValue) {
             }
-            // todo Make it so a player cannot choose values so belows are needed
-            if (seaSize > selectedLibrary.words.Length)
-                seaSize = selectedLibrary.words.Length;
-            if (lineLength > seaSize)
-                lineLength = seaSize;
-
+            Debug.Assert(seaSize <= selectedLibrary.words.Length);
+            Debug.Assert(lineLength <= seaSize);
             GameData.Instance.NewGame(selectedLibrary, roomSize, gameLength, seaSize, lineLength);
         }
 

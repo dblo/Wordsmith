@@ -2,7 +2,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
-using System;
 using UnityEngine.SceneManagement;
 
 namespace OO {
@@ -90,12 +89,16 @@ namespace OO {
 
         [Command]
         public void CmdPlayerReady () {
-            if (!AllPlayersReady())
+            if (!AllPlayersReady()) 
                 return;
 
-            players.ForEach((p) => p.CmdSynchronizeWords());
-            var newWordSea = GameOver() ? null : wordSea.GenerateNewSea();
-            RpcAllPlayersReady(newWordSea);
+            players.ForEach(p => p.CmdSynchronizeWords());
+            if (GameOver()) {
+                RpcAllPlayersReady(null);
+            } else {
+                var newWordSea = WordSea.GenerateNewSea(GameData.Instance.SelectedLibrary, GameData.Instance.GetSeaSize());
+                RpcAllPlayersReady(newWordSea);
+            }
         }
 
         [ClientRpc]
@@ -150,8 +153,8 @@ namespace OO {
         }
 
         private void ShowGameOverScreen () {
-            var lineLogsGO = GameObject.Find("LineLogs");
-            var rTrans = lineLogsGO.GetComponent<RectTransform>();
+            var lineLogsGo = GameObject.Find("LineLogs");
+            var rTrans = lineLogsGo.GetComponent<RectTransform>();
             rTrans.anchorMin = new Vector2(0, 0.3f);
 
             wordSea.gameObject.SetActive(false);
@@ -168,15 +171,7 @@ namespace OO {
             return true;
         }
 
-        public void SetUIButtonsInteractable (bool value) {
-            var canvas = GameObject.Find("Canvas");
-            var buttons = canvas.GetComponentsInChildren<Button>();
-            foreach (var btn in buttons) {
-                btn.interactable = value;
-            }
-        }
-
-        public bool GameOver () {
+        private bool GameOver () {
             return currentRound > GameData.Instance.GetGameLength();
         }
 

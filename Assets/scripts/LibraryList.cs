@@ -40,10 +40,10 @@ namespace OO {
             }
         }
 
-        public Library GetSelectedLibrary () {
+        public LibraryListButton GetSelectedLibrary () {
             if (selectedButton == null)
                 return null;
-            return selectedButton.GetComponentInChildren<LibraryListButton>().Library;
+            return selectedButton.GetComponentInChildren<LibraryListButton>();
         }
 
         // Add an element to contents and if its the first element then set it to be selected
@@ -77,21 +77,20 @@ namespace OO {
             }
         }
 
+        // May not be called if no element is selected
         public void DeleteSelected () {
-            // todo handle user cannot delete default libs? gray out button? handle return false below?
-            var libraryName = selectedButton.GetComponentInChildren<Text>().text;
-            GameData.Instance.DeleteLibrary(libraryName);
-
             var index = selectedButton.transform.GetSiblingIndex();
             Button nextSelected = null;
-            if (contentsTransform.childCount > index + 1)
+            if (contentsTransform.childCount > index + 1) {
+                // Element below exists
                 nextSelected = contentsTransform.GetChild(index + 1).GetComponent<Button>();
-            else if (contentsTransform.childCount > 1 && index == contentsTransform.childCount - 1)
+            } else if (contentsTransform.childCount > 1) {
+                // Element above exists
                 nextSelected = contentsTransform.GetChild(index - 1).GetComponent<Button>();
-            else if (contentsTransform.childCount > 1)
-                nextSelected = contentsTransform.GetChild(0).GetComponent<Button>();
-            // else deleting last element, do nothing
-
+            } else if (contentsTransform.childCount == 1) {
+                // Leave nextSelected as null
+            } else
+                throw new InvalidOperationException("Did not account for this case");
             Destroy(selectedButton.gameObject);
             SetSelectedListElement(nextSelected);
         }
