@@ -88,9 +88,11 @@ namespace OO {
 
         private void OnLibrarySelectionChange () {
             var selectedLibrary = libraryList.GetSelectedLibrary().Library;
-            if (selectedLibrary == null)
+            if (selectedLibrary == null) {
+                // Selected the "Any" element so allow any sea size
+                seaSizeSlider.maxValue = SEA_SIZE_DEFAULT_MAX;
                 return;
-
+            }
             seaSizeSlider.maxValue = Math.Min(SEA_SIZE_DEFAULT_MAX, selectedLibrary.Words.Length);
         }
 

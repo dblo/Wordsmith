@@ -13,15 +13,14 @@ namespace OO {
         public string Name { get { return name; } }
         public bool PlayerMade { get { return playerMade; } }
         public string[] Words { get { return words; } }
+        public Color Color {
+            get { return playerMade ? PLAYER_MADE_COLOR : DEVELOPER_MADE_COLOR; }
+        }
 
         public Library (string name, bool playerMade, string[] words) {
             this.name = name;
             this.playerMade = playerMade;
             this.words = words;
-        }
-
-        public Color GetColor () {
-            return playerMade ? PLAYER_MADE_COLOR : DEVELOPER_MADE_COLOR;
         }
     }
 }

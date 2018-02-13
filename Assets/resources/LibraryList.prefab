@@ -101,8 +101,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   listElementPrefab: {fileID: 114595311156985344, guid: 1bf44368990ced14ca6364345a551264,
     type: 2}
-  SelectedColor: {r: 0.23137255, g: 0.6509804, b: 0.91764706, a: 1}
-  NormalColor: {r: 0, g: 0.25882354, b: 0.4392157, a: 1}
+  selectedColor: {r: 0, g: 0, b: 0, a: 0}
+  normalColor: {r: 0, g: 0, b: 0, a: 0}
+  content: {fileID: 224823479334432868}
 --- !u!114 &114611114794997744
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -7,14 +7,13 @@ namespace OO {
         [SerializeField] private Button listElementPrefab;
         [SerializeField] private Color selectedColor;
         [SerializeField] private Color normalColor;
+        [SerializeField] private Transform content;
 
-        private Transform contentsTransform;
-        private Button selectedButton;
-        // Callback set by externals
-        private Action onSelectedAction;
+        private Button selectedElement;
+        private Action onSelectedAction; // Callback set by externals
 
         public bool HasSelection () {
-            return selectedButton != null;
+            return selectedElement != null;
         }
 
         public void AddSelectedListener (Action action) {
@@ -22,15 +21,11 @@ namespace OO {
         }
 
         private void Awake () {
-            contentsTransform = GetComponentInChildren<VerticalLayoutGroup>().transform;
-            var listElement = contentsTransform.GetComponentInChildren<Button>();
+            var listElement = content.GetComponentInChildren<Button>();
             if (listElement != null) {
                 // The list has at least one element in the scene, set first as selected
                 SetSelectedListElement(listElement);
             }
-        }
-
-        private void Start () {
             SetupLibraries();
         }
 
@@ -41,28 +36,28 @@ namespace OO {
         }
 
         public LibraryListButton GetSelectedLibrary () {
-            if (selectedButton == null)
+            if (selectedElement == null)
                 return null;
-            return selectedButton.GetComponentInChildren<LibraryListButton>();
+            return selectedElement.GetComponentInChildren<LibraryListButton>();
         }
 
         // Add an element to contents and if its the first element then set it to be selected
         public void AddListElement (Library library) {
-            var go = Instantiate(listElementPrefab, contentsTransform);
+            var go = Instantiate(listElementPrefab, content);
             go.GetComponent<LibraryListButton>().Setup(library);
 
             var btn = go.GetComponent<Button>();
             btn.onClick.AddListener(() => SetSelectedListElement(btn));
 
-            if (selectedButton == null)
+            if (selectedElement == null)
                 SetSelectedListElement(btn);
         }
 
         private void SetSelectedListElement (Button btn) {
-            if (selectedButton != null) {
-                var colors = selectedButton.colors;
+            if (selectedElement != null) {
+                var colors = selectedElement.colors;
                 colors.normalColor = normalColor;
-                selectedButton.colors = colors;
+                selectedElement.colors = colors;
             }
             if (btn != null) {
                 var colors = btn.colors;
@@ -70,7 +65,7 @@ namespace OO {
                 colors.highlightedColor = selectedColor;
                 btn.colors = colors;
             }
-            selectedButton = btn;
+            selectedElement = btn;
 
             if (onSelectedAction != null) {
                 onSelectedAction();
@@ -79,19 +74,19 @@ namespace OO {
 
         // May not be called if no element is selected
         public void DeleteSelected () {
-            var index = selectedButton.transform.GetSiblingIndex();
+            var index = selectedElement.transform.GetSiblingIndex();
             Button nextSelected = null;
-            if (contentsTransform.childCount > index + 1) {
+            if (content.childCount > index + 1) {
                 // Element below exists
-                nextSelected = contentsTransform.GetChild(index + 1).GetComponent<Button>();
-            } else if (contentsTransform.childCount > 1) {
+                nextSelected = content.GetChild(index + 1).GetComponent<Button>();
+            } else if (content.childCount > 1) {
                 // Element above exists
-                nextSelected = contentsTransform.GetChild(index - 1).GetComponent<Button>();
-            } else if (contentsTransform.childCount == 1) {
+                nextSelected = content.GetChild(index - 1).GetComponent<Button>();
+            } else if (content.childCount == 1) {
                 // Leave nextSelected as null
             } else
                 throw new InvalidOperationException("Did not account for this case");
-            Destroy(selectedButton.gameObject);
+            Destroy(selectedElement.gameObject);
             SetSelectedListElement(nextSelected);
         }
     }
