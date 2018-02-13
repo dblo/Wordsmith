@@ -231,12 +231,12 @@ namespace OO {
         }
 
         private void OnSeaSizeChange (float value) {
-            lineLengthSlider.maxValue = Math.Min(LINE_LENGTH_DEFAULT_MAX, value);
 
             if ((int) value == DEFAULT_SLIDER_VALUE) {
                 seaSizeLabel.text = "Sea size: Any";
             } else {
                 seaSizeLabel.text = "Sea size: " + value;
+                lineLengthSlider.maxValue = Math.Min(LINE_LENGTH_DEFAULT_MAX, value);
             }
         }
 

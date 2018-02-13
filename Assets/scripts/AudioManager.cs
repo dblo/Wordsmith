@@ -2,17 +2,38 @@
 
 namespace OO {
     public class AudioManager : MonoBehaviour {
-        public static bool SoundMuted { get; set; }
+        public static AudioManager Instance { get; private set; }
+        public bool SoundMuted { get; private set; }
+        private AudioSource audioSource;
 
         private void Awake () {
+            if (Instance != null) {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
             DontDestroyOnLoad(gameObject);
+            audioSource = GetComponent<AudioSource>();
 
+            SoundMuted = Preferences.GetBool(Preferences.SOUND_MUTED);
             var musicMuted = Preferences.GetBool(Preferences.MUSIC_MUTED);
             if (!musicMuted) {
-                var audioSource = GetComponent<AudioSource>();
                 audioSource.Play();
             }
-            SoundMuted = Preferences.GetBool(Preferences.SOUND_MUTED);
+        }
+
+        public void SetMusicMuted (bool value) {
+            if (value) {
+                audioSource.Stop();
+            } else {
+                audioSource.Play();
+            }
+            Preferences.Set(Preferences.MUSIC_MUTED, value);
+        }
+
+        public void SetSoundMuted (bool value) {
+            SoundMuted = value;
+            Preferences.Set(Preferences.SOUND_MUTED, value);
         }
     }
 }

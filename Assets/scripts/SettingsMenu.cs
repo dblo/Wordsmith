@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace OO {
@@ -7,21 +8,20 @@ namespace OO {
             var musicMuted = Preferences.GetBool(Preferences.MUSIC_MUTED);
             var musicToggle = GameObject.Find("MusicToggle").GetComponent<Toggle>();
             musicToggle.isOn = musicMuted;
-            musicToggle.onValueChanged.AddListener(delegate { SetMusicMuted(musicToggle); });
+            musicToggle.onValueChanged.AddListener(AudioManager.Instance.SetMusicMuted);
 
             var soundMuted = Preferences.GetBool(Preferences.SOUND_MUTED);
             var soundToggle = GameObject.Find("SoundToggle").GetComponent<Toggle>();
             soundToggle.isOn = soundMuted;
-            soundToggle.onValueChanged.AddListener(delegate { SetSoundMuted(soundToggle); });
+            soundToggle.onValueChanged.AddListener(AudioManager.Instance.SetSoundMuted);
 
             var clearPrefsBtn = GameObject.Find("ClearPrefsButton").GetComponent<Button>();
             clearPrefsBtn.onClick.AddListener(PlayerPrefs.DeleteAll);
 
             var playerNameInput = GameObject.Find("PlayerNameInput").GetComponent<InputField>();
             var playerName = PlayerPrefs.GetString(Preferences.PLAYER_NAME);
-            if (playerName != "") {
-                playerNameInput.text = playerName;
-            }
+            playerNameInput.text = playerName;
+
             if (GameObject.Find("GameManager") == null) {
                 playerNameInput.onEndEdit.AddListener(SetPlayerName);
             } else {
@@ -38,22 +38,7 @@ namespace OO {
             PlayerPrefs.SetString(Preferences.PLAYER_NAME, name);
         }
 
-        private static void SetMusicMuted (Toggle toggle) {
-            var am = GameObject.Find("AudioManager").GetComponent<AudioSource>();
-            if (toggle.isOn) {
-                am.Stop();
-            } else {
-                am.Play();
-            }
-            Preferences.Set(Preferences.MUSIC_MUTED, toggle.isOn);
-        }
-
-        private static void SetSoundMuted (Toggle toggle) {
-            Preferences.Set(Preferences.SOUND_MUTED, toggle.isOn);
-            AudioManager.SoundMuted = toggle.isOn;
-        }
-
-        public void SeedLibraries() {
+        public void SeedLibraries () {
             LibrarySeeder.Seed();
         }
     }
