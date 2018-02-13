@@ -36,7 +36,7 @@ namespace OO {
                 GameData.Instance.DeleteLibrary(selectedLibrary);
                 libraryList.DeleteSelected();
             };
-            var msg = "Really delete " + libraryList.GetSelectedLibrary().Library.name + "?";
+            var msg = "Really delete " + libraryList.GetSelectedLibrary().Library.Name + "?";
             ConfirmationDialog.Create(msg, delete, transform.parent);
         }
 
@@ -51,7 +51,7 @@ namespace OO {
             }
 
             var library = new Library(seaName.text, true, seaContent.text.Split(' '));
-            var existingLibrary = GameData.Instance.FindLibrary(library.name);
+            var existingLibrary = GameData.Instance.FindLibrary(library.Name);
             if (existingLibrary == null) {
                 GameData.Instance.AddLibrary(library);
                 libraryList.AddListElement(library);
@@ -61,7 +61,7 @@ namespace OO {
                 GameData.Instance.ReplaceLibrary(library);
                 libraryList.GetSelectedLibrary().Library = library;
             };
-            var msg = existingLibrary.playerMade ? "Overwrite?" : "Overwrite DEFAULT library?";
+            var msg = existingLibrary.PlayerMade ? "Overwrite?" : "Overwrite DEFAULT library?";
             ConfirmationDialog.Create(msg, overwrite, transform.parent);
         }
 
@@ -78,8 +78,8 @@ namespace OO {
         private void OnLibrarySelected () {
             if (libraryList.HasSelection()) {
                 var library = libraryList.GetSelectedLibrary().Library;
-                seaName.text = library.name;
-                seaContent.text = string.Join(" ", library.words);
+                seaName.text = library.Name;
+                seaContent.text = string.Join(" ", library.Words);
             } else {
                 seaName.text = "";
                 seaContent.text = "";

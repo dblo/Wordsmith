@@ -50,7 +50,7 @@ namespace OO {
 
         private static void SetSoundMuted (Toggle toggle) {
             Preferences.Set(Preferences.SOUND_MUTED, toggle.isOn);
-            GameManager.SoundMuted = toggle.isOn;
+            AudioManager.SoundMuted = toggle.isOn;
         }
 
         public void SeedLibraries() {

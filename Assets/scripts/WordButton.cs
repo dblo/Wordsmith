@@ -27,7 +27,7 @@ namespace OO {
             rTrans.anchorMin = minSeaAnchors;
             rTrans.anchorMax = maxSeaAnchors;
 
-            if (!GameManager.SoundMuted) {
+            if (!AudioManager.SoundMuted) {
                 audioSorces[1].Play();
             }
             SetListener(onClickAction);
@@ -69,7 +69,7 @@ namespace OO {
         }
 
         public void PlayChoseWordSounds () {
-            if (!GameManager.SoundMuted) {
+            if (!AudioManager.SoundMuted) {
                 audioSorces[0].Play();
             }
         }

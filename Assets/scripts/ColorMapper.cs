@@ -27,6 +27,7 @@ namespace OO {
 
         public void ComputeColors (List<PlayerConnection> players) {
             playersWords.Clear();
+            colors.Clear();
 
             foreach (var p in players) {
                 playersWords.Add((string[]) p.Words.Clone());

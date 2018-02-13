@@ -6,8 +6,6 @@ using UnityEngine.SceneManagement;
 
 namespace OO {
     public class GameManager : NetworkBehaviour {
-        public static bool SoundMuted { get; set; }
-
         [SerializeField] private WordSea wordSea;
         [SerializeField] private ButtonBar buttonBar;
         [SerializeField] private ScorePanel scorePanel;
@@ -17,10 +15,6 @@ namespace OO {
         private List<PlayerConnection> players;
         private ColorMapper colorWordMapper;
         private int currentRound = 1;
-
-        private void Awake () {
-            SoundMuted = Preferences.GetBool(Preferences.SOUND_MUTED);
-        }
 
         public override void OnStartServer () {
             players = new List<PlayerConnection>();
@@ -49,7 +43,7 @@ namespace OO {
             players = FindSortedPlayers();
             colorWordMapper = new ColorMapper(playercount);
 
-            libraryNameDisplay.text = library.name;
+            libraryNameDisplay.text = library.Name;
             UpdateRoundDisplay();
             CreateLineLogs();
             buttonBar.GameStarting();

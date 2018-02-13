@@ -78,12 +78,12 @@ namespace OO {
         }
 
         public Library FindLibrary (string name) {
-            return libraries.Find(l => l.name.Equals(name));
+            return libraries.Find(l => l.Name.Equals(name));
         }
 
         public void ReplaceLibrary (Library library) {
             for (var i = 0; i < libraries.Count; i++) {
-                if (!libraries[i].name.Equals(library.name))
+                if (!libraries[i].Name.Equals(library.Name))
                     continue;
                 libraries[i] = library;
                 Save();

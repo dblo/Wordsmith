@@ -2,6 +2,8 @@
 
 namespace OO {
     public class AudioManager : MonoBehaviour {
+        public static bool SoundMuted { get; set; }
+
         private void Awake () {
             DontDestroyOnLoad(gameObject);
 
@@ -10,7 +12,7 @@ namespace OO {
                 var audioSource = GetComponent<AudioSource>();
                 audioSource.Play();
             }
+            SoundMuted = Preferences.GetBool(Preferences.SOUND_MUTED);
         }
     }
-
 }
