@@ -6,30 +6,24 @@ using UnityEngine.SceneManagement;
 
 namespace OO {
     public class GameManager : NetworkBehaviour {
-        public WordSea wordSea;
-        public ButtonBar buttonBar;
-        public ScorePanel scorePanelPrefab;
-        public bool SoundMuted { get; private set; }
+        public static bool SoundMuted { get; set; }
 
-        private List<LineLog> lineLogs = new List<LineLog>();
+        [SerializeField] private WordSea wordSea;
+        [SerializeField] private ButtonBar buttonBar;
+        [SerializeField] private ScorePanel scorePanel;
+        [SerializeField] private Text roundDisplay;
+        [SerializeField] private Text libraryNameDisplay;
+        private readonly List<LineLog> lineLogs = new List<LineLog>();
         private List<PlayerConnection> players;
         private ColorMapper colorWordMapper;
-        private Text roundDisplay;
-        private Text libraryNameDisplay;
         private int currentRound = 1;
 
         private void Awake () {
-            SoundMuted = Preferences.GetBool(Preferences.SoundMuted);
-            roundDisplay = GameObject.Find("RoundDisplay").GetComponent<Text>();
-            libraryNameDisplay = GameObject.Find("LibraryNameDisplay").GetComponent<Text>();
+            SoundMuted = Preferences.GetBool(Preferences.SOUND_MUTED);
         }
 
         public override void OnStartServer () {
             players = new List<PlayerConnection>();
-        }
-
-        internal int[] GetScores () {
-            return colorWordMapper.GetScores();
         }
 
         // Only called on server
@@ -46,10 +40,6 @@ namespace OO {
                 GameData.Instance.GetGameLength(), GameData.Instance.GetLineLength());
         }
 
-        public void SetSoundMuted (bool value) {
-            SoundMuted = value;
-        }
-
         [ClientRpc]
         private void RpcOnAllPlayersJoined (string libraryJson, string[] newWordSea, int playercount,
                                             int gameLength, int lineLength) {
@@ -59,7 +49,7 @@ namespace OO {
             players = FindSortedPlayers();
             colorWordMapper = new ColorMapper(playercount);
 
-            libraryNameDisplay.text = library.Name;
+            libraryNameDisplay.text = library.name;
             UpdateRoundDisplay();
             CreateLineLogs();
             buttonBar.GameStarting();
@@ -67,21 +57,22 @@ namespace OO {
             wordSea.SetNewSea(newWordSea);
         }
 
-        private List<PlayerConnection> FindSortedPlayers () {
+        private static List<PlayerConnection> FindSortedPlayers () {
             var pcs = new List<PlayerConnection>();
             var gos = GameObject.FindGameObjectsWithTag("Player");
             foreach (var go in gos) {
                 var pc = go.GetComponent<PlayerConnection>();
-                if (pc.isLocalPlayer)
+                if (pc.isLocalPlayer) {
                     pcs.Insert(0, pc);
-                else
+                } else {
                     pcs.Add(pc);
+                }
             }
             return pcs;
         }
 
         private void CreateLineLogs () {
-            for (int i = 0; i < players.Count; i++) {
+            for (var i = 0; i < players.Count; i++) {
                 lineLogs.Add(LineLog.Create((float) i / players.Count,
                     (float) (i + 1) / players.Count, players[i].PlayerName));
             }
@@ -89,7 +80,7 @@ namespace OO {
 
         [Command]
         public void CmdPlayerReady () {
-            if (!AllPlayersReady()) 
+            if (!AllPlayersReady())
                 return;
 
             players.ForEach(p => p.CmdSynchronizeWords());
@@ -102,7 +93,7 @@ namespace OO {
         }
 
         [ClientRpc]
-        void RpcAllPlayersReady (string[] newWordSea) {
+        private void RpcAllPlayersReady (string[] newWordSea) {
             RemoveTemporaryWords();
 
             colorWordMapper.ComputeColors(players);
@@ -128,7 +119,7 @@ namespace OO {
         }
 
         public void AddTemporaryWordsToLineLog (string[] words) {
-            for (int i = 0; i < players.Count; i++) {
+            for (var i = 0; i < players.Count; i++) {
                 if (players[i].isLocalPlayer) {
                     var tempColors = ColorMapper.GetTemporaryWordColors(words.Length);
                     lineLogs[i].AddTemporaryLine(words, tempColors);
@@ -138,7 +129,7 @@ namespace OO {
         }
 
         private void RemoveTemporaryWords () {
-            for (int i = 0; i < players.Count; i++) {
+            for (var i = 0; i < players.Count; i++) {
                 if (players[i].isLocalPlayer) {
                     lineLogs[i].RemoveTemporaryLine();
                     break;
@@ -147,7 +138,7 @@ namespace OO {
         }
 
         private void AddWordsToLineLogs (List<string[]> colors) {
-            for (int i = 0; i < players.Count; i++) {
+            for (var i = 0; i < players.Count; i++) {
                 lineLogs[i].AddLine(players[i].Words, colors[i]);
             }
         }
@@ -160,7 +151,9 @@ namespace OO {
             wordSea.gameObject.SetActive(false);
 
             var canvas = GameObject.Find("Canvas");
-            Instantiate(scorePanelPrefab, canvas.transform);
+            var go = Instantiate(scorePanel, canvas.transform);
+            var sp = go.GetComponent<ScorePanel>();
+            sp.Setup(colorWordMapper.Scores);
         }
 
         private bool AllPlayersReady () {

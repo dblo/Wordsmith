@@ -4,12 +4,13 @@ using UnityEngine.UI;
 
 namespace OO {
     public class ButtonBar : MonoBehaviour {
-        public Button goButton;
-        public WordSea wordSea;
-        public Button saveLibraryButton;
-        public Text infoText;
+        [SerializeField] private Button goButton;
+        [SerializeField] private WordSea wordSea;
+        [SerializeField] private Button saveLibraryButton;
+        [SerializeField] private Text infoText;
 
-        private List<Button> buttons = new List<Button>();
+        private const float BUTTON_ANCHOR_X_WIDTH = 0.2f;
+        private readonly List<Button> buttons = new List<Button>();
         private PlayerConnection localPlayer;
         private Text waitingText;
         private GameObject playersJoiningText;
@@ -98,8 +99,8 @@ namespace OO {
         }
 
         private string[] GetWords () {
-            string[] words = new string[buttons.Count];
-            for (int i = 0; i < buttons.Count; i++) {
+            var words = new string[buttons.Count];
+            for (var i = 0; i < buttons.Count; i++) {
                 words[i] = buttons[i].GetComponentInChildren<Text>().text;
             }
             return words;
@@ -112,9 +113,9 @@ namespace OO {
         private void ShiftWordsLeft (Button btn) {
             var rTrans = btn.GetComponent<RectTransform>();
             var minAnchorX = rTrans.anchorMin.x;
-            int btnIndex = (int)(minAnchorX / 0.2f);
+            var btnIndex = (int)(minAnchorX / BUTTON_ANCHOR_X_WIDTH);
 
-            for (int i = buttons.Count - 1; i > btnIndex; i--) {
+            for (var i = buttons.Count - 1; i > btnIndex; i--) {
                 var rTransRight = buttons[i].GetComponent<RectTransform>();
                 var rTransLeft = buttons[i-1].GetComponent<RectTransform>();
                 rTransRight.anchorMin = rTransLeft.anchorMin;

@@ -4,9 +4,9 @@ using UnityEngine.UI;
 
 namespace OO {
     public class LibraryList : MonoBehaviour {
-        public Button listElementPrefab;
-        public Color SelectedColor;
-        public Color NormalColor;
+        [SerializeField] private Button listElementPrefab;
+        [SerializeField] private Color selectedColor;
+        [SerializeField] private Color normalColor;
 
         private Transform contentsTransform;
         private Button selectedButton;
@@ -58,16 +58,16 @@ namespace OO {
                 SetSelectedListElement(btn);
         }
 
-        public void SetSelectedListElement (Button btn) {
+        private void SetSelectedListElement (Button btn) {
             if (selectedButton != null) {
                 var colors = selectedButton.colors;
-                colors.normalColor = NormalColor;
+                colors.normalColor = normalColor;
                 selectedButton.colors = colors;
             }
             if (btn != null) {
                 var colors = btn.colors;
-                colors.normalColor = SelectedColor;
-                colors.highlightedColor = SelectedColor;
+                colors.normalColor = selectedColor;
+                colors.highlightedColor = selectedColor;
                 btn.colors = colors;
             }
             selectedButton = btn;

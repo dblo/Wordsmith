@@ -7,13 +7,13 @@ using UnityEngine.SceneManagement;
 
 namespace OO {
     public class MainMenu : MonoBehaviour {
-        public static bool InLanMode;
+        public static bool InLanMode { get; private set; }
 
         private Toggle lanToggle;
 
         private void Awake () {
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
-            var lanEnabled = Preferences.GetBool(Preferences.LanEnabled);
+            var lanEnabled = Preferences.GetBool(Preferences.LAN_ENABLED);
 
             lanToggle = GameObject.Find("LanToggle").GetComponent<Toggle>();
             lanToggle.isOn = lanEnabled;
@@ -39,7 +39,7 @@ namespace OO {
             }
         }
 
-        private void OnMatchList (bool success, string extendedInfo, List<MatchInfoSnapshot> responseData) {
+        private static void OnMatchList (bool success, string extendedInfo, List<MatchInfoSnapshot> responseData) {
             if (!success || responseData.Count == 0)
                 return;
 
@@ -53,8 +53,8 @@ namespace OO {
             Instantiate(Resources.Load("SettingsDialog"), parent);
         }
 
-        public void SetLanMode (bool value) {
-            Preferences.Set(Preferences.LanEnabled, value);
+        private static void SetLanMode (bool value) {
+            Preferences.Set(Preferences.LAN_ENABLED, value);
             InLanMode = value;
 
             if (InLanMode) {

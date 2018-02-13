@@ -1,19 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace OO {
     public class ColorMapper {
-        private const int perfectScoreBonus = 2;
-        private List<string[]> playersWords;
-        private List<string[]> colors;
-        private List<int> playersScore;
+        private const int PERFECT_SCORE_BONUS = 2;
+        private readonly List<string[]> playersWords;
+        private readonly List<string[]> colors;
+        private readonly List<int> playersScore;
 
         public ColorMapper (int playerCount) {
             playersScore = new List<int>(Enumerable.Repeat(0, playerCount).ToArray());
+            playersWords = new List<string[]>(playerCount);
+            colors = new List<string[]>(playerCount);
         }
 
-        public int[] GetScores () {
-            return playersScore.ToArray();
+        public List<int> Scores {
+            get { return playersScore; }
         }
 
         // Returns list where element i contains the colors that correspond to the 
@@ -23,16 +26,15 @@ namespace OO {
         }
 
         public void ComputeColors (List<PlayerConnection> players) {
-            playersWords = new List<string[]>(players.Count);
-            colors = new List<string[]>(players.Count);
+            playersWords.Clear();
 
             foreach (var p in players) {
                 playersWords.Add((string[]) p.Words.Clone());
                 colors.Add(GetInitialColors(GameData.Instance.GetLineLength()));
             }
-            for (int i = 0; i < GameData.Instance.GetLineLength(); i++) {
+            for (var i = 0; i < GameData.Instance.GetLineLength(); i++) {
                 var word = playersWords[0][i];
-                int j = 1;
+                var j = 1;
                 for (; j < players.Count; j++) {
                     if (!word.Equals(playersWords[j][i])) {
                         break;
@@ -40,7 +42,7 @@ namespace OO {
                 }
                 if (j < players.Count)
                     continue;
-                for (int k = 0; k < players.Count; k++) {
+                for (var k = 0; k < players.Count; k++) {
                     colors[k][i] = "green";
                     playersWords[k][i] = null;
                 }
@@ -49,12 +51,13 @@ namespace OO {
             var wordDict = new Dictionary<string, uint>();
             foreach (var words in playersWords) {
                 foreach (var word in words) {
-                    if (word == null)
-                        continue;
-                    else if (wordDict.ContainsKey(word))
+                    if (word == null) {
+                        //Do nothing
+                    } else if (wordDict.ContainsKey(word)) {
                         wordDict[word] += 1;
-                    else
+                    } else {
                         wordDict[word] = 1;
+                    }
                 }
             }
             // Remove all words not chosen by at least 2 players
@@ -68,30 +71,31 @@ namespace OO {
         }
 
         private void MarkWordYellow (Dictionary<string, uint> wordDict, string key) {
-            for (int i = 0; i < playersWords.Count; i++) {
-                for (int j = 0; j < playersWords[i].Length; j++) {
-                    if (key.Equals(playersWords[i][j])) {
-                        colors[i][j] = "yellow";
-                        wordDict[key] -= 1;
-                        if (wordDict[key] == 0) {
-                            return;
-                        }
+            for (var i = 0; i < playersWords.Count; i++) {
+                for (var j = 0; j < playersWords[i].Length; j++) {
+                    if (!key.Equals(playersWords[i][j])) continue;
+
+                    colors[i][j] = "yellow";
+                    wordDict[key] -= 1;
+                    if (wordDict[key] == 0) {
+                        return;
                     }
                 }
             }
         }
 
         public void ComputeScore () {
-            for (int i = 0; i < colors.Count; i++) {
-                int score = 0;
+            for (var i = 0; i < colors.Count; i++) {
+                var score = 0;
                 foreach (var c in colors[i]) {
-                    if (c == "green")
+                    if (c == "green") {
                         score += 2;
-                    else if (c == "yellow")
+                    } else if (c == "yellow") {
                         score += 1;
+                    } // else red so grant no points
                 }
                 if (PerfectScore(GameData.Instance.GetLineLength(), score))
-                    score += perfectScoreBonus;
+                    score += PERFECT_SCORE_BONUS;
                 playersScore[i] += score;
             }
         }

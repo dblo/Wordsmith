@@ -11,7 +11,7 @@ namespace OO {
 
             var library = new string[nouns.Length + verbs.Length + adjectives.Length + prepositions.Length];
             Array.Copy(nouns, library, nouns.Length);
-            int ix = nouns.Length;
+            var ix = nouns.Length;
             Array.Copy(verbs, 0, library, ix, verbs.Length);
             ix += verbs.Length;
             Array.Copy(adjectives, 0, library, ix, adjectives.Length);

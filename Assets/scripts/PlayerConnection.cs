@@ -13,19 +13,19 @@ namespace OO {
         }
 
         private void Start () {
+            // Need to init gm for all playerConnections on the host. Only for localPlayer necessary on clients.
             gm = GameObject.Find("GameManager").GetComponent<GameManager>();
+            if (!isLocalPlayer) return;
 
-            if (isLocalPlayer) {
-                var bb = GameObject.Find("ButtonBar").GetComponent<ButtonBar>();
-                bb.AssignLocalPlayer(this);
+            var bb = GameObject.Find("ButtonBar").GetComponent<ButtonBar>();
+            bb.AssignLocalPlayer(this);
 
-                var playerName = PlayerPrefs.GetString(Preferences.PlayerName);
-                if (playerName.Equals("")) {
-                    playerName = "Player " + new System.Random().Next(100);
-                    PlayerPrefs.SetString(Preferences.PlayerName, playerName);
-                }
-                CmdLocalPlayerReady(playerName);
+            var playerName = PlayerPrefs.GetString(Preferences.PLAYER_NAME);
+            if (playerName.Equals("")) {
+                playerName = "Player " + new System.Random().Next(100);
+                PlayerPrefs.SetString(Preferences.PLAYER_NAME, playerName);
             }
+            CmdLocalPlayerReady(playerName);
         }
 
         public void Reset () {

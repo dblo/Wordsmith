@@ -5,11 +5,11 @@ using UnityEngine.UI;
 
 namespace OO {
     public class SeaMaker : MonoBehaviour {
-        public LibraryList libraryList;
+        [SerializeField] private LibraryList libraryList;
         private InputField seaName;
         private InputField seaContent;
 
-        void Start () {
+        private void Start () {
             seaName = GameObject.Find("SeaNameInput").GetComponent<InputField>();
             seaContent = GameObject.Find("SeaContentInput").GetComponent<InputField>();
 
@@ -29,15 +29,15 @@ namespace OO {
         }
 
         private void DeleteSelected () {
-            if (libraryList.HasSelection()) {
-                Action delete = () => {
-                    var selectedLibrary = libraryList.GetSelectedLibrary().Library;
-                    GameData.Instance.DeleteLibrary(selectedLibrary);
-                    libraryList.DeleteSelected();
-                };
-                var msg = "Really delete " + libraryList.GetSelectedLibrary().Library.Name + "?";
-                ConfirmationDialog.Create(msg, delete, transform.parent);
-            }
+            if (!libraryList.HasSelection()) return;
+
+            Action delete = () => {
+                var selectedLibrary = libraryList.GetSelectedLibrary().Library;
+                GameData.Instance.DeleteLibrary(selectedLibrary);
+                libraryList.DeleteSelected();
+            };
+            var msg = "Really delete " + libraryList.GetSelectedLibrary().Library.name + "?";
+            ConfirmationDialog.Create(msg, delete, transform.parent);
         }
 
         public void OnClickCloseButton () {
@@ -51,21 +51,18 @@ namespace OO {
             }
 
             var library = new Library(seaName.text, true, seaContent.text.Split(' '));
-            var existingLibrary = GameData.Instance.FindLibrary(library.Name);
+            var existingLibrary = GameData.Instance.FindLibrary(library.name);
             if (existingLibrary == null) {
                 GameData.Instance.AddLibrary(library);
                 libraryList.AddListElement(library);
                 return;
             }
-            Action OnOverwrite = () => {
+            Action overwrite = () => {
                 GameData.Instance.ReplaceLibrary(library);
-                libraryList.GetSelectedLibrary().SetLibrary(library);
+                libraryList.GetSelectedLibrary().Library = library;
             };
-            if (existingLibrary.PlayerMade) {
-                ConfirmationDialog.Create("Overwrite?", OnOverwrite, transform.parent);
-            } else {
-                ConfirmationDialog.Create("Overwrite DEFAULT library?", OnOverwrite, transform.parent);
-            }
+            var msg = existingLibrary.playerMade ? "Overwrite?" : "Overwrite DEFAULT library?";
+            ConfirmationDialog.Create(msg, overwrite, transform.parent);
         }
 
         public void OnClickNewButton () {
@@ -78,11 +75,11 @@ namespace OO {
             ConfirmationDialog.Create("Discard unsaved changes?", discard, transform.parent);
         }
 
-        public void OnLibrarySelected () {
+        private void OnLibrarySelected () {
             if (libraryList.HasSelection()) {
                 var library = libraryList.GetSelectedLibrary().Library;
-                seaName.text = library.Name;
-                seaContent.text = string.Join(" ", library.Words);
+                seaName.text = library.name;
+                seaContent.text = string.Join(" ", library.words);
             } else {
                 seaName.text = "";
                 seaContent.text = "";

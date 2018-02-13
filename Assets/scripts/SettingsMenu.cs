@@ -4,21 +4,21 @@ using UnityEngine.UI;
 namespace OO {
     public class SettingsMenu : MonoBehaviour {
         private void Awake () {
-            var musicMuted = Preferences.GetBool(Preferences.MusicMuted);
+            var musicMuted = Preferences.GetBool(Preferences.MUSIC_MUTED);
             var musicToggle = GameObject.Find("MusicToggle").GetComponent<Toggle>();
             musicToggle.isOn = musicMuted;
             musicToggle.onValueChanged.AddListener(delegate { SetMusicMuted(musicToggle); });
 
-            var soundMuted = Preferences.GetBool(Preferences.SoundMuted);
+            var soundMuted = Preferences.GetBool(Preferences.SOUND_MUTED);
             var soundToggle = GameObject.Find("SoundToggle").GetComponent<Toggle>();
             soundToggle.isOn = soundMuted;
             soundToggle.onValueChanged.AddListener(delegate { SetSoundMuted(soundToggle); });
 
             var clearPrefsBtn = GameObject.Find("ClearPrefsButton").GetComponent<Button>();
-            clearPrefsBtn.onClick.AddListener(() => PlayerPrefs.DeleteAll());
+            clearPrefsBtn.onClick.AddListener(PlayerPrefs.DeleteAll);
 
             var playerNameInput = GameObject.Find("PlayerNameInput").GetComponent<InputField>();
-            var playerName = PlayerPrefs.GetString(Preferences.PlayerName);
+            var playerName = PlayerPrefs.GetString(Preferences.PLAYER_NAME);
             if (playerName != "") {
                 playerNameInput.text = playerName;
             }
@@ -34,26 +34,23 @@ namespace OO {
             Destroy(gameObject);
         }
 
-        public void SetPlayerName (string name) {
-            PlayerPrefs.SetString(Preferences.PlayerName, name);
+        private static void SetPlayerName (string name) {
+            PlayerPrefs.SetString(Preferences.PLAYER_NAME, name);
         }
 
-        private void SetMusicMuted (Toggle toggle) {
+        private static void SetMusicMuted (Toggle toggle) {
             var am = GameObject.Find("AudioManager").GetComponent<AudioSource>();
             if (toggle.isOn) {
                 am.Stop();
             } else {
                 am.Play();
             }
-            Preferences.Set(Preferences.MusicMuted, toggle.isOn);
+            Preferences.Set(Preferences.MUSIC_MUTED, toggle.isOn);
         }
 
-        private void SetSoundMuted (Toggle toggle) {
-            Preferences.Set(Preferences.SoundMuted, toggle.isOn);
-            var gmGO = GameObject.Find("GameManager");
-            if (gmGO == null)
-                return; // Settings opened via main menu, no sound effects to handle atm
-            gmGO.GetComponent<GameManager>().SetSoundMuted(toggle.isOn);
+        private static void SetSoundMuted (Toggle toggle) {
+            Preferences.Set(Preferences.SOUND_MUTED, toggle.isOn);
+            GameManager.SoundMuted = toggle.isOn;
         }
 
         public void SeedLibraries() {

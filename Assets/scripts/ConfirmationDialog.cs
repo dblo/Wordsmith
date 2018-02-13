@@ -4,17 +4,17 @@ using UnityEngine.UI;
 
 namespace OO {
     public class ConfirmationDialog : MonoBehaviour {
-        private Action yesAcition;
+        private Action yesCallback;
 
         public static void Create (string text, Action action, Transform parent) {
             var go = (GameObject) Instantiate(Resources.Load("ConfirmationDialog"), parent);
             var textComp = go.GetComponentInChildren<Text>();
             textComp.text = text;
-            go.GetComponent<ConfirmationDialog>().yesAcition = action;
+            go.GetComponent<ConfirmationDialog>().yesCallback = action;
         }
 
         public void OnClickYes () {
-            yesAcition();
+            yesCallback();
             Destroy(gameObject);
         }
 

@@ -4,15 +4,12 @@ using UnityEngine;
 namespace OO {
     [Serializable]
     public class Library {
-        [SerializeField]
-        private string name;
-        [SerializeField]
-        private bool playerMade;
-        [SerializeField]
-        private string[] words;
+        [SerializeField] public string name;
+        [SerializeField] public bool playerMade;
+        [SerializeField] public string[] words;
 
-        private static readonly Color playerMadeColor = Color.white;
-        private static readonly Color developerMadeColor = Color.red;
+        private static readonly Color PLAYER_MADE_COLOR = Color.white;
+        private static readonly Color DEVELOPER_MADE_COLOR = Color.red;
 
         public Library (string name, bool playerMade, string[] words) {
             this.name = name;
@@ -20,16 +17,8 @@ namespace OO {
             this.words = words;
         }
 
-        public string Name { get { return name; } }
-        public bool PlayerMade { get { return playerMade; } }
-        public string[] Words { get { return words; } }
-
         public Color GetColor () {
-            return PlayerMade ? playerMadeColor : developerMadeColor;
-        }
-
-        public static Color GetColor (bool playerMade) {
-            return playerMade ? playerMadeColor : developerMadeColor;
+            return playerMade ? PLAYER_MADE_COLOR : DEVELOPER_MADE_COLOR;
         }
     }
 }

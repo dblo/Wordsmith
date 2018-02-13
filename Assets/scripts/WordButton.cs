@@ -6,30 +6,28 @@ namespace OO {
     public class WordButton : MonoBehaviour {
         private Vector2 minSeaAnchors;
         private Vector2 maxSeaAnchors;
-        private GameManager gm;
         private AudioSource[] audioSorces;
 
         private void Awake () {
             audioSorces = GetComponents<AudioSource>();
-            gm = GameObject.Find("GameManager").GetComponent<GameManager>();
         }
 
         public void ComputeSeaAnchors (int index) {
-            float x = index % WordSea.MaxCols;
-            float y = index / WordSea.MaxCols;
-            minSeaAnchors = new Vector2(x / WordSea.MaxCols, y / WordSea.MaxRows);
-            maxSeaAnchors = new Vector2((x + 1) / WordSea.MaxCols, (y + 1) / WordSea.MaxRows);
+            float x = index % WordSea.MAX_COLS;
+            float y = index / WordSea.MAX_COLS;
+            minSeaAnchors = new Vector2(x / WordSea.MAX_COLS, y / WordSea.MAX_ROWS);
+            maxSeaAnchors = new Vector2((x + 1) / WordSea.MAX_COLS, (y + 1) / WordSea.MAX_ROWS);
         }
 
         public void MoveToWordSea (Transform parent, Action<Button> onClickAction) {
             var button = GetComponent<Button>();
             button.transform.SetParent(parent, false);
 
-            RectTransform rTrans = GetComponent<RectTransform>();
+            var rTrans = GetComponent<RectTransform>();
             rTrans.anchorMin = minSeaAnchors;
             rTrans.anchorMax = maxSeaAnchors;
 
-            if (!gm.SoundMuted) {
+            if (!GameManager.SoundMuted) {
                 audioSorces[1].Play();
             }
             SetListener(onClickAction);
@@ -39,8 +37,8 @@ namespace OO {
             var button = GetComponent<Button>();
             button.transform.SetParent(parent, false);
 
-            float xMin = 0;
-            float xMax = 0;
+            float xMin;
+            float xMax;
             switch (GameData.Instance.GetLineLength()) {
                 case 1:
                     xMin = 0.3f;
@@ -64,14 +62,14 @@ namespace OO {
             var anchorMin = new Vector2(xMin, 0);
             var anchorMax = new Vector2(xMax, 1);
 
-            RectTransform rTrans = GetComponent<RectTransform>();
+            var rTrans = GetComponent<RectTransform>();
             rTrans.anchorMin = anchorMin;
             rTrans.anchorMax = anchorMax;
             SetListener(onClickAction);
         }
 
         public void PlayChoseWordSounds () {
-            if (!gm.SoundMuted) {
+            if (!GameManager.SoundMuted) {
                 audioSorces[0].Play();
             }
         }

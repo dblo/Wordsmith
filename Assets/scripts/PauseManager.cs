@@ -2,7 +2,7 @@
 
 namespace OO {
     public class PauseManager : MonoBehaviour {
-        public GameObject pauseMenuPrefab;
+       [SerializeField] private GameObject pauseMenuPrefab;
 
         private GameObject pauseMenu;
 

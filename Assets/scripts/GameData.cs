@@ -8,26 +8,19 @@ namespace OO {
     public class GameData {
         public static GameData Instance {
             get {
-                if (instance == null) {
-                    instance = Load(Application.persistentDataPath + "/gamedata.dat");
-                }
-                return instance;
+                return instance ?? (instance =
+                           Load(Application.persistentDataPath + "/gamedata.dat"));
             }
         }
         public Library SelectedLibrary { get; private set; }
         public int LibraryCount { get { return libraries.Count; } }
 
         private static GameData instance;
-        [SerializeField]
-        private List<Library> libraries;
-        [SerializeField]
-        private int roomSize;
-        [SerializeField]
-        private int gameLength;
-        [SerializeField]
-        private int seaSize;
-        [SerializeField]
-        private int lineLength;
+        [SerializeField] private List<Library> libraries;
+        [SerializeField] private int roomSize;
+        [SerializeField] private int gameLength;
+        [SerializeField] private int seaSize;
+        [SerializeField] private int lineLength;
         private string savePath;
 
         public Library GetLibrary (int ix) {
@@ -69,13 +62,10 @@ namespace OO {
         }
 
         public void DeleteLibrary (Library library) {
-            foreach (var lib in libraries) {
-                if (lib == library) {
-                    libraries.Remove(lib);
-                    Save();
-                    return;
-                }
-            }
+            if (libraries.Remove(library)) {
+                Save();
+            } else
+                throw new InvalidOperationException("Could not find library to be deleted.");
         }
 
         public void NewGame (Library selectedLibrary, int roomSize, int gameLength, int seaSize, int lineLength) {
@@ -88,16 +78,16 @@ namespace OO {
         }
 
         public Library FindLibrary (string name) {
-            return libraries.Find(l => l.Name.Equals(name));
+            return libraries.Find(l => l.name.Equals(name));
         }
 
         public void ReplaceLibrary (Library library) {
-            for (int i = 0; i < libraries.Count; i++) {
-                if (libraries[i].Name.Equals(library.Name)) {
-                    libraries[i] = library;
-                    Save();
-                    return;
-                }
+            for (var i = 0; i < libraries.Count; i++) {
+                if (!libraries[i].name.Equals(library.name))
+                    continue;
+                libraries[i] = library;
+                Save();
+                return;
             }
             throw new InvalidOperationException("No library to replace was found.");
         }

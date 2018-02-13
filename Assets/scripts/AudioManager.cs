@@ -2,17 +2,10 @@
 
 namespace OO {
     public class AudioManager : MonoBehaviour {
-        public static AudioManager instance;
-
-        void Awake () {
-            if (instance != null) {
-                Destroy(gameObject);
-                return;
-            }
-            instance = this;
+        private void Awake () {
             DontDestroyOnLoad(gameObject);
 
-            var musicMuted = Preferences.GetBool(Preferences.MusicMuted);
+            var musicMuted = Preferences.GetBool(Preferences.MUSIC_MUTED);
             if (!musicMuted) {
                 var audioSource = GetComponent<AudioSource>();
                 audioSource.Play();

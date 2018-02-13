@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace OO {
     public class Lobby : MonoBehaviour {
-        public LibraryList libraryList;
+        [SerializeField] private LibraryList libraryList;
 
         private Slider gameLengthSlider;
         private Slider roomSizeSlider;
@@ -18,14 +18,14 @@ namespace OO {
         private Text lineLengthLabel;
         private System.Random rng = new System.Random();
 
-        private const string AnyLibrary = "Any";
-        private const int DefaultSliderValue = 0;
-        private const int seaSizeDefaultMax = 12;
-        private const int lineLengthDefaultMax = 4;
-        private const char PlayerCountDelimiter = '(';
-        private const char GameLengthDelimiter = ')';
-        private const char SeaSizeDelimiter = '{';
-        private const char LineLengthDelimiter = '}';
+        private const string ANY_LIBRARY = "Any";
+        private const int DEFAULT_SLIDER_VALUE = 0;
+        private const int SEA_SIZE_DEFAULT_MAX = 12;
+        private const int LINE_LENGTH_DEFAULT_MAX = 4;
+        private const char PLAYER_COUNT_DELIMITER = '(';
+        private const char GAME_LENGTH_DELIMITER = ')';
+        private const char SEA_SIZE_DELIMITER = '{';
+        private const char LINE_LENGTH_DELIMITER = '}';
 
         private void Awake () {
             gameLengthSlider = GameObject.Find("GameLengthSlider").GetComponent<Slider>();
@@ -37,13 +37,13 @@ namespace OO {
             seaSizeLabel = GameObject.Find("SeaSizeLabel").GetComponent<Text>();
             lineLengthLabel = GameObject.Find("LineLengthLabel").GetComponent<Text>();
 
-            seaSizeSlider.maxValue = seaSizeDefaultMax;
-            lineLengthSlider.maxValue = lineLengthDefaultMax;
+            seaSizeSlider.maxValue = SEA_SIZE_DEFAULT_MAX;
+            lineLengthSlider.maxValue = LINE_LENGTH_DEFAULT_MAX;
 
             SetupOnClickListeners();
             UsePrefsValuesIfPresent();
 
-            if(GameData.Instance.LibraryCount == 0) {
+            if (GameData.Instance.LibraryCount == 0) {
                 var playButton = transform.Find("PlayButton").GetComponent<Button>();
                 playButton.interactable = false;
 
@@ -53,23 +53,23 @@ namespace OO {
         }
 
         private void UsePrefsValuesIfPresent () {
-            var gameLengthPref = PlayerPrefs.GetInt(Preferences.DefaultGameLength, DefaultSliderValue);
-            if (gameLengthPref > DefaultSliderValue)
+            var gameLengthPref = PlayerPrefs.GetInt(Preferences.DEFAULT_GAME_LENGTH, DEFAULT_SLIDER_VALUE);
+            if (gameLengthPref > DEFAULT_SLIDER_VALUE)
                 GameLength = gameLengthPref;
             OnGameLengthChange(GameLength);
 
-            var playerCountPref = PlayerPrefs.GetInt(Preferences.DefaultPlayerCount, DefaultSliderValue);
-            if (playerCountPref > DefaultSliderValue)
+            var playerCountPref = PlayerPrefs.GetInt(Preferences.DEFAULT_PLAYER_COUNT, DEFAULT_SLIDER_VALUE);
+            if (playerCountPref > DEFAULT_SLIDER_VALUE)
                 PlayerCount = playerCountPref;
             OnPlayerCountChange(PlayerCount);
 
-            var seaSizePref = PlayerPrefs.GetInt(Preferences.DefaultSeaSize, DefaultSliderValue);
-            if (seaSizePref > DefaultSliderValue)
+            var seaSizePref = PlayerPrefs.GetInt(Preferences.DEFAULT_SEA_SIZE, DEFAULT_SLIDER_VALUE);
+            if (seaSizePref > DEFAULT_SLIDER_VALUE)
                 SeaSize = seaSizePref;
             OnSeaSizeChange(SeaSize);
 
-            var lineLengthPref = PlayerPrefs.GetInt(Preferences.DefaultLineLength, DefaultSliderValue);
-            if (lineLengthPref > DefaultSliderValue)
+            var lineLengthPref = PlayerPrefs.GetInt(Preferences.DEFAULT_LINE_LENGTH, DEFAULT_SLIDER_VALUE);
+            if (lineLengthPref > DEFAULT_SLIDER_VALUE)
                 LineLength = lineLengthPref;
             OnLineLengthChange(LineLength);
         }
@@ -86,21 +86,21 @@ namespace OO {
             libraryList.AddSelectedListener(OnLibrarySelectionChange);
         }
 
-        public void OnLibrarySelectionChange() {
+        private void OnLibrarySelectionChange () {
             var selectedLibrary = libraryList.GetSelectedLibrary().Library;
             if (selectedLibrary == null)
                 return;
 
-            seaSizeSlider.maxValue = Math.Min(seaSizeDefaultMax, selectedLibrary.Words.Length);
+            seaSizeSlider.maxValue = Math.Min(SEA_SIZE_DEFAULT_MAX, selectedLibrary.words.Length);
         }
 
         public void StartGame () {
             Debug.Assert(GameData.Instance.LibraryCount > 0);
 
-            PlayerPrefs.SetInt(Preferences.DefaultPlayerCount, PlayerCount);
-            PlayerPrefs.SetInt(Preferences.DefaultGameLength, GameLength);
-            PlayerPrefs.SetInt(Preferences.DefaultSeaSize, SeaSize);
-            PlayerPrefs.SetInt(Preferences.DefaultLineLength, LineLength);
+            PlayerPrefs.SetInt(Preferences.DEFAULT_PLAYER_COUNT, PlayerCount);
+            PlayerPrefs.SetInt(Preferences.DEFAULT_GAME_LENGTH, GameLength);
+            PlayerPrefs.SetInt(Preferences.DEFAULT_SEA_SIZE, SeaSize);
+            PlayerPrefs.SetInt(Preferences.DEFAULT_LINE_LENGTH, LineLength);
 
             var nm = GameObject.Find("NetworkManager").GetComponent<NetworkManager>();
             if (MainMenu.InLanMode) {
@@ -111,7 +111,7 @@ namespace OO {
                 //    var roomName = CreateRoomName();
                 //    NetworkManager.singleton.matchMaker.ListMatches(0, 3, roomName, true, 0, 0, OnMatchList);
                 //} else {
-                HostMMGame(nm);
+                HostMmGame(nm);
                 //}
             }
         }
@@ -129,28 +129,28 @@ namespace OO {
                 int randomIndex = rng.Next(GameData.Instance.LibraryCount);
                 selectedLibrary = GameData.Instance.GetLibrary(randomIndex);
             }
-            if (GameLength == DefaultSliderValue) {
+            if (GameLength == DEFAULT_SLIDER_VALUE) {
                 gameLength = rng.Next(1, (int) gameLengthSlider.maxValue + 1);
             }
-            if (PlayerCount == DefaultSliderValue) {
+            if (PlayerCount == DEFAULT_SLIDER_VALUE) {
                 roomSize = rng.Next(1, (int) roomSizeSlider.maxValue + 1);
             }
-            if (SeaSize == DefaultSliderValue && LineLength == DefaultSliderValue) {
-                var seaSizeMax = Math.Min(selectedLibrary.Words.Length,
+            if (SeaSize == DEFAULT_SLIDER_VALUE && LineLength == DEFAULT_SLIDER_VALUE) {
+                var seaSizeMax = Math.Min(selectedLibrary.words.Length,
                     (int) seaSizeSlider.maxValue);
                 seaSize = rng.Next(1, seaSizeMax + 1);
 
                 var lineLengthMax = Math.Min((int) lineLengthSlider.maxValue, seaSize);
                 lineLength = rng.Next(1, lineLengthMax + 1);
-            } else if (SeaSize == DefaultSliderValue && LineLength != DefaultSliderValue) {
-                var seaSizeMax = Math.Min(selectedLibrary.Words.Length,
+            } else if (SeaSize == DEFAULT_SLIDER_VALUE && LineLength != DEFAULT_SLIDER_VALUE) {
+                var seaSizeMax = Math.Min(selectedLibrary.words.Length,
                     LineLength);
                 seaSize = rng.Next(1, seaSizeMax + 1);
-            } else if (SeaSize != DefaultSliderValue && LineLength == DefaultSliderValue) {
+            } else if (SeaSize != DEFAULT_SLIDER_VALUE && LineLength == DEFAULT_SLIDER_VALUE) {
                 lineLength = rng.Next(1, SeaSize + 1);
-            } else if (SeaSize != DefaultSliderValue && LineLength != DefaultSliderValue) {
+            } else if (SeaSize != DEFAULT_SLIDER_VALUE && LineLength != DEFAULT_SLIDER_VALUE) {
             }
-            Debug.Assert(seaSize <= selectedLibrary.Words.Length);
+            Debug.Assert(seaSize <= selectedLibrary.words.Length);
             Debug.Assert(lineLength <= seaSize);
             GameData.Instance.NewGame(selectedLibrary, roomSize, gameLength, seaSize, lineLength);
         }
@@ -158,22 +158,22 @@ namespace OO {
         private string CreateRoomName () {
             string roomName = "";
             var selectedLibrary = GameData.Instance.SelectedLibrary;
-            if (!selectedLibrary.PlayerMade) {
-                roomName = selectedLibrary.Name;
+            if (!selectedLibrary.playerMade) {
+                roomName = selectedLibrary.name;
             } // else leave as empty string
 
-            if (PlayerCount != DefaultSliderValue)
-                roomName += PlayerCountDelimiter + PlayerCount.ToString();
-            if (GameLength != DefaultSliderValue)
-                roomName += GameLengthDelimiter + GameLength.ToString();
-            if (SeaSize != DefaultSliderValue)
-                roomName += SeaSizeDelimiter + SeaSize.ToString();
-            if (LineLength != DefaultSliderValue)
-                roomName += LineLengthDelimiter + LineLength.ToString();
+            if (PlayerCount != DEFAULT_SLIDER_VALUE)
+                roomName += PLAYER_COUNT_DELIMITER + PlayerCount.ToString();
+            if (GameLength != DEFAULT_SLIDER_VALUE)
+                roomName += GAME_LENGTH_DELIMITER + GameLength.ToString();
+            if (SeaSize != DEFAULT_SLIDER_VALUE)
+                roomName += SEA_SIZE_DELIMITER + SeaSize.ToString();
+            if (LineLength != DEFAULT_SLIDER_VALUE)
+                roomName += LINE_LENGTH_DELIMITER + LineLength.ToString();
             return roomName;
         }
 
-        private void HostMMGame (NetworkManager nm) {
+        private void HostMmGame (NetworkManager nm) {
             SetupGameParameters();
 
             var roomName = CreateRoomName();
@@ -215,7 +215,7 @@ namespace OO {
         }
 
         private void OnGameLengthChange (float value) {
-            if (value == DefaultSliderValue) {
+            if ((int) value == DEFAULT_SLIDER_VALUE) {
                 gameLengthLabel.text = "Game length: Any";
             } else {
                 gameLengthLabel.text = "Game length: " + value;
@@ -223,7 +223,7 @@ namespace OO {
         }
 
         private void OnPlayerCountChange (float value) {
-            if (value == DefaultSliderValue) {
+            if ((int) value == DEFAULT_SLIDER_VALUE) {
                 roomSizeLabel.text = "Players: Any";
             } else {
                 roomSizeLabel.text = "Players: " + value;
@@ -231,9 +231,9 @@ namespace OO {
         }
 
         private void OnSeaSizeChange (float value) {
-            lineLengthSlider.maxValue = Math.Min(lineLengthDefaultMax, value);
+            lineLengthSlider.maxValue = Math.Min(LINE_LENGTH_DEFAULT_MAX, value);
 
-            if (value == DefaultSliderValue) {
+            if ((int) value == DEFAULT_SLIDER_VALUE) {
                 seaSizeLabel.text = "Sea size: Any";
             } else {
                 seaSizeLabel.text = "Sea size: " + value;
@@ -241,7 +241,7 @@ namespace OO {
         }
 
         private void OnLineLengthChange (float value) {
-            if (value == DefaultSliderValue) {
+            if ((int) value == DEFAULT_SLIDER_VALUE) {
                 lineLengthLabel.text = "Line length: Any";
             } else {
                 lineLengthLabel.text = "Line length: " + value;
