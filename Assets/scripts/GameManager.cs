@@ -101,9 +101,9 @@ namespace OO {
             } else {
                 UpdateRoundDisplay();
                 foreach (var p in players) {
-                    p.Reset();
+                    p.NewRound();
                 }
-                buttonBar.OnNewRound();
+                buttonBar.NewRound();
                 wordSea.SetNewSea(newWordSea);
             }
         }

@@ -5,31 +5,24 @@ using UnityEngine.UI;
 namespace OO {
     public class ButtonBar : MonoBehaviour {
         [SerializeField] private Button goButton;
+        [SerializeField] private Button homeButton;
         [SerializeField] private WordSea wordSea;
         [SerializeField] private Button saveLibraryButton;
         [SerializeField] private Text infoText;
-
+        [SerializeField] private Text waitingText;
+        [SerializeField] private GameObject playersJoiningText;
         private const float BUTTON_ANCHOR_X_WIDTH = 0.2f;
         private readonly List<Button> buttons = new List<Button>();
         private PlayerConnection localPlayer;
-        private Text waitingText;
-        private GameObject playersJoiningText;
-
-        private void Awake () {
-            waitingText = GameObject.Find("WaitingText").GetComponent<Text>();
-            playersJoiningText = GameObject.Find("PlayerJoiningText");
-            goButton.onClick.AddListener(OnGoButtonClicked);
-        }
 
         public void OnGameOver () {
-            OnNewRound();
-            goButton.interactable = true;
-            goButton.GetComponentInChildren<Text>().text = "Home";
-            goButton.onClick.RemoveAllListeners();
-            goButton.onClick.AddListener(OnHomeButtonClicked);
+            waitingText.enabled = false;
             ToggleShowInfoText(false);
+            goButton.gameObject.SetActive(false);
+            homeButton.gameObject.SetActive(true);
 
             if (!localPlayer.isServer) {
+                // Let any client save the used library by clicking this button
                 saveLibraryButton.gameObject.SetActive(true);
             }
         }
@@ -39,7 +32,7 @@ namespace OO {
             if (AllWordsChosen())
                 return false;
 
-            btn.GetComponent<WordButton>().MoveToButtonBar(transform, buttons.Count, WordClicked);
+            btn.GetComponent<WordButton>().MoveToButtonBar(transform, buttons.Count, OnClickWordButton);
             buttons.Add(btn);
 
             if (AllWordsChosen())
@@ -47,12 +40,12 @@ namespace OO {
             return true;
         }
 
-        public void AssignLocalPlayer (PlayerConnection localPlayer) {
+        public void SetLocalPlayer (PlayerConnection localPlayer) {
             this.localPlayer = localPlayer;
         }
 
-        public void WordClicked (Button btn) {
-            ShiftWordsLeft(btn);
+        private void OnClickWordButton (Button btn) {
+            MoveWordsIfNeeded(btn);
             buttons.Remove(btn);
             wordSea.ReturnWord(btn);
             goButton.interactable = false;
@@ -62,7 +55,7 @@ namespace OO {
             ToggleShowInfoText(true);
         }
 
-        public void OnNewRound () {
+        public void NewRound () {
             waitingText.enabled = false;
             ToggleShowInfoText(true);
         }
@@ -74,26 +67,27 @@ namespace OO {
             }
         }
 
-        private void Reset () {
+        private void ResetButtons () {
             foreach (var b in buttons) {
                 wordSea.ReturnWord(b);
             }
             buttons.Clear();
         }
 
-        public void OnGoButtonClicked () {
+        public void OnClickGoButton () {
             localPlayer.WordsChosen(GetWords());
-            Reset();
-            wordSea.SetSeaFrozen(true);
-            goButton.interactable = false;
+            ResetButtons();
+            wordSea.SetSeaInteractable(false);
             waitingText.enabled = true;
+            // Needed for case wgere the player has selected all words and then returns a word before pressing Go
+            goButton.interactable = false;
         }
 
-        public void OnHomeButtonClicked () {
+        public void OnClickHomeButton () {
             GameManager.LaunchMainMenu();
         }
 
-        public void OnSaveLibrary () {
+        public void OnClickSaveLibraryButton () {
             saveLibraryButton.gameObject.SetActive(false);
             wordSea.SaveLibrary();
         }
@@ -110,7 +104,7 @@ namespace OO {
             return buttons.Count == GameData.Instance.GetLineLength();
         }
 
-        private void ShiftWordsLeft (Button btn) {
+        private void MoveWordsIfNeeded (Button btn) {
             var rTrans = btn.GetComponent<RectTransform>();
             var minAnchorX = rTrans.anchorMin.x;
             var btnIndex = (int)(minAnchorX / BUTTON_ANCHOR_X_WIDTH);

@@ -19,13 +19,13 @@ namespace OO {
 
         private void WordClicked (Button btn) {
             if (buttonBar.TryAdd(btn)) {
-                btn.GetComponent<WordButton>().PlayChoseWordSounds();
+                btn.GetComponent<WordButton>().PlayWordChosenSounds();
             }
         }
 
-        public void SetSeaFrozen (bool value) {
+        public void SetSeaInteractable (bool value) {
             foreach (var b in buttons) {
-                b.interactable = !value;
+                b.interactable = value;
             }
         }
 
@@ -52,7 +52,7 @@ namespace OO {
                 var text = buttons[i].GetComponentInChildren<Text>();
                 text.text = words[i];
             }
-            SetSeaFrozen(false);
+            SetSeaInteractable(true);
         }
 
         public static string[] GenerateNewSea (Library library, int seaSize) {

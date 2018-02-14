@@ -187,6 +187,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 647f2930b3d320547b94bf7a44a1983b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerLines: {fileID: 114533292894157070}
+  playerLabel: {fileID: 114294757620075904}
 --- !u!114 &114533292894157070
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -199,7 +201,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_OnCullStateChanged:
     m_PersistentCalls:

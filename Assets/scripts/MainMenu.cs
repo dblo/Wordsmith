@@ -9,13 +9,10 @@ namespace OO {
     public class MainMenu : MonoBehaviour {
         public static bool InLanMode { get; private set; }
 
-        private Toggle lanToggle;
-
         private void Awake () {
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             var lanEnabled = Preferences.GetBool(Preferences.LAN_ENABLED);
-
-            lanToggle = GameObject.Find("LanToggle").GetComponent<Toggle>();
+            Toggle lanToggle = transform.Find("LanToggle").GetComponent<Toggle>();
             lanToggle.isOn = lanEnabled;
             SetLanMode(lanEnabled);
             lanToggle.onValueChanged.AddListener(SetLanMode);
@@ -54,7 +51,7 @@ namespace OO {
         }
 
         private static void SetLanMode (bool value) {
-            Preferences.Set(Preferences.LAN_ENABLED, value);
+            Preferences.SetBool(Preferences.LAN_ENABLED, value);
             InLanMode = value;
 
             if (InLanMode) {

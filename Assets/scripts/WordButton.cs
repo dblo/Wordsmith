@@ -7,9 +7,13 @@ namespace OO {
         private Vector2 minSeaAnchors;
         private Vector2 maxSeaAnchors;
         private AudioSource[] audioSorces;
+        private Button button;
+        private RectTransform rectTrans;
 
         private void Awake () {
             audioSorces = GetComponents<AudioSource>();
+            button = GetComponent<Button>();
+            rectTrans = GetComponent<RectTransform>();
         }
 
         public void ComputeSeaAnchors (int index) {
@@ -19,22 +23,18 @@ namespace OO {
             maxSeaAnchors = new Vector2((x + 1) / WordSea.MAX_COLS, (y + 1) / WordSea.MAX_ROWS);
         }
 
-        public void MoveToWordSea (Transform parent, Action<Button> onClickAction) {
-            var button = GetComponent<Button>();
+        public void MoveToWordSea (Transform parent, Action<Button> onClickCallback) {
             button.transform.SetParent(parent, false);
-
-            var rTrans = GetComponent<RectTransform>();
-            rTrans.anchorMin = minSeaAnchors;
-            rTrans.anchorMax = maxSeaAnchors;
+            rectTrans.anchorMin = minSeaAnchors;
+            rectTrans.anchorMax = maxSeaAnchors;
 
             if (!AudioManager.Instance.SoundMuted) {
                 audioSorces[1].Play();
             }
-            SetListener(onClickAction);
+            SetListener(onClickCallback);
         }
 
         public void MoveToButtonBar (Transform parent, float xIndex, Action<Button> onClickAction) {
-            var button = GetComponent<Button>();
             button.transform.SetParent(parent, false);
 
             float xMin;
@@ -57,25 +57,22 @@ namespace OO {
                     xMax = 0.2f * (xIndex + 1);
                     break;
                 default:
-                    throw new InvalidOperationException("Invalid ButtonBar.lineLength");
+                    throw new InvalidOperationException("Unhandled ButtonBar.lineLength");
             }
             var anchorMin = new Vector2(xMin, 0);
             var anchorMax = new Vector2(xMax, 1);
-
-            var rTrans = GetComponent<RectTransform>();
-            rTrans.anchorMin = anchorMin;
-            rTrans.anchorMax = anchorMax;
+            rectTrans.anchorMin = anchorMin;
+            rectTrans.anchorMax = anchorMax;
             SetListener(onClickAction);
         }
 
-        public void PlayChoseWordSounds () {
+        public void PlayWordChosenSounds () {
             if (!AudioManager.Instance.SoundMuted) {
                 audioSorces[0].Play();
             }
         }
 
         private void SetListener (Action<Button> action) {
-            var button = GetComponent<Button>();
             button.onClick.RemoveAllListeners();
             button.onClick.AddListener(delegate { action(button); });
         }

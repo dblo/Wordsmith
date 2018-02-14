@@ -11,12 +11,12 @@ namespace OO {
         public const string PLAYER_NAME = "player_name";
         public const string LAN_ENABLED = "lan_enabled";
 
-        public static void Set(string key, bool value) {
+        public static void SetBool(string key, bool value) {
             PlayerPrefs.SetInt(key, value ? 1 : 0);
         }
 
         public static bool GetBool(string key) {
-            return PlayerPrefs.GetInt(key) != 0;
+            return PlayerPrefs.GetInt(key, 0) != 0;
         }
     }
 }

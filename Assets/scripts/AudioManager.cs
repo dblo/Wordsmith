@@ -28,12 +28,12 @@ namespace OO {
             } else {
                 audioSource.Play();
             }
-            Preferences.Set(Preferences.MUSIC_MUTED, value);
+            Preferences.SetBool(Preferences.MUSIC_MUTED, value);
         }
 
         public void SetSoundMuted (bool value) {
             SoundMuted = value;
-            Preferences.Set(Preferences.SOUND_MUTED, value);
+            Preferences.SetBool(Preferences.SOUND_MUTED, value);
         }
     }
 }

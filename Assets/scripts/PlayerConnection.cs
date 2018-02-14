@@ -5,7 +5,8 @@ namespace OO {
     public class PlayerConnection : NetworkBehaviour {
         public string PlayerName { get; private set; }
         public string[] Words { get; private set; }
-
+        // All PlayerConnections on the server and the localPlayer instances 
+        // on the clients will comunicate with their gm instance
         private GameManager gm;
 
         public bool Ready {
@@ -13,12 +14,12 @@ namespace OO {
         }
 
         private void Start () {
-            // Need to init gm for all playerConnections on the host. Only for localPlayer necessary on clients.
             gm = GameObject.Find("GameManager").GetComponent<GameManager>();
-            if (!isLocalPlayer) return;
+            if (!isLocalPlayer)
+                return;
 
             var bb = GameObject.Find("ButtonBar").GetComponent<ButtonBar>();
-            bb.AssignLocalPlayer(this);
+            bb.SetLocalPlayer(this);
 
             var playerName = PlayerPrefs.GetString(Preferences.PLAYER_NAME);
             if (playerName.Equals("")) {
@@ -28,7 +29,7 @@ namespace OO {
             CmdLocalPlayerReady(playerName);
         }
 
-        public void Reset () {
+        public void NewRound () {
             Words = null;
         }
 

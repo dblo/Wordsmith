@@ -5,23 +5,11 @@ using UnityEngine.UI;
 
 namespace OO {
     public class LineLog : MonoBehaviour {
-        private Text playerLines;
-        private Text playerLabel;
+        [SerializeField] private Text playerLines;
+        [SerializeField] private Text playerLabel;
         private readonly List<string> lines = new List<string>();
         private const float ANCHOR_Y_MIN = 0f;
         private const float ANCHOR_Y_MAX = 1f;
-
-        private void Awake () {
-            var gos = GetComponentsInChildren<Text>();
-            foreach (var go in gos) {
-                if (go.name == "Log") {
-                    playerLines = go;
-                } else if (go.name == "Label") {
-                    playerLabel = go;
-                } else
-                    throw new InvalidOperationException("Unhandeled case");
-            }
-        }
 
         public void AddLine (string[] words, string[] colors) {
             var line = CreateRichText(words, colors);
