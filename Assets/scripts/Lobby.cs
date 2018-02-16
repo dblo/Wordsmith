@@ -93,7 +93,7 @@ namespace OO {
                 seaSizeSlider.maxValue = SEA_SIZE_DEFAULT_MAX;
                 return;
             }
-            seaSizeSlider.maxValue = Math.Min(SEA_SIZE_DEFAULT_MAX, selectedLibrary.Words.Length);
+            seaSizeSlider.maxValue = Math.Min(SEA_SIZE_DEFAULT_MAX, selectedLibrary.GetChoices(0).Length);
         }
 
         public void StartGame () {
@@ -138,21 +138,21 @@ namespace OO {
                 roomSize = rng.Next(1, (int) roomSizeSlider.maxValue + 1);
             }
             if (SeaSize == DEFAULT_SLIDER_VALUE && LineLength == DEFAULT_SLIDER_VALUE) {
-                var seaSizeMax = Math.Min(selectedLibrary.Words.Length,
+                var seaSizeMax = Math.Min(selectedLibrary.GetChoices(0).Length,
                     (int) seaSizeSlider.maxValue);
                 seaSize = rng.Next(1, seaSizeMax + 1);
 
                 var lineLengthMax = Math.Min((int) lineLengthSlider.maxValue, seaSize);
                 lineLength = rng.Next(1, lineLengthMax + 1);
             } else if (SeaSize == DEFAULT_SLIDER_VALUE && LineLength != DEFAULT_SLIDER_VALUE) {
-                var seaSizeMax = Math.Min(selectedLibrary.Words.Length,
+                var seaSizeMax = Math.Min(selectedLibrary.GetChoices(0).Length,
                     LineLength);
                 seaSize = rng.Next(1, seaSizeMax + 1);
             } else if (SeaSize != DEFAULT_SLIDER_VALUE && LineLength == DEFAULT_SLIDER_VALUE) {
                 lineLength = rng.Next(1, SeaSize + 1);
             } else if (SeaSize != DEFAULT_SLIDER_VALUE && LineLength != DEFAULT_SLIDER_VALUE) {
             }
-            Debug.Assert(seaSize <= selectedLibrary.Words.Length);
+            Debug.Assert(seaSize <= selectedLibrary.GetChoices(0).Length);
             Debug.Assert(lineLength <= seaSize);
             GameData.Instance.NewGame(selectedLibrary, roomSize, gameLength, seaSize, lineLength);
         }

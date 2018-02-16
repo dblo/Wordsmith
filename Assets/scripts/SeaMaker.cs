@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -50,7 +51,8 @@ namespace OO {
                 return;
             }
 
-            var library = new Library(seaName.text, true, seaContent.text.Split(' '));
+            var choices = new SeaContent(seaContent.text.Split(' '));
+            var library = new Library(seaName.text, true, new List<SeaContent>() { choices });
             var existingLibrary = GameData.Instance.FindLibrary(library.Name);
             if (existingLibrary == null) {
                 GameData.Instance.AddLibrary(library);
@@ -79,7 +81,7 @@ namespace OO {
             if (libraryList.HasSelection()) {
                 var library = libraryList.GetSelectedLibrary().Library;
                 seaName.text = library.Name;
-                seaContent.text = string.Join(" ", library.Words);
+                seaContent.text = string.Join(" ", library.GetChoices(0));
             } else {
                 seaName.text = "";
                 seaContent.text = "";

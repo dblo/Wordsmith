@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace OO {
     public static class LibrarySeeder {
@@ -9,16 +10,17 @@ namespace OO {
             string[] adjectives = { "good", "first", "new", "last", "long", "great", "little", "own", "other", "old", "right", "big", "high", "different", "small", "large", "next", "early", "young", "important", "few", "public", "bad", "same", "able" };
             string[] prepositions = { "to", "of", "in", "for", "on", "with", "at", "by", "from", "up", "about", "into", "over", "after" };
 
-            var library = new string[nouns.Length + verbs.Length + adjectives.Length + prepositions.Length];
-            Array.Copy(nouns, library, nouns.Length);
+            var choices = new string[nouns.Length + verbs.Length + adjectives.Length + prepositions.Length];
+            Array.Copy(nouns, choices, nouns.Length);
             var ix = nouns.Length;
-            Array.Copy(verbs, 0, library, ix, verbs.Length);
+            Array.Copy(verbs, 0, choices, ix, verbs.Length);
             ix += verbs.Length;
-            Array.Copy(adjectives, 0, library, ix, adjectives.Length);
+            Array.Copy(adjectives, 0, choices, ix, adjectives.Length);
             ix += adjectives.Length;
-            Array.Copy(prepositions, 0, library, ix, prepositions.Length);
+            Array.Copy(prepositions, 0, choices, ix, prepositions.Length);
 
-            GameData.Instance.AddLibrary(new Library("Default", false, library));
+            var content = new SeaContent(choices);
+            GameData.Instance.AddLibrary(new Library("Default", false, new List<SeaContent>() { content }));
         }
     }
 }

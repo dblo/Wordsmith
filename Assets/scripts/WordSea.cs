@@ -55,12 +55,12 @@ namespace OO {
             SetSeaInteractable(true);
         }
 
-        public static string[] GenerateNewSea (Library library, int seaSize) {
-            Debug.Assert(library.Words.Length >= seaSize);
+        public static string[] GenerateNewSea (string[] libraryWords, int seaSize) {
+            Debug.Assert(libraryWords.Length >= seaSize);
 
-            int libLen = library.Words.Length;
+            int libLen = libraryWords.Length;
             var indices = new HashSet<int>();
-            var words = new string[seaSize];
+            var seaWords = new string[seaSize];
 
             for (int i = 0; i < seaSize; i++) {
                 int r = rng.Next(libLen);
@@ -68,9 +68,9 @@ namespace OO {
                     r = rng.Next(libLen);
                 }
                 indices.Add(r);
-                words[i] = library.Words[r];
+                seaWords[i] = libraryWords[r];
             }
-            return words;
+            return seaWords;
         }
     }
 }

@@ -27,7 +27,7 @@ namespace OO {
                 return;
 
             players.ForEach((p) => p.CmdSynchronizeName());
-            var newWordSea = WordSea.GenerateNewSea(GameData.Instance.SelectedLibrary, GameData.Instance.GetSeaSize());
+            var newWordSea = WordSea.GenerateNewSea(GameData.Instance.SelectedLibrary.GetChoices(0), GameData.Instance.GetSeaSize());
 
             var libraryJson = JsonUtility.ToJson(GameData.Instance.SelectedLibrary);
             RpcOnAllPlayersJoined(libraryJson, newWordSea, GameData.Instance.GetRoomSize(),
@@ -81,7 +81,7 @@ namespace OO {
             if (GameOver()) {
                 RpcAllPlayersReady(null);
             } else {
-                var newWordSea = WordSea.GenerateNewSea(GameData.Instance.SelectedLibrary, GameData.Instance.GetSeaSize());
+                var newWordSea = WordSea.GenerateNewSea(GameData.Instance.SelectedLibrary.GetChoices(0), GameData.Instance.GetSeaSize());
                 RpcAllPlayersReady(newWordSea);
             }
         }

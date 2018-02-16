@@ -6,14 +6,11 @@ using System;
 namespace OO {
     [Serializable]
     public class GameData {
-        public static GameData Instance {
-            get {
-                return instance ?? (instance =
-                           Load(Application.persistentDataPath + "/gamedata.dat"));
-            }
-        }
+        public enum LibraryType { Free, Fixed, Query }
+
         public Library SelectedLibrary { get; private set; }
         public int LibraryCount { get { return libraries.Count; } }
+        public static LibraryType ActiveLibraryType { get; private set; }
 
         private static GameData instance;
         [SerializeField] private List<Library> libraries;
@@ -22,6 +19,13 @@ namespace OO {
         [SerializeField] private int seaSize;
         [SerializeField] private int lineLength;
         private string savePath;
+
+        public static GameData Instance {
+            get {
+                return instance ?? (instance =
+                           Load(Application.persistentDataPath + "/gamedata.dat"));
+            }
+        }
 
         public Library GetLibrary (int ix) {
             return libraries[ix];
