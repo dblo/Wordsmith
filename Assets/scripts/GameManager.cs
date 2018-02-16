@@ -147,7 +147,10 @@ namespace OO {
             var canvas = GameObject.Find("Canvas");
             var go = Instantiate(scorePanel, canvas.transform);
             var sp = go.GetComponent<ScorePanel>();
-            sp.Setup(colorWordMapper.Scores);
+
+            var maxScore = GameData.Instance.GetLineLength() * GameData.Instance.GetGameLength() 
+                * ColorMapper.GREEN_SCORE;
+            sp.Setup(colorWordMapper.Score, maxScore);
         }
 
         private bool AllPlayersReady () {

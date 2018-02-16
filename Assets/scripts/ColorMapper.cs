@@ -4,19 +4,16 @@ using System.Linq;
 
 namespace OO {
     public class ColorMapper {
-        private const int PERFECT_SCORE_BONUS = 2;
+        public int Score { get; private set; }
+
+        public const int GREEN_SCORE = 2;
+        public const int YELLOW_SCORE = 1;
         private readonly List<string[]> playersWords;
         private readonly List<string[]> colors;
-        private readonly List<int> playersScore;
 
         public ColorMapper (int playerCount) {
-            playersScore = new List<int>(Enumerable.Repeat(0, playerCount).ToArray());
             playersWords = new List<string[]>(playerCount);
             colors = new List<string[]>(playerCount);
-        }
-
-        public List<int> Scores {
-            get { return playersScore; }
         }
 
         // Returns list where element i contains the colors that correspond to the 
@@ -61,9 +58,9 @@ namespace OO {
                     }
                 }
             }
-            // Remove all words not chosen by at least 2 players
+            // Remove all words not chosen by all players
             foreach (var key in wordDict.Keys.ToList()) {
-                if (wordDict[key] < 2)
+                if (wordDict[key] < players.Count)
                     wordDict.Remove(key);
             }
             foreach (var key in wordDict.Keys.ToList()) {
@@ -86,18 +83,12 @@ namespace OO {
         }
 
         public void ComputeScore () {
-            for (var i = 0; i < colors.Count; i++) {
-                var score = 0;
-                foreach (var c in colors[i]) {
-                    if (c == "green") {
-                        score += 2;
-                    } else if (c == "yellow") {
-                        score += 1;
-                    } // else red so grant no points
-                }
-                if (PerfectScore(GameData.Instance.GetLineLength(), score))
-                    score += PERFECT_SCORE_BONUS;
-                playersScore[i] += score;
+            foreach (var c in colors[0]) {
+                if (c == "green") {
+                    Score += GREEN_SCORE;
+                } else if (c == "yellow") {
+                    Score += YELLOW_SCORE;
+                } // else red so grant no points
             }
         }
 
@@ -107,11 +98,6 @@ namespace OO {
 
         public static string[] GetTemporaryWordColors (int length) {
             return Enumerable.Repeat("white", length).ToArray();
-        }
-
-        // True if score is such that 2 points per word was awarded
-        private static bool PerfectScore (int wordCount, int score) {
-            return score == wordCount * 2;
         }
     }
 }
