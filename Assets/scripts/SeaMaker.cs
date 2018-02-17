@@ -51,8 +51,18 @@ namespace OO {
                 return;
             }
 
-            var choices = new SeaContent(seaContent.text.Split(' '));
-            var library = new Library(seaName.text, true, new List<SeaContent>() { choices });
+            List<SeaContent> seaChoices = new List<SeaContent>();
+            if (seaContent.text.Contains("\n")) {
+                var roundContent = seaContent.text.Split('\n');
+                foreach (var row in roundContent) {
+                    seaChoices.Add(new SeaContent(row.Split(' ')));
+                }
+            } else {
+                SeaContent choices = new SeaContent(seaContent.text.Split(' '));
+                seaChoices.Add(choices);
+            }
+
+            var library = new Library(seaName.text, true, seaChoices);
             var existingLibrary = GameData.Instance.FindLibrary(library.Name);
             if (existingLibrary == null) {
                 GameData.Instance.AddLibrary(library);
@@ -81,7 +91,7 @@ namespace OO {
             if (libraryList.HasSelection()) {
                 var library = libraryList.GetSelectedLibrary().Library;
                 seaName.text = library.Name;
-                seaContent.text = string.Join(" ", library.GetChoices(0));
+                seaContent.text = library.GetAllChoices();
             } else {
                 seaName.text = "";
                 seaContent.text = "";

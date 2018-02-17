@@ -773,7 +773,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Game Length
+  m_Text: Game length
 --- !u!222 &579849667
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1378,7 +1378,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Line length
+  m_Text: Picks
 --- !u!222 &943026056
 CanvasRenderer:
   m_ObjectHideFlags: 0

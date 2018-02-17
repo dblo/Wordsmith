@@ -34,12 +34,12 @@ namespace OO {
             SetListener(onClickCallback);
         }
 
-        public void MoveToButtonBar (Transform parent, float xIndex, Action<Button> onClickAction) {
+        public void MoveToButtonBar (Transform parent, int lineLength, float xIndex, Action<Button> onClickAction) {
             button.transform.SetParent(parent, false);
 
             float xMin;
             float xMax;
-            switch (GameData.Instance.GetLineLength()) {
+            switch (lineLength) {
                 case 1:
                     xMin = 0.3f;
                     xMax = 0.5f;

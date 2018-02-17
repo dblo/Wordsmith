@@ -10,7 +10,6 @@ namespace OO {
 
         public Library SelectedLibrary { get; private set; }
         public int LibraryCount { get { return libraries.Count; } }
-        public static LibraryType ActiveLibraryType { get; private set; }
 
         private static GameData instance;
         [SerializeField] private List<Library> libraries;
@@ -19,6 +18,7 @@ namespace OO {
         [SerializeField] private int seaSize;
         [SerializeField] private int lineLength;
         private string savePath;
+        private LibraryType libraryType;
 
         public static GameData Instance {
             get {
@@ -47,6 +47,10 @@ namespace OO {
             return lineLength;
         }
 
+        public LibraryType GetLibraryType () {
+            return libraryType;
+        }
+
         private void Save () {
             var json = JsonUtility.ToJson(this);
             File.WriteAllText(savePath, json);
@@ -72,12 +76,13 @@ namespace OO {
                 throw new InvalidOperationException("Could not find library to be deleted.");
         }
 
-        public void NewGame (Library selectedLibrary, int roomSize, int gameLength, int seaSize, int lineLength) {
+        public void NewGame (Library selectedLibrary, int roomSize, int gameLength, int seaSize, int lineLength, LibraryType libraryType) {
             SelectedLibrary = selectedLibrary;
             this.roomSize = roomSize;
             this.gameLength = gameLength;
             this.seaSize = seaSize;
             this.lineLength = lineLength;
+            this.libraryType = libraryType;
             Save();
         }
 

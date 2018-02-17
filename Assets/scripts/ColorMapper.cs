@@ -12,8 +12,8 @@ namespace OO {
         private readonly List<string[]> colors;
 
         public ColorMapper (int playerCount) {
-            playersWords = new List<string[]>(playerCount);
-            colors = new List<string[]>(playerCount);
+            playersWords = new List<string[]>(GameManager.MAX_PLAYERS);
+            colors = new List<string[]>(GameManager.MAX_PLAYERS);
         }
 
         // Returns list where element i contains the colors that correspond to the 
@@ -22,15 +22,15 @@ namespace OO {
             return colors;
         }
 
-        public void ComputeColors (List<PlayerConnection> players) {
+        public void ComputeColors (List<PlayerConnection> players, int picks) {
             playersWords.Clear();
             colors.Clear();
 
             foreach (var p in players) {
                 playersWords.Add((string[]) p.Words.Clone());
-                colors.Add(GetInitialColors(GameData.Instance.GetLineLength()));
+                colors.Add(GetInitialColors(picks));
             }
-            for (var i = 0; i < GameData.Instance.GetLineLength(); i++) {
+            for (var i = 0; i < picks; i++) {
                 var word = playersWords[0][i];
                 var j = 1;
                 for (; j < players.Count; j++) {

@@ -88,12 +88,18 @@ namespace OO {
 
         private void OnLibrarySelectionChange () {
             var selectedLibrary = libraryList.GetSelectedLibrary().Library;
-            if (selectedLibrary == null) {
-                // Selected the "Any" element so allow any sea size
+            if (selectedLibrary == null) { // Selected the "Any" element so allow any sea size
                 seaSizeSlider.maxValue = SEA_SIZE_DEFAULT_MAX;
                 return;
             }
-            seaSizeSlider.maxValue = Math.Min(SEA_SIZE_DEFAULT_MAX, selectedLibrary.GetChoices(0).Length);
+            if (selectedLibrary.GetLibraryType() == GameData.LibraryType.Fixed) {
+                gameLengthSlider.gameObject.SetActive(false);
+                seaSizeSlider.gameObject.SetActive(false);
+            } else {
+                gameLengthSlider.gameObject.SetActive(true);
+                seaSizeSlider.gameObject.SetActive(true);
+                seaSizeSlider.maxValue = Math.Min(SEA_SIZE_DEFAULT_MAX, selectedLibrary.GetChoices(0).Length);
+            }
         }
 
         public void StartGame () {
@@ -153,8 +159,13 @@ namespace OO {
             } else if (SeaSize != DEFAULT_SLIDER_VALUE && LineLength != DEFAULT_SLIDER_VALUE) {
             }
             Debug.Assert(seaSize <= selectedLibrary.GetChoices(0).Length);
-            Debug.Assert(lineLength <= seaSize);
-            GameData.Instance.NewGame(selectedLibrary, roomSize, gameLength, seaSize, lineLength);
+            //Debug.Assert(lineLength <= seaSize);
+
+            if (selectedLibrary.GetLibraryType() == GameData.LibraryType.Fixed) {
+                gameLength = selectedLibrary.RoundCount;
+                seaSize = selectedLibrary.GetChoices(0).Length;
+            }
+            GameData.Instance.NewGame(selectedLibrary, roomSize, gameLength, seaSize, lineLength, GameData.LibraryType.Fixed);
         }
 
         private string CreateRoomName () {
@@ -238,7 +249,11 @@ namespace OO {
                 seaSizeLabel.text = "Sea size: Any";
             } else {
                 seaSizeLabel.text = "Sea size: " + value;
-                lineLengthSlider.maxValue = Math.Min(LINE_LENGTH_DEFAULT_MAX, value);
+
+                var selectedLibrary = GameData.Instance.SelectedLibrary;
+                if (selectedLibrary != null && selectedLibrary.GetLibraryType() == GameData.LibraryType.Free) {
+                    lineLengthSlider.maxValue = Math.Min(LINE_LENGTH_DEFAULT_MAX, value);
+                }
             }
         }
 

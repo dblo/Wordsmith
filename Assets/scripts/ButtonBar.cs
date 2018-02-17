@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +15,7 @@ namespace OO {
         private const float BUTTON_ANCHOR_X_WIDTH = 0.2f;
         private readonly List<Button> buttons = new List<Button>();
         private PlayerConnection localPlayer;
+        private int currentLineLength;
 
         public void OnGameOver () {
             waitingText.enabled = false;
@@ -32,7 +34,7 @@ namespace OO {
             if (AllWordsChosen())
                 return false;
 
-            btn.GetComponent<WordButton>().MoveToButtonBar(transform, buttons.Count, OnClickWordButton);
+            btn.GetComponent<WordButton>().MoveToButtonBar(transform, currentLineLength, buttons.Count, OnClickWordButton);
             buttons.Add(btn);
 
             if (AllWordsChosen())
@@ -51,11 +53,13 @@ namespace OO {
             goButton.interactable = false;
         }
         public void GameStarting () {
+            currentLineLength = GameData.Instance.GetLineLength();
             playersJoiningText.SetActive(false);
             ToggleShowInfoText(true);
         }
 
-        public void NewRound () {
+        public void NewRound (int picks) {
+            currentLineLength = picks;
             waitingText.enabled = false;
             ToggleShowInfoText(true);
         }
@@ -63,7 +67,7 @@ namespace OO {
         private void ToggleShowInfoText (bool show) {
             infoText.enabled = show;
             if (show) {
-                infoText.text = "Compose a line of " + GameData.Instance.GetLineLength() + " words.";
+                infoText.text = "Compose a line of " + currentLineLength + " words.";
             }
         }
 
@@ -89,7 +93,7 @@ namespace OO {
 
         public void OnClickSaveLibraryButton () {
             saveLibraryButton.gameObject.SetActive(false);
-            wordSea.SaveLibrary();
+            GameData.Instance.AddLibrary(GameData.Instance.SelectedLibrary);
         }
 
         private string[] GetWords () {
@@ -101,7 +105,7 @@ namespace OO {
         }
 
         private bool AllWordsChosen () {
-            return buttons.Count == GameData.Instance.GetLineLength();
+            return buttons.Count == currentLineLength;
         }
 
         private void MoveWordsIfNeeded (Button btn) {
