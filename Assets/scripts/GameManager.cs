@@ -29,16 +29,16 @@ namespace OO {
                 return;
 
             players.ForEach((p) => p.CmdSynchronizeName());
-            var libraryJson = JsonUtility.ToJson(GameData.Instance.SelectedLibrary);
+            var libraryJson = JsonUtility.ToJson(GameData.Library);
             var newWordSea = GenerateNewSea();
-            RpcOnAllPlayersJoined(libraryJson, newWordSea, GameData.Instance.GetRoomSize(),
-                GameData.Instance.GetGameLength(), GameData.Instance.GetLineLength());
+            RpcOnAllPlayersJoined(libraryJson, newWordSea, GameData.PlayerCount,
+                GameData.GameLength, GameData.Picks);
         }
 
         private static string[] GenerateNewSea () {
             string[] newWordSea = null;
-            if (GameData.Instance.GetLibraryType() == GameData.LibraryType.Free) {
-                newWordSea = WordSea.GenerateNewSea(GameData.Instance.SelectedLibrary.GetChoices(0), GameData.Instance.GetSeaSize());
+            if (GameData.Library.Type == LibraryType.Free) {
+                newWordSea = WordSea.GenerateNewSea(GameData.Library.GetSea(0), GameData.SeaSize);
             } // else leave as null, clients will refer to the library to get the sea each round
             return newWordSea;
         }
@@ -47,7 +47,7 @@ namespace OO {
         private void RpcOnAllPlayersJoined (string libraryJson, string[] newWordSea, int playercount,
                                             int gameLength, int lineLength) {
             var library = JsonUtility.FromJson<Library>(libraryJson);
-            GameData.Instance.NewGame(library, playercount, gameLength, newWordSea.Length, lineLength, GameData.LibraryType.Fixed);
+            GameData.NewGame(library, playercount, gameLength, newWordSea.Length, lineLength);
 
             players = FindSortedPlayers();
             colorWordMapper = new ColorMapper(playercount);
@@ -55,7 +55,9 @@ namespace OO {
             libraryNameDisplay.text = library.Name;
             UpdateRoundDisplay();
             CreateLineLogs();
-            buttonBar.GameStarting();
+
+            int picks = Math.Min(GameData.Library.GetSea(currentRound).Length, GameData.Picks);
+            buttonBar.GameStarting(picks);
             wordSea.CreateUi();
             ChangeSea(newWordSea);
         }
@@ -99,11 +101,12 @@ namespace OO {
         private void RpcAllPlayersReady (string[] newWordSea) {
             RemoveTemporaryWords();
 
-            colorWordMapper.ComputeColors(players, Math.Min(GameData.Instance.SelectedLibrary.GetChoices(currentRound).Length, GameData.Instance.GetLineLength()));
+            int picks = Math.Min(GameData.Library.GetSea(currentRound).Length, GameData.Picks);
+            colorWordMapper.ComputeColors(players, picks);
             colorWordMapper.ComputeScore();
             AddWordsToLineLogs(colorWordMapper.GetColors());
             currentRound++;
-            
+
             if (GameOver()) {
                 buttonBar.OnGameOver();
                 ShowGameOverScreen();
@@ -112,14 +115,15 @@ namespace OO {
                 foreach (var p in players) {
                     p.NewRound();
                 }
-                buttonBar.NewRound(Math.Min(GameData.Instance.SelectedLibrary.GetChoices(currentRound).Length, GameData.Instance.GetLineLength()));
+                int newPicksCount = Math.Min(GameData.Library.GetSea(currentRound).Length, GameData.Picks);
+                buttonBar.NewRound(newPicksCount);
                 ChangeSea(newWordSea);
             }
         }
 
         private void ChangeSea (string[] newWordSea) {
             if (newWordSea == null || newWordSea.Length == 0) { // Length check only necessary because UNET doesnt serialize string[] null correctly
-                if (GameData.Instance.GetLibraryType() == GameData.LibraryType.Free)
+                if (GameData.Library.Type == LibraryType.Free)
                     throw new InvalidOperationException("NewWordSea null in Free mode.");
                 wordSea.SetNewSea(currentRound);
             } else {
@@ -128,7 +132,8 @@ namespace OO {
         }
 
         private void UpdateRoundDisplay () {
-            roundDisplay.text = currentRound + 1 + "/" + GameData.Instance.GetGameLength();
+            int roundNumberOneBased = currentRound + 1;
+            roundDisplay.text = roundNumberOneBased + "/" + GameData.GameLength;
         }
 
         public void AddTemporaryWordsToLineLog (string[] words) {
@@ -167,8 +172,7 @@ namespace OO {
             var go = Instantiate(scorePanel, canvas.transform);
             var sp = go.GetComponent<ScorePanel>();
 
-            var maxScore = GameData.Instance.GetLineLength() * GameData.Instance.GetGameLength()
-                * ColorMapper.GREEN_SCORE;
+            var maxScore = GameData.Picks * GameData.GameLength * ColorMapper.GREEN_SCORE;
             sp.Setup(colorWordMapper.Score, maxScore);
         }
 
@@ -181,11 +185,11 @@ namespace OO {
         }
 
         private bool GameOver () {
-            return currentRound == GameData.Instance.GetGameLength();
+            return currentRound == GameData.GameLength;
         }
 
         private bool IsGameFull () {
-            return players.Count == GameData.Instance.GetRoomSize();
+            return players.Count == GameData.PlayerCount;
         }
 
         public static void LaunchMainMenu () {

@@ -52,8 +52,8 @@ namespace OO {
             wordSea.ReturnWord(btn);
             goButton.interactable = false;
         }
-        public void GameStarting () {
-            currentLineLength = GameData.Instance.GetLineLength();
+        public void GameStarting (int picks) {
+            currentLineLength = picks;
             playersJoiningText.SetActive(false);
             ToggleShowInfoText(true);
         }
@@ -93,7 +93,7 @@ namespace OO {
 
         public void OnClickSaveLibraryButton () {
             saveLibraryButton.gameObject.SetActive(false);
-            GameData.Instance.AddLibrary(GameData.Instance.SelectedLibrary);
+            LibraryManager.Instance.AddLibrary(GameData.Library);
         }
 
         private string[] GetWords () {

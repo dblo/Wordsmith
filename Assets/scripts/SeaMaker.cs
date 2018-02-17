@@ -34,7 +34,7 @@ namespace OO {
 
             Action delete = () => {
                 var selectedLibrary = libraryList.GetSelectedLibrary().Library;
-                GameData.Instance.DeleteLibrary(selectedLibrary);
+                LibraryManager.Instance.DeleteLibrary(selectedLibrary);
                 libraryList.DeleteSelected();
             };
             var msg = "Really delete " + libraryList.GetSelectedLibrary().Library.Name + "?";
@@ -63,14 +63,14 @@ namespace OO {
             }
 
             var library = new Library(seaName.text, true, seaChoices);
-            var existingLibrary = GameData.Instance.FindLibrary(library.Name);
+            var existingLibrary = LibraryManager.Instance.FindLibrary(library.Name);
             if (existingLibrary == null) {
-                GameData.Instance.AddLibrary(library);
+                LibraryManager.Instance.AddLibrary(library);
                 libraryList.AddListElement(library);
                 return;
             }
             Action overwrite = () => {
-                GameData.Instance.ReplaceLibrary(library);
+                LibraryManager.Instance.ReplaceLibrary(library);
                 libraryList.GetSelectedLibrary().Library = library;
             };
             var msg = existingLibrary.PlayerMade ? "Overwrite?" : "Overwrite DEFAULT library?";

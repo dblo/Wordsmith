@@ -1,109 +1,29 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using UnityEngine;
-using System;
+﻿using System;
 
 namespace OO {
     [Serializable]
-    public class GameData {
-        public enum LibraryType { Free, Fixed, Query }
+    public static class GameData {
+        public static Library Library { get; private set; }
+        public static int PlayerCount { get; private set; }
+        public static int GameLength { get; private set; }
+        public static int SeaSize { get; private set; }
+        public static int Picks { get; private set; }
 
-        public Library SelectedLibrary { get; private set; }
-        public int LibraryCount { get { return libraries.Count; } }
-
-        private static GameData instance;
-        [SerializeField] private List<Library> libraries;
-        [SerializeField] private int roomSize;
-        [SerializeField] private int gameLength;
-        [SerializeField] private int seaSize;
-        [SerializeField] private int lineLength;
-        private string savePath;
-        private LibraryType libraryType;
-
-        public static GameData Instance {
-            get {
-                return instance ?? (instance =
-                           Load(Application.persistentDataPath + "/gamedata.dat"));
-            }
+        public static void SetSeaSize (int size) {
+            SeaSize = size;
         }
 
-        public Library GetLibrary (int ix) {
-            return libraries[ix];
+        public static void SetPicks (int picks) {
+            Picks = picks;
         }
 
-        public int GetRoomSize () {
-            return roomSize;
-        }
-
-        public int GetGameLength () {
-            return gameLength;
-        }
-
-        public int GetSeaSize () {
-            return seaSize;
-        }
-
-        public int GetLineLength () {
-            return lineLength;
-        }
-
-        public LibraryType GetLibraryType () {
-            return libraryType;
-        }
-
-        private void Save () {
-            var json = JsonUtility.ToJson(this);
-            File.WriteAllText(savePath, json);
-        }
-
-        private static GameData Load (string path) {
-            if (!File.Exists(path)) {
-                return new GameData() {
-                    savePath = path,
-                    libraries = new List<Library>()
-                };
-            }
-            var json = File.ReadAllText(path);
-            var data = JsonUtility.FromJson<GameData>(json);
-            data.savePath = path;
-            return data;
-        }
-
-        public void DeleteLibrary (Library library) {
-            if (libraries.Remove(library)) {
-                Save();
-            } else
-                throw new InvalidOperationException("Could not find library to be deleted.");
-        }
-
-        public void NewGame (Library selectedLibrary, int roomSize, int gameLength, int seaSize, int lineLength, LibraryType libraryType) {
-            SelectedLibrary = selectedLibrary;
-            this.roomSize = roomSize;
-            this.gameLength = gameLength;
-            this.seaSize = seaSize;
-            this.lineLength = lineLength;
-            this.libraryType = libraryType;
-            Save();
-        }
-
-        public Library FindLibrary (string name) {
-            return libraries.Find(l => l.Name.Equals(name));
-        }
-
-        public void ReplaceLibrary (Library library) {
-            for (var i = 0; i < libraries.Count; i++) {
-                if (!libraries[i].Name.Equals(library.Name))
-                    continue;
-                libraries[i] = library;
-                Save();
-                return;
-            }
-            throw new InvalidOperationException("No library to replace was found.");
-        }
-
-        public void AddLibrary (Library library) {
-            libraries.Add(library);
-            Save();
+        public static void NewGame (Library library, int playerCount, int gameLength,
+            int seaSize, int picks) {
+            Library = library;
+            PlayerCount = playerCount;
+            GameLength = gameLength;
+            SeaSize = seaSize;
+            Picks = picks;
         }
     }
 }

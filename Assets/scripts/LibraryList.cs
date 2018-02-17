@@ -8,6 +8,7 @@ namespace OO {
         [SerializeField] private Color selectedColor;
         [SerializeField] private Color normalColor;
         [SerializeField] private Transform content;
+        [SerializeField] private bool selectFirst;
 
         private Button selectedElement;
         private Action onSelectedAction; // Callback set by externals
@@ -30,8 +31,8 @@ namespace OO {
         }
 
         private void SetupLibraries () {
-            for (int i = 0; i < GameData.Instance.LibraryCount; i++) {
-                AddListElement(GameData.Instance.GetLibrary(i));
+            for (int i = 0; i < LibraryManager.Instance.LibraryCount; i++) {
+                AddListElement(LibraryManager.Instance.GetLibrary(i));
             }
         }
 
@@ -49,7 +50,7 @@ namespace OO {
             var btn = go.GetComponent<Button>();
             btn.onClick.AddListener(() => SetSelectedListElement(btn));
 
-            if (selectedElement == null)
+            if (selectedElement == null && selectFirst)
                 SetSelectedListElement(btn);
         }
 

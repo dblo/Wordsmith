@@ -20,7 +20,7 @@ namespace OO {
             Array.Copy(prepositions, 0, choices, ix, prepositions.Length);
 
             var content = new SeaContent(choices);
-            GameData.Instance.AddLibrary(new Library("Default", false, new List<SeaContent>() { content }));
+            LibraryManager.Instance.AddLibrary(new Library("Default", false, new List<SeaContent>() { content }));
         }
     }
 }

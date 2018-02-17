@@ -15,29 +15,29 @@ namespace OO {
         public bool PlayerMade { get { return playerMade; } }
         public int RoundCount { get { return content.Count; } }
 
-        public string[] GetChoices (int index) {
-            return content[index].Choices;
+        public LibraryType Type {
+            get {
+                if (content.Count == 1)
+                    return LibraryType.Free;
+                else if (content[0] is SeaContent)
+                    return LibraryType.Fixed;
+                else
+                    throw new InvalidOperationException("Unhandled library type");
+            }
         }
 
-        public GameData.LibraryType GetLibraryType() {
-            if (content.Count == 1)
-                return GameData.LibraryType.Free;
-            else if (content[0] is SeaContent)
-                return GameData.LibraryType.Fixed;
-            //else if (content[0] is Query)
-            //    return GameData.LibraryType.Query;
-            else
-                throw new InvalidOperationException("Unhandled library type");
+        public string[] GetSea (int index) {
+            return content[index].Choices;
         }
 
         public string GetAllChoices () {
             string res = "";
-            for (int i = 0;;) {
+            for (int i = 0; ;) {
                 res += string.Join(" ", content[i].Choices);
 
                 i++;
                 if (i < content.Count) {
-                    res += "\n\n";
+                    res += "\n";
                 } else
                     break;
             }

@@ -29,9 +29,8 @@ namespace OO {
         }
 
         public void CreateUi () {
-            int seaSize = GameData.Instance.GetSeaSize();
-            buttons = new List<Button>(seaSize);
-            CreateButtons(seaSize);
+            buttons = new List<Button>(GameData.SeaSize);
+            CreateButtons(GameData.SeaSize);
         }
 
         private void CreateButtons (int seaSize) {
@@ -45,7 +44,7 @@ namespace OO {
         }
 
         public void SetNewSea (int roundNumber) {
-            var newSea = GameData.Instance.SelectedLibrary.GetChoices(roundNumber);
+            var newSea = GameData.Library.GetSea(roundNumber);
             if(buttons.Count != newSea.Length) {
                 buttons.ForEach(b => Destroy(b.gameObject));
                 buttons.Clear();
