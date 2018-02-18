@@ -22,15 +22,15 @@ namespace OO {
             return colors;
         }
 
-        public void ComputeColors (List<PlayerConnection> players, int picks) {
+        public void ComputeColors (List<PlayerConnection> players) {
             playersWords.Clear();
             colors.Clear();
 
             foreach (var p in players) {
                 playersWords.Add((string[]) p.Words.Clone());
-                colors.Add(GetInitialColors(picks));
+                colors.Add(GetInitialColors(GameData.Picks));
             }
-            for (var i = 0; i < picks; i++) {
+            for (var i = 0; i < GameData.Picks; i++) {
                 var word = playersWords[0][i];
                 var j = 1;
                 for (; j < players.Count; j++) {

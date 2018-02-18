@@ -8,22 +8,33 @@ namespace OO {
         public static int GameLength { get; private set; }
         public static int SeaSize { get; private set; }
         public static int Picks { get; private set; }
+        public static int CurrentRound { get; private set; }
+        public static int PrefferedPicks { get; private set; }
 
         public static void SetSeaSize (int size) {
             SeaSize = size;
         }
 
-        public static void SetPicks (int picks) {
-            Picks = picks;
+        public static void NewRound () {
+            CurrentRound++;
+
+            if (CurrentRound < GameLength)
+                UpdatePicks();
         }
 
         public static void NewGame (Library library, int playerCount, int gameLength,
-            int seaSize, int picks) {
+            int seaSize, int prefferedPicks) {
             Library = library;
             PlayerCount = playerCount;
             GameLength = gameLength;
             SeaSize = seaSize;
-            Picks = picks;
+            CurrentRound = 0;
+            PrefferedPicks = prefferedPicks;
+            UpdatePicks();
+        }
+
+        private static void UpdatePicks () {
+            Picks = Math.Min(Library.GetSea(CurrentRound).Length, PrefferedPicks);
         }
     }
 }

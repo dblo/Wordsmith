@@ -43,17 +43,12 @@ namespace OO {
             }
         }
 
-        public void SetNewSea (int roundNumber) {
-            var newSea = GameData.Library.GetSea(roundNumber);
-            if(buttons.Count != newSea.Length) {
+        public void SetNewSea (string[] words) {
+            if(buttons.Count != words.Length) {
                 buttons.ForEach(b => Destroy(b.gameObject));
                 buttons.Clear();
-                CreateButtons(newSea.Length);
+                CreateButtons(words.Length);
             }
-            SetNewSea(newSea);
-        }
-
-        public void SetNewSea (string[] words) {
             for (int i = 0; i < words.Length; i++) {
                 var text = buttons[i].GetComponentInChildren<Text>();
                 text.text = words[i];

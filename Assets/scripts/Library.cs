@@ -27,7 +27,9 @@ namespace OO {
         }
 
         public string[] GetSea (int index) {
-            return content[index].Choices;
+            if (Type == LibraryType.Fixed) // todo this is dirty hack
+                return content[index].Choices;
+            return content[0].Choices;
         }
 
         public string GetAllChoices () {
@@ -47,6 +49,22 @@ namespace OO {
 
         public Color Color {
             get { return playerMade ? PLAYER_MADE_COLOR : DEVELOPER_MADE_COLOR; }
+        }
+
+        public int GetTotalWordsPicked () {
+            if (Type == LibraryType.Free)
+                return GameData.Picks * GameData.GameLength;
+            else if (Type == LibraryType.Fixed) {
+                int count = 0;
+                foreach (var sc in content) {
+                    if (GameData.PrefferedPicks <= sc.Choices.Length) {
+                        count += GameData.PrefferedPicks;
+                    } else {
+                        count += sc.Choices.Length;
+                    }
+                }
+                return count;
+            } else throw new InvalidOperationException("Unhandled case");
         }
 
         public Library (string name, bool playerMade, List<SeaContent> content) {

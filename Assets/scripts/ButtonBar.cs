@@ -15,7 +15,6 @@ namespace OO {
         private const float BUTTON_ANCHOR_X_WIDTH = 0.2f;
         private readonly List<Button> buttons = new List<Button>();
         private PlayerConnection localPlayer;
-        private int currentLineLength;
 
         public void OnGameOver () {
             waitingText.enabled = false;
@@ -34,7 +33,7 @@ namespace OO {
             if (AllWordsChosen())
                 return false;
 
-            btn.GetComponent<WordButton>().MoveToButtonBar(transform, currentLineLength, buttons.Count, OnClickWordButton);
+            btn.GetComponent<WordButton>().MoveToButtonBar(transform, GameData.Picks, buttons.Count, OnClickWordButton);
             buttons.Add(btn);
 
             if (AllWordsChosen())
@@ -52,14 +51,12 @@ namespace OO {
             wordSea.ReturnWord(btn);
             goButton.interactable = false;
         }
-        public void GameStarting (int picks) {
-            currentLineLength = picks;
+        public void GameStarting () {
             playersJoiningText.SetActive(false);
             ToggleShowInfoText(true);
         }
 
-        public void NewRound (int picks) {
-            currentLineLength = picks;
+        public void NewRound () {
             waitingText.enabled = false;
             ToggleShowInfoText(true);
         }
@@ -67,7 +64,7 @@ namespace OO {
         private void ToggleShowInfoText (bool show) {
             infoText.enabled = show;
             if (show) {
-                infoText.text = "Compose a line of " + currentLineLength + " words.";
+                infoText.text = "Compose a line of " + GameData.Picks + " words.";
             }
         }
 
@@ -105,7 +102,7 @@ namespace OO {
         }
 
         private bool AllWordsChosen () {
-            return buttons.Count == currentLineLength;
+            return buttons.Count == GameData.Picks;
         }
 
         private void MoveWordsIfNeeded (Button btn) {
