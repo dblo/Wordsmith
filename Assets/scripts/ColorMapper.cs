@@ -8,13 +8,8 @@ namespace OO {
 
         public const int GREEN_SCORE = 2;
         public const int YELLOW_SCORE = 1;
-        private readonly List<string[]> playersWords;
-        private readonly List<string[]> colors;
-
-        public ColorMapper (int playerCount) {
-            playersWords = new List<string[]>(GameManager.MAX_PLAYERS);
-            colors = new List<string[]>(GameManager.MAX_PLAYERS);
-        }
+        private readonly List<string[]> playersWords = new List<string[]>();
+        private readonly List<string[]> colors = new List<string[]>();
 
         // Returns list where element i contains the colors that correspond to the 
         // words for player i as sent to ComputeColors

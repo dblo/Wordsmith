@@ -11,10 +11,6 @@ namespace OO {
         public static int CurrentRound { get; private set; }
         public static int PrefferedPicks { get; private set; }
 
-        public static void SetSeaSize (int size) {
-            SeaSize = size;
-        }
-
         public static void NewRound () {
             CurrentRound++;
 

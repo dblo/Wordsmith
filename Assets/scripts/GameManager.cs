@@ -7,7 +7,6 @@ using System;
 
 namespace OO {
     public class GameManager : NetworkBehaviour {
-        public const int MAX_PLAYERS = 3;
         [SerializeField] private WordSea wordSea;
         [SerializeField] private ButtonBar buttonBar;
         [SerializeField] private ScorePanel scorePanel;
@@ -15,7 +14,7 @@ namespace OO {
         [SerializeField] private Text libraryNameDisplay;
         private readonly List<LineLog> lineLogs = new List<LineLog>();
         private List<PlayerConnection> players;
-        private ColorMapper colorWordMapper;
+        private ColorMapper colorWordMapper = new ColorMapper();
 
         public override void OnStartServer () {
             players = new List<PlayerConnection>();
@@ -49,14 +48,12 @@ namespace OO {
             GameData.NewGame(library, playercount, gameLength, newWordSea.Length, lineLength);
 
             players = FindSortedPlayers();
-            colorWordMapper = new ColorMapper(playercount);
 
             libraryNameDisplay.text = library.Name;
             UpdateRoundDisplay();
             CreateLineLogs();
 
             buttonBar.GameStarting();
-            wordSea.CreateUi();
             ChangeSea(newWordSea);
         }
 

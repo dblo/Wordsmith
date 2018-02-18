@@ -9,7 +9,7 @@ namespace OO {
         public const int MAX_COLS = 4;
         public const int MAX_ROWS = 3;
 
-        private List<Button> buttons;
+        private List<Button> buttons = new List<Button>(MAX_COLS * MAX_ROWS);
         private static System.Random rng = new System.Random();
 
         public void ReturnWord (Button btn) {
@@ -26,11 +26,6 @@ namespace OO {
             foreach (var b in buttons) {
                 b.interactable = value;
             }
-        }
-
-        public void CreateUi () {
-            buttons = new List<Button>(GameData.SeaSize);
-            CreateButtons(GameData.SeaSize);
         }
 
         private void CreateButtons (int seaSize) {
