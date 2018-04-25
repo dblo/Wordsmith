@@ -205,7 +205,6 @@ PlayerSettings:
   tvOSSmallIconLayers: []
   tvOSSmallIconLayers2x: []
   tvOSLargeIconLayers: []
-  tvOSLargeIconLayers2x: []
   tvOSTopShelfImageLayers: []
   tvOSTopShelfImageLayers2x: []
   tvOSTopShelfImageWideLayers: []
@@ -644,7 +643,7 @@ PlayerSettings:
   facebookSdkVersion: 7.9.4
   apiCompatibilityLevel: 2
   cloudProjectId: 59a0d4e3-9e58-422f-9c76-454882893a87
-  projectName: WordSmith
+  projectName: Word Sea
   organizationId: olle
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0

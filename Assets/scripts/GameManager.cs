@@ -9,11 +9,12 @@ namespace OO {
     public class GameManager : NetworkBehaviour {
         [SerializeField] private WordSea wordSea;
         [SerializeField] private ButtonBar buttonBar;
-        [SerializeField] private ScorePanel scorePanel;
         [SerializeField] private Text roundDisplay;
         [SerializeField] private Text libraryNameDisplay;
-        private readonly List<LineLog> lineLogs = new List<LineLog>();
         private List<PlayerConnection> players;
+
+        [SerializeField] private ScorePanel scorePanelPrefab;
+        private readonly List<LineLog> lineLogs = new List<LineLog>();
         private ColorMapper colorWordMapper = new ColorMapper();
 
         public override void OnStartServer () {
@@ -162,7 +163,7 @@ namespace OO {
             wordSea.gameObject.SetActive(false);
 
             var canvas = GameObject.Find("Canvas");
-            var go = Instantiate(scorePanel, canvas.transform);
+            var go = Instantiate(scorePanelPrefab, canvas.transform);
             var sp = go.GetComponent<ScorePanel>();
 
             var maxScore = GameData.Library.GetTotalWordsPicked() * ColorMapper.GREEN_SCORE;
